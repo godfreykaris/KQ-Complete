@@ -1,0 +1,10 @@
+kqonline@ C:\Users\USER\Documents\4.1\COM 407 User Interface Design\KQ-Online\kqonline
++-- @types/react-dom@18.2.6
++-- @types/react@18.2.14
++-- @vitejs/plugin-react@4.0.2
++-- axios@1.4.0
++-- laravel-vite-plugin@0.7.8
++-- react-dom@18.2.0
++-- react@18.2.0
+`-- vite@4.4.2
+
