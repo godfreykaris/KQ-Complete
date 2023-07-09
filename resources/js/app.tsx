@@ -1,13 +1,21 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client';
 
 const App = () => {
     return (
-        <h1>Laravel SPA</h1>
+        <b><h1>Laravel SPA Wow</h1><hr /></b>
+        
     )
 }
 
-ReactDOM.render(
-    <App />,
-    document.getElementById('app')
-)
+const rootElement = document.getElementById('app');
+
+if (rootElement) 
+{
+    const root = createRoot(rootElement);
+
+    root.render
+    (
+        <App />
+    )
+}
