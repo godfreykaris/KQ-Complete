@@ -6,10 +6,27 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
-                'resources/js/app.tsx',
+                'resources/js/App.tsx',
             ],
             refresh: true,
         }),
         react(),
     ],
+
+    module: {
+        rules: [
+          {
+            test: /\.tsx?$/,
+            use: 'ts-loader',
+            exclude: /node_modules/,
+          },
+          {
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader'],
+          },
+        ],
+      },
+      resolve: {
+        extensions: ['.tsx', '.ts', '.js'],
+      },
 });
