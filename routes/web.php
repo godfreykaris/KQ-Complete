@@ -22,6 +22,6 @@ Route::get('/', function () {
 
 Route::get('/flights', [FlightsController::class, 'index']);
 
-Route::get('/ticket/{id}', [TicketsController::class, 'show']);
+Route::get('/ticket/{ticket_number}', [TicketsController::class, 'show']);
 
 Route::get('/available_destinations/{departure_destination}', [DestinationsController::class, 'show']);

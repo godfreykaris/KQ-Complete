@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class TicketsController extends Controller
 {
-    public function show($id)
+    public function show($ticket_number)
     {
         try 
         {
@@ -17,7 +17,7 @@ class TicketsController extends Controller
                                     JOIN flight_statuses fst ON t.flight_status_id = fst.id
                                     JOIN flights f ON t.flight_id = f.id
                                     JOIN seats s ON t.seat_id = s.id
-                                    WHERE t.id = ?', [$id]);
+                                    WHERE t.ticket_number = ?', [$ticket_number]);
         
             return response()->json($ticket[0]);
         } 

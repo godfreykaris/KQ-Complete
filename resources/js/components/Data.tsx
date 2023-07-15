@@ -10,7 +10,7 @@ const Data: React.FC = () => {
   const [data, setData] = useState<any[]>([]);
   const [links, setLinks] = useState<Link[]>([
     { id: 1, label: 'Fetch Flights', url: 'http://127.0.0.1:8000/flights' },
-    { id: 2, label: 'Fetch Ticket', url: 'http://127.0.0.1:8000/ticket/1' },
+    { id: 2, label: 'Fetch Ticket', url: 'http://127.0.0.1:8000/ticket/NA290856' },
     { id: 3, label: 'Available Destinations', url: 'http://127.0.0.1:8000/available_destinations/Nairobi' },
   ]);
 
