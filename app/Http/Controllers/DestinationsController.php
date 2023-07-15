@@ -33,7 +33,7 @@ class DestinationsController extends Controller
             // Log the exception or handle it as needed
             // For example:
             Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred. '], 500);
         }
     }
 }
