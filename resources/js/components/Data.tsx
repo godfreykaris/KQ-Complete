@@ -4,15 +4,8 @@ import React, { useState } from 'react';
 const Data: React.FC = () => {
   const [data, setData] = useState([]);
 
-  const fetchPlanes = () => {
-    fetch('http://127.0.0.1:8000/planes')
-      .then(response => response.json())
-      .then((data) => setData(data))
-      .catch(error => console.error(error));
-  };
-
-  const fetchSeats = () => {
-    fetch('http://127.0.0.1:8000/seats')
+  const fetchFlights = () => {
+    fetch('http://127.0.0.1:8000/flights')
       .then(response => response.json())
       .then((data) => setData(data))
       .catch(error => console.error(error));
@@ -20,8 +13,7 @@ const Data: React.FC = () => {
 
   return (
     <div>
-      <button onClick={fetchPlanes}>Fetch Planes</button>
-      <button onClick={fetchSeats}>Fetch Seats</button>
+      <button onClick={fetchFlights}>Fetch Flights</button>
       <pre>{JSON.stringify(data, null, 2)}</pre>
     </div>
   );

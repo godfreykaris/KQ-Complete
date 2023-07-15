@@ -1,8 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PlanesController;
-use App\Http\Controllers\SeatsController;
+use App\Http\Controllers\FlightsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +18,4 @@ Route::get('/', function () {
     return view('app');
 });
 
-Route::get('/planes', [PlanesController::class, 'index']);
-
-Route::get('/seats', [SeatsController::class, 'index']);
+Route::get('/flights', [FlightsController::class, 'index']);
