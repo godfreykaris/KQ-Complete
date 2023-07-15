@@ -18,10 +18,18 @@ const Data: React.FC = () => {
       .catch(error => console.error(error));
   };
 
+  const fetchAvailableDestinations = () => {
+    fetch('http://127.0.0.1:8000/available_destinations/Nairobi')
+      .then(response => response.json())
+      .then((data) => setData(data))
+      .catch(error => console.error(error));
+  };
+
   return (
     <div>
       <button onClick={fetchFlights}>Fetch Flights</button>
       <button onClick={fetchTicket}>Fetch Ticket</button>
+      <button onClick={fetchAvailableDestinations}>Available Destinations</button>
       <pre>{JSON.stringify(data, null, 2)}</pre>
     </div>
   );
