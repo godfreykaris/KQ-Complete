@@ -8,13 +8,16 @@
     "devDependencies": {
         "@types/react": "^18.2.14",
         "@types/react-dom": "^18.2.6",
-        "axios": "^1.1.2",
-        "laravel-vite-plugin": "^0.7.5",
-        "vite": "^4.0.0"
+        "axios": "^1.4.0",
+        "laravel-vite-plugin": "^0.7.8",
+        "vite": "^4.4.2"
     },
     "dependencies": {
         "@vitejs/plugin-react": "^4.0.2",
+        "css-loader": "^6.8.1",
         "react": "^18.2.0",
-        "react-dom": "^18.2.0"
+        "react-dom": "^18.2.0",
+        "style-loader": "^3.3.3",
+        "ts-loader": "^9.4.4"
     }
 }

@@ -3,6 +3,10 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\Flight;
+use App\Models\Seat;
+use App\Models\Ticket;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -12,11 +16,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        $this->call(PlanesTableSeeder::class);
+        $this->call(FlightClassesTableSeeder::class);
+        $this->call(SeatLocationsTableSeeder::class);
+        $this->call(DestinationsTableSeeder::class);
+        $this->call(FlightStatusesTableSeeder::class);
+        Seat::factory(100)->create();
+        Flight::factory(30)->create();
+        Ticket::factory(40)->create();
     }
 }
