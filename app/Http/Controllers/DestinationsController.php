@@ -21,7 +21,7 @@ class DestinationsController extends Controller
             } 
             else 
             {
-                return response()->json(['error' => 'The departure destination is non-existent!'], 500);
+                return response()->json(['error' => 'Unavaliable departure destination!'], 500);
 
             }
             
@@ -33,7 +33,7 @@ class DestinationsController extends Controller
             // Log the exception or handle it as needed
             // For example:
             Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred. '], 500);
+            return response()->json(['error' => 'An error occurred.'], 500);
         }
     }
 }
