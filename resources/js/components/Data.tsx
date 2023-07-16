@@ -13,7 +13,8 @@ const Data: React.FC = () => {
     { id: 2, label: 'Fetch Ticket', url: 'http://127.0.0.1:8000/ticket/NA290856' },
     { id: 3, label: 'Available Destinations', url: 'http://127.0.0.1:8000/available_destinations/Nairobi' },
     { id: 4, label: 'Add Booking', url: 'http://127.0.0.1:8000/bookings' },
-    { id: 5, label: 'Change Booking', url: 'http://127.0.0.1:8000/bookings/HCAXHP' },
+    { id: 5, label: 'Change Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}' },
+    { id: 6, label: 'Delete Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}'},
   ]);
 
   const fetchData = (url: string) => {
@@ -105,6 +106,23 @@ const Data: React.FC = () => {
     }
   };
 
+  const deleteBooking = () => {
+  const deleteBookingUrl = links.find((link) => link.id === 6)?.url;
+
+  if (deleteBookingUrl) {
+    fetch(deleteBookingUrl, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+};
+
   return (
     <div style={{ display: 'flex' }}>
       <div style={{ width: '50%', paddingRight: '1rem', borderRight: '1px solid #ccc' }}>
@@ -119,6 +137,10 @@ const Data: React.FC = () => {
                 </button>
               ) : link.label === 'Change Booking' ? (
                 <button onClick={changeBooking} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Delete Booking' ? (
+                <button onClick={deleteBooking} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
                 </button>
               ) : (

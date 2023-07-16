@@ -30,3 +30,6 @@ Route::get('/available_destinations/{departure_destination}', [DestinationsContr
 Route::post('/bookings', [BookingsController::class, 'store'])->name('bookings.store');
 
 Route::put('/bookings/{bookingReference}', [BookingsController::class, 'update'])->name('bookings.update');
+
+Route::delete('/bookings/{bookingReference}', [BookingsController::class, 'destroy'])->name('bookings.destroy');
+

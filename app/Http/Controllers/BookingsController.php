@@ -152,6 +152,10 @@ class BookingsController extends Controller
             // Retrieve the booking
             $booking = Booking::where('booking_reference', $bookingReference)->first();
 
+            if (!$booking) {
+                return response()->json(['error' => 'Booking not found.'], 404);
+            }
+
             // Validate the request data
             $validatedData = $request->validate([
                 'flight_id' => 'required|exists:flights,id',
@@ -206,7 +210,7 @@ class BookingsController extends Controller
             }
             else
             {
-                return response()->json(['error' => 'An error occurred. ' . $bookingReference], 500);
+                return response()->json(['error' => 'An error occurred. '], 500);
             }
 
 
@@ -233,8 +237,56 @@ class BookingsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $bookingReference)
     {
-        //
+        try {
+            // Retrieve the booking
+            $booking = Booking::where('booking_reference', $bookingReference)->first();
+
+            if (!$booking) {
+                return response()->json(['error' => 'Booking not found.'], 404);
+            }
+
+            // Delete the booking
+            $booking->delete();
+
+            // Update the associated ticket if necessary
+            $ticket = Ticket::where('booking_reference', $bookingReference)->first();
+            
+            if ($ticket)
+            {
+                $seat_id = $ticket->seat_id;
+
+                $ticket->delete();
+            }
+            else
+            {
+                return response()->json(['error' => 'Ticket not found. '], 500);
+            }
+
+
+            // Check if the selected seat is available
+            //$seat = DB::table('seats')->where('id', $validatedData['seat_id'])->first();
+
+            
+            // Update the seat availability
+            if ($seat_id) 
+            {               
+                Seat::where('id', $seat_id)->update(['is_available' => true]);
+            }
+            else
+            {
+                return response()->json(['error' => 'Seat not found. '], 500);
+            }
+
+            // Return a success response
+            return response()->json(['message' => 'Booking deleted successfully.']);
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error($e->getMessage());
+
+            // Return the error response
+            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+        }
     }
 }
