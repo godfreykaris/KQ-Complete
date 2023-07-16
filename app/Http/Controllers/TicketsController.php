@@ -5,19 +5,24 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+use App\Models\Ticket;
+
 class TicketsController extends Controller
 {
     public function show($ticket_number)
     {
         try 
         {
+            /** For testing only */
+            $randomTicketNumber = Ticket::pluck('ticket_number')->random();
+
             $ticket = DB::select('SELECT t.ticket_number, t.passenger_name, t.passenger_email, t.ticket_price, t.booking_reference,
                                      t.boarding_pass, fst.name AS flight_status_name, f.flight_number AS flight_number, s.seat_number AS seat_number
                                     FROM tickets t
                                     JOIN flight_statuses fst ON t.flight_status_id = fst.id
                                     JOIN flights f ON t.flight_id = f.id
                                     JOIN seats s ON t.seat_id = s.id
-                                    WHERE t.ticket_number = ?', [$ticket_number]);
+                                    WHERE t.ticket_number = ?', [$randomTicketNumber]);
         
             return response()->json($ticket[0]);
         } 
