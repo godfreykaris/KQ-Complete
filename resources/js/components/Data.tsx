@@ -12,6 +12,7 @@ const Data: React.FC = () => {
     { id: 1, label: 'Fetch Flights', url: 'http://127.0.0.1:8000/flights' },
     { id: 2, label: 'Fetch Ticket', url: 'http://127.0.0.1:8000/ticket/NA290856' },
     { id: 3, label: 'Available Destinations', url: 'http://127.0.0.1:8000/available_destinations/Nairobi' },
+    { id: 4, label: 'Add Booking', url: 'http://127.0.0.1:8000/bookings' },
   ]);
 
   const fetchData = (url: string) => {
@@ -52,6 +53,29 @@ const Data: React.FC = () => {
     });
   }, [links]);
 
+  const addBooking = () => {
+    const bookingData = {
+      flight_id: 1,
+      class_id: 1,
+      seat_id: 3,
+      passenger_name: 'John Doe',
+      passenger_email: 'johndoe@example.com',
+      // Add other booking details
+    };
+
+    fetch('http://127.0.0.1:8000/bookings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+      },
+      body: JSON.stringify(bookingData),
+    })
+      .then(response => response.json())
+      .then(data => setData(data))
+      .catch(error => console.error(error));
+  };
+
   return (
     <div style={{ display: 'flex' }}>
       <div style={{ width: '50%', paddingRight: '1rem', borderRight: '1px solid #ccc' }}>
@@ -59,8 +83,16 @@ const Data: React.FC = () => {
         {links.map(link => (
           <div key={link.id} style={{ marginBottom: '1rem' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <p style={{ marginRight: '1rem', marginBottom: '0.5rem' , color: 'rgb(94, 129, 157)' }}>{link.label}</p>
-              <button onClick={() => fetchData(link.url)} style={{ backgroundColor: 'rgb(0,128,128)', marginBottom: '0.1rem' }}>{link.label}</button>
+              <p style={{ marginRight: '1rem', marginBottom: '0.5rem', color: 'rgb(94, 129, 157)' }}>{link.label}</p>
+              {link.label === 'Add Booking' ? (
+                <button onClick={addBooking} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : (
+                <button onClick={() => fetchData(link.url)} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              )}
             </div>
             <div>
               <input
@@ -68,7 +100,7 @@ const Data: React.FC = () => {
                 value={link.url}
                 onChange={e => handleUrlChange(e, link.id)}
                 ref={inputRef => (inputRefs.current[link.id] = inputRef)}
-                style={{ width: 'auto'}}
+                style={{ width: 'auto' }}
               />
             </div>
           </div>
@@ -80,8 +112,6 @@ const Data: React.FC = () => {
       </div>
     </div>
   );
-  
-   
 };
 
 export default Data;

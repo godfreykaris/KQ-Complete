@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('flight_id')->constrained('flights');
+            $table->foreignId('flight_class_id')->constrained('flight_classes');
             $table->foreignId('seat_id')->constrained('seats');
             $table->string('passenger_name');
             $table->string('passenger_email');
