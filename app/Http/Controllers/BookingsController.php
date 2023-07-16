@@ -210,7 +210,7 @@ class BookingsController extends Controller
             }
             else
             {
-                return response()->json(['error' => 'An error occurred. '], 500);
+                return response()->json(['error' => 'Ticket not found. '], 500);
             }
 
 
