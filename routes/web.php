@@ -28,3 +28,5 @@ Route::get('/ticket/{ticket_number}', [TicketsController::class, 'show']);
 Route::get('/available_destinations/{departure_destination}', [DestinationsController::class, 'show']);
 
 Route::post('/bookings', [BookingsController::class, 'store'])->name('bookings.store');
+
+Route::put('/bookings/{bookingReference}', [BookingsController::class, 'update'])->name('bookings.update');

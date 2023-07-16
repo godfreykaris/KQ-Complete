@@ -13,6 +13,7 @@ const Data: React.FC = () => {
     { id: 2, label: 'Fetch Ticket', url: 'http://127.0.0.1:8000/ticket/NA290856' },
     { id: 3, label: 'Available Destinations', url: 'http://127.0.0.1:8000/available_destinations/Nairobi' },
     { id: 4, label: 'Add Booking', url: 'http://127.0.0.1:8000/bookings' },
+    { id: 5, label: 'Change Booking', url: 'http://127.0.0.1:8000/bookings/HCAXHP' },
   ]);
 
   const fetchData = (url: string) => {
@@ -40,6 +41,7 @@ const Data: React.FC = () => {
       return link;
     });
     setLinks(updatedLinks);
+    
   };
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -76,6 +78,33 @@ const Data: React.FC = () => {
       .catch(error => console.error(error));
   };
 
+  const changeBooking = () => {
+    const bookingData = {
+      flight_id: 1,
+      class_id: 1,
+      seat_id: 3,
+      passenger_name: 'John Doe',
+      passenger_email: 'johndoe@example.com',
+      // Add other booking details
+    };
+
+    const changeBookingUrl = links.find((link) => link.id === 5)?.url;
+
+    if (changeBookingUrl) {
+      fetch(changeBookingUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        },
+        body: JSON.stringify(bookingData),
+      })
+        .then((response) => response.json())
+        .then((data) => setData(data))
+        .catch((error) => console.error(error));
+    }
+  };
+
   return (
     <div style={{ display: 'flex' }}>
       <div style={{ width: '50%', paddingRight: '1rem', borderRight: '1px solid #ccc' }}>
@@ -88,11 +117,16 @@ const Data: React.FC = () => {
                 <button onClick={addBooking} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
                 </button>
+              ) : link.label === 'Change Booking' ? (
+                <button onClick={changeBooking} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
               ) : (
                 <button onClick={() => fetchData(link.url)} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
                 </button>
               )}
+
             </div>
             <div>
               <input
