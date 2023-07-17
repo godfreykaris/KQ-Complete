@@ -17,8 +17,9 @@ const Data: React.FC = () => {
     { id: 6, label: 'Delete Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}'},
     { id: 7, label: 'Guest Booking Inquiry', url: 'http://127.0.0.1:8000/booking_inquiry/guest'},
     { id: 8, label: 'Register A User', url: 'http://127.0.0.1:8000/users/register'},
+    { id: 9, label: 'Registerd User Booking Inquiry', url: 'http://127.0.0.1:8000/booking_inquiry/registered_user'},
   ]);
-
+  
   const fetchData = (url: string) => {
     fetch(url)
       .then(response => response.json())
@@ -176,6 +177,35 @@ const registerUser = () => {
       .catch((error) => console.error(error));
   }
 };
+
+const accountBasedBookingInquiry = () => {
+  const bookingInquiryData = {
+    user_id: 1,
+    booking_inquiry_type_id: 1,
+    name: 'John Doe',
+    email: 'johndoe@example.com',
+    subject: 'Booking cancellation',
+    message: 'I need to cancel the booking with this reference number CSJFGHJ.',
+    // Add other booking details
+  };
+
+  const accountBasedBookingInquiryUrl = links.find((link) => link.id === 9)?.url;
+
+  if (accountBasedBookingInquiryUrl) {
+    fetch(accountBasedBookingInquiryUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify(bookingInquiryData),
+    })
+      .then((response) => response.json())
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+};
+
   return (
     <div style={{ display: 'flex' }}>
       <div style={{ width: '50%', paddingRight: '1rem', borderRight: '1px solid #ccc' }}>
@@ -202,6 +232,10 @@ const registerUser = () => {
                 </button>
               ) :  link.label === 'Register A User' ? (
                 <button onClick={registerUser} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Registerd User Booking Inquiry' ? (
+                <button onClick={accountBasedBookingInquiry} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
                 </button>
               ) :(

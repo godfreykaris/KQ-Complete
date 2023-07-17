@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\BookingInquiryType;
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class GuestBookingInquiriesTableSeeder extends Seeder
+use App\Models\BookingInquiryType;
+
+class AccountBasedBookingInquiriesTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -17,7 +17,6 @@ class GuestBookingInquiriesTableSeeder extends Seeder
         [
             'name' => fake()->name,
             'email' => fake()->email,
-            'user_id' => User::pluck('id')->random(),
             'booking_inquiry_type_id' => BookingInquiryType::pluck('id')->random(),
             'subject' => fake()->sentence,
             'message' => fake()->paragraph,

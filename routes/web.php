@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountBasedBookingInquiriesController;
 use App\Http\Controllers\DestinationsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FlightsController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\TicketsController;
 use App\Http\Controllers\BookingsController;
 use App\Http\Controllers\GuestBookingInquiryController;
 use App\Http\Controllers\UsersController;
+use App\Models\AccountBasedBookingInquiry;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,4 +38,5 @@ Route::put('/bookings/{bookingReference}', [BookingsController::class, 'update']
 Route::delete('/bookings/{bookingReference}', [BookingsController::class, 'destroy'])->name('bookings.destroy');
 
 Route::post('/booking_inquiry/guest', [GuestBookingInquiryController::class, 'store'])->name('guest_booking_inquiry.store');
+Route::post('/booking_inquiry/registered_user', [AccountBasedBookingInquiriesController::class, 'store'])->name('account_based_booking_inquiry.store');
 
