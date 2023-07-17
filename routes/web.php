@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FlightsController;
 use App\Http\Controllers\TicketsController;
 use App\Http\Controllers\BookingsController;
+use App\Http\Controllers\GuestBookingInquiryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,8 +29,7 @@ Route::get('/ticket/{ticket_number}', [TicketsController::class, 'show']);
 Route::get('/available_destinations/{departure_destination}', [DestinationsController::class, 'show']);
 
 Route::post('/bookings', [BookingsController::class, 'store'])->name('bookings.store');
-
 Route::put('/bookings/{bookingReference}', [BookingsController::class, 'update'])->name('bookings.update');
-
 Route::delete('/bookings/{bookingReference}', [BookingsController::class, 'destroy'])->name('bookings.destroy');
 
+Route::post('/booking_inquiry/guest', [GuestBookingInquiryController::class, 'store'])->name('bookings.store');
