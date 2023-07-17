@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\BookingInquiryType;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -21,5 +22,10 @@ class BookingInquiryTypesSeeder extends Seeder
             // ['name' => 'Seat Inquiry'],
             // ['name' => 'Schedule Inquiry'],
         ];
+
+        foreach($bookingInquiryTypes as $key => $value)
+        {
+            BookingInquiryType::create($value);
+        }
     }
 }

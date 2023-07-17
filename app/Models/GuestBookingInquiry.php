@@ -9,5 +9,5 @@ class GuestBookingInquiry extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'email', 'subject', 'message', 'inquiry_type_id'];
+    protected $fillable = ['name', 'email', 'subject', 'message', 'booking_inquiry_type_id'];
 }

@@ -32,4 +32,4 @@ Route::post('/bookings', [BookingsController::class, 'store'])->name('bookings.s
 Route::put('/bookings/{bookingReference}', [BookingsController::class, 'update'])->name('bookings.update');
 Route::delete('/bookings/{bookingReference}', [BookingsController::class, 'destroy'])->name('bookings.destroy');
 
-Route::post('/booking_inquiry/guest', [GuestBookingInquiryController::class, 'store'])->name('bookings.store');
+Route::post('/booking_inquiry/guest', [GuestBookingInquiryController::class, 'store'])->name('guest_booking_inquiry.store');

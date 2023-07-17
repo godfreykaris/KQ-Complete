@@ -15,7 +15,7 @@ const Data: React.FC = () => {
     { id: 4, label: 'Add Booking', url: 'http://127.0.0.1:8000/bookings' },
     { id: 5, label: 'Change Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}' },
     { id: 6, label: 'Delete Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}'},
-    { id: 7, label: 'Guest Booking Inquiry', url: 'http://127.0.0.1:8000/booking_inquiry/guests'},
+    { id: 7, label: 'Guest Booking Inquiry', url: 'http://127.0.0.1:8000/booking_inquiry/guest'},
   ]);
 
   const fetchData = (url: string) => {
@@ -138,7 +138,7 @@ const guestBookingInquiry = () => {
 
   if (guestBookingInquiryUrl) {
     fetch(guestBookingInquiryUrl, {
-      method: 'PUT',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',

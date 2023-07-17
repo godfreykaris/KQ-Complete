@@ -18,7 +18,7 @@ class GuestBookingInquiriesTableSeeder extends Seeder
             'email' => fake()->email,
             'booking_inquiry_type_id' => BookingInquiryType::pluck('id')->random(),
             'subject' => fake()->sentence,
-            'message' => fake()->sentence,
+            'message' => fake()->paragraph,
         ];
     }
 }
