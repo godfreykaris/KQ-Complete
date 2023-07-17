@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SeatLocationsTableSeeder::class);
         $this->call(DestinationsTableSeeder::class);
         $this->call(FlightStatusesTableSeeder::class);
+        $this->call(BookingInquiryTypesSeeder::class);
         Seat::factory(100)->create();
         Flight::factory(30)->create();
         Ticket::factory(40)->create();
