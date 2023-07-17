@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('booking_inquiry_types', function (Blueprint $table) 
-        {
+        Schema::create('guest_booking_inquiries', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('email')->nullable(false);
+            $table->string('subject');
+            $table->text('message');
+            $table->foreignId('booking_inquiry_type_id')->constrained('booking_inquiry_types')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('booking_inquiry_types');
+        Schema::dropIfExists('guest_booking_inquiries');
     }
 };
