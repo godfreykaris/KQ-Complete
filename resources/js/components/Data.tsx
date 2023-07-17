@@ -16,6 +16,7 @@ const Data: React.FC = () => {
     { id: 5, label: 'Change Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}' },
     { id: 6, label: 'Delete Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}'},
     { id: 7, label: 'Guest Booking Inquiry', url: 'http://127.0.0.1:8000/booking_inquiry/guest'},
+    { id: 8, label: 'Register A User', url: 'http://127.0.0.1:8000/users/register'},
   ]);
 
   const fetchData = (url: string) => {
@@ -150,6 +151,31 @@ const guestBookingInquiry = () => {
       .catch((error) => console.error(error));
   }
 };
+
+const registerUser = () => {
+  const registerUserData = {
+    name: 'John Doe',
+    email: 'johndoe@example.com',
+    password: 'jdskfbvdijkdbhadh',
+    // Add other booking details
+  };
+
+  const registerUserUrl = links.find((link) => link.id === 8)?.url;
+
+  if (registerUserUrl) {
+    fetch(registerUserUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify(registerUserData),
+    })
+      .then((response) => response.json())
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+};
   return (
     <div style={{ display: 'flex' }}>
       <div style={{ width: '50%', paddingRight: '1rem', borderRight: '1px solid #ccc' }}>
@@ -172,6 +198,10 @@ const guestBookingInquiry = () => {
                 </button>
               ) : link.label === 'Guest Booking Inquiry' ? (
                 <button onClick={guestBookingInquiry} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) :  link.label === 'Register A User' ? (
+                <button onClick={registerUser} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
                 </button>
               ) :(

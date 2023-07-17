@@ -23,7 +23,7 @@ Route::get('/', function () {
     return view('app');
 });
 
-Route::post('/users/register', [UsersController::class, 'store'])->name('user_register.store');
+Route::post('/users/register', [UsersController::class, 'register'])->name('user_register.store');
 
 Route::get('/flights', [FlightsController::class, 'index']);
 
