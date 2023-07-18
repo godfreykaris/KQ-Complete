@@ -20,6 +20,7 @@ const Data: React.FC = () => {
     { id: 9, label: 'Registerd User Booking Inquiry', url: 'http://127.0.0.1:8000/booking_inquiry/registered_user'},
     { id: 10, label: 'Add Passengers', url: 'http://127.0.0.1:8000/passengers/add/{booking_reference}'},
     { id: 11, label: 'Delete Passenger', url: 'http://127.0.0.1:8000/passengers/delete/{passengerId}'},
+    { id: 12, label: 'Change Passenger', url: 'http://127.0.0.1:8000/passengers/change/{passengerId}'},
     
   ]);
   
@@ -357,6 +358,42 @@ const deletePassenger = () => {
   });
 };
 
+const changePassenger = () => {
+  const passengerData = {
+    'name' : 'John Doe',
+    'date_of_birth' : '2022-08-12', // Convert the date format to 'YYYY-MM-DD'
+    
+  };
+
+  const  changePassengerUrl = links.find((link) => link.id === 12)?.url;
+
+  if (changePassengerUrl) {
+    fetch(changePassengerUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify(passengerData),
+    })
+      .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
   return (
     <div style={{ display: 'flex' }}>
       <div style={{ width: '50%', paddingRight: '1rem', borderRight: '1px solid #ccc' }}>
@@ -395,6 +432,10 @@ const deletePassenger = () => {
                 </button>
               ) : link.label === 'Delete Passenger' ? (
                 <button onClick={deletePassenger} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Change Passenger' ? (
+                <button onClick={changePassenger} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
                 </button>
               ) :(

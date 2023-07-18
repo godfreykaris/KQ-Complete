@@ -83,14 +83,21 @@ class PassengersController extends Controller
             ]);
 
             // Retrieve the booking
-            $passenger = Passenger::where('passenger_id', $passengerId)->first();
+            $passenger = Passenger::where('id', $passengerId)->first();
 
             if (!$passenger) {
-                return response()->json(['error' => 'Booking not found.'], 404);
+                return response()->json(['error' => 'Passenger not found.'], 404);
             }
 
             // Update the passenger details
-            $passenger->update($validatedData);
+           // $passenger->update($validatedData);
+
+            /** For testing only */
+            $passenger->update([
+                'name' => fake()->name,
+                'date_of_birth' => fake()->date,
+
+            ]);
 
             return response()->json([ 'passenger' => $passenger, 'info' => 'Passenger updated successfully', 'status' => 1]);
         } catch (\Exception $e) {
