@@ -13,6 +13,5 @@ class Passenger extends Model
         'booking_id',
         'name',
         'date_of_birth',
-        'gender',
     ];
 }

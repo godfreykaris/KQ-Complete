@@ -57,6 +57,7 @@ class BookingsController extends Controller
                 
                     'passenger_name' => 'required|string',
                     'passenger_email' => 'required|email',
+                    'date_of_birth' => 'required|date',
                 
                 ]);
             
@@ -80,7 +81,8 @@ class BookingsController extends Controller
                 $booking = Booking::create([
                     // 'flight_id' => $validatedData['flight_id'],
                     // 'flight_class_id' => $validatedData['class_id'],
-                    // 'seat_id' => $validatedData['seat_id'],          
+                    // 'seat_id' => $validatedData['seat_id'],   
+                    //'date_of_birth' => $validatedData['date_of_birth'],       
                     // 'passenger_name' => $validatedData['passenger_name'],
                     // 'passenger_email' => $validatedData['passenger_email'],
 
@@ -90,7 +92,7 @@ class BookingsController extends Controller
                     'seat_id' => $seat->id,          
                     'passenger_name' => fake()->name,
                     'passenger_email' => fake()->safeEmail,
-
+                    'date_of_birth' => fake()->date,
                     'booking_reference' => fake()->unique()->regexify('[A-Z0-9]{6}'),
                     'booking_date' => fake()->dateTime(),
                 ]);
@@ -101,6 +103,7 @@ class BookingsController extends Controller
                     'ticket_number' => fake()->unique()->regexify('[A-Z]{2}\d{6}'),
                     'passenger_name' => $booking->passenger_name,
                     'passenger_email' => $booking->passenger_email,
+                    ///Date of birth
                     'ticket_price' => fake()->randomFloat(2, 100, 1000),
                     'booking_reference' => $booking->booking_reference,
                     'boarding_pass' => fake()->unique()->regexify('[A-Z0-9]{10}'),
