@@ -253,6 +253,9 @@ class BookingsController extends Controller
             // Delete the booking
             $booking->delete();
 
+            // Delete the associated passengers
+            $booking->passengers()->delete();
+
             // Update the associated ticket if necessary
             $ticket = Ticket::where('booking_reference', $bookingReference)->first();
             

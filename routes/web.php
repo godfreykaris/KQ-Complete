@@ -7,6 +7,7 @@ use App\Http\Controllers\FlightsController;
 use App\Http\Controllers\TicketsController;
 use App\Http\Controllers\BookingsController;
 use App\Http\Controllers\GuestBookingInquiryController;
+use App\Http\Controllers\PassengersController;
 use App\Http\Controllers\UsersController;
 use App\Models\AccountBasedBookingInquiry;
 
@@ -40,3 +41,6 @@ Route::delete('/bookings/{bookingReference}', [BookingsController::class, 'destr
 Route::post('/booking_inquiry/guest', [GuestBookingInquiryController::class, 'store'])->name('guest_booking_inquiry.store');
 Route::post('/booking_inquiry/registered_user', [AccountBasedBookingInquiriesController::class, 'store'])->name('account_based_booking_inquiry.store');
 
+Route::post('/bookings/{bookingReference}/passengers', [PassengersController::class, 'addPassenger'])->name('passengers.add');
+Route::delete('/passengers/{passengerId}', [PassengerController::class, 'deletePassenger'])->name('passengers.delete');
+Route::put('/passengers/{passengerId}', [PassengerController::class, 'updatePassenger'])->name('passengers.update');

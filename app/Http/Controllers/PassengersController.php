@@ -50,7 +50,7 @@ class PassengersController extends Controller
         try
         {
             // Retrieve the booking
-            $passenger = Booking::where('passenger_id', $passengerId)->first();
+            $passenger = Passenger::where('passenger_id', $passengerId)->first();
 
             if (!$passenger) {
                 return response()->json(['error' => 'Booking not found.'], 404);
@@ -80,8 +80,12 @@ class PassengersController extends Controller
                 'date_of_birth' => 'required|date',
             ]);
 
-            // Retrieve the passenger
-            $passenger = Passenger::findOrFail($passengerId);
+            // Retrieve the booking
+            $passenger = Passenger::where('passenger_id', $passengerId)->first();
+
+            if (!$passenger) {
+                return response()->json(['error' => 'Booking not found.'], 404);
+            }
 
             // Update the passenger details
             $passenger->update($validatedData);
