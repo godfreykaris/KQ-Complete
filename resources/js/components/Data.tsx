@@ -66,6 +66,7 @@ const Data: React.FC = () => {
       seat_id: 3,
       passenger_name: 'John Doe',
       passenger_email: 'johndoe@example.com',
+      date_of_birth: "8/12/22",
       // Add other booking details
     };
 
@@ -89,6 +90,7 @@ const Data: React.FC = () => {
       seat_id: 3,
       passenger_name: 'John Doe',
       passenger_email: 'johndoe@example.com',
+      date_of_birth: "8/12/22",
       // Add other booking details
     };
 

@@ -15,8 +15,15 @@ class Booking extends Model
         'seat_id',
         'passenger_name',
         'passenger_email',
+        'date_of_birth',
         'booking_reference',
         'booking_date',
+        
     ];
+
+    public function passengers()
+    {
+        return $this->hasMany(Passenger::class);
+    }
     
 }

@@ -166,6 +166,7 @@ class BookingsController extends Controller
                 'seat_id' => 'required|exists:seats,id',
                 'passenger_name' => 'required|string',
                 'passenger_email' => 'required|email',
+                'date_of_birth' => 'required|date',
             ]);
 
             // Retrieve the selected flight and check if it's available
@@ -191,6 +192,7 @@ class BookingsController extends Controller
                 // 'seat_id' => $validatedData['seat_id'],
                 // 'passenger_name' => $validatedData['passenger_name'],
                 // 'passenger_email' => $validatedData['passenger_email'],
+                // 'date_of_birth' => $validatedData['date_of_birth'],
 
                 /**For testing only */
                 'flight_id' => Flight::pluck('id')->random(),
@@ -198,6 +200,7 @@ class BookingsController extends Controller
                 'seat_id' => $seat->id,          
                 'passenger_name' => fake()->name,
                 'passenger_email' => fake()->safeEmail,
+                'date_of_birth' => fake()->date,
             ]);
 
             // Update the associated ticket if necessary
@@ -250,12 +253,6 @@ class BookingsController extends Controller
                 return response()->json(['error' => 'Booking not found.'], 404);
             }
 
-            // Delete the booking
-            $booking->delete();
-
-            // Delete the associated passengers
-            $booking->passengers()->delete();
-
             // Update the associated ticket if necessary
             $ticket = Ticket::where('booking_reference', $bookingReference)->first();
             
@@ -284,6 +281,14 @@ class BookingsController extends Controller
             {
                 return response()->json(['error' => 'Seat not found. '], 500);
             }
+
+            // Delete the associated passengers
+            $booking->passengers()->delete();
+            
+            // Delete the booking
+            $booking->delete();
+
+            
 
             // Return a success response
             return response()->json(['message' => 'Booking deleted successfully.']);

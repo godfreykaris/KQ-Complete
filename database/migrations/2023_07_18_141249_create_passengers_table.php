@@ -13,10 +13,8 @@ return new class extends Migration
     {
         Schema::create('passengers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('booking_id');
             $table->string('name');
             $table->date('date_of_birth');
-            $table->string('gender');
             $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade');
             $table->timestamps();
         });
