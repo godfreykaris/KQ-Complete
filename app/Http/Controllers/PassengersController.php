@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class PassengersController extends Controller
 {
-    public function addPassenger(Request $request, $bookingReference)
+    public function addPassengers(Request $request, $bookingReference)
     {
         try
         {
@@ -27,12 +27,14 @@ class PassengersController extends Controller
             ]);
 
             // Create and save the new passengers
+            $addedPassengers = [];
             foreach ($passengersData['passengers'] as $passengerData) {
                 $passenger = new Passenger($passengerData);
                 $booking->passengers()->save($passenger);
+                $addedPassengers[] = $passenger->toArray(); // Convert passenger object to an array and store it
             }
 
-            return response()->json(['passengers' => $passengersData, 'status' => 1]);
+            return response()->json(['passengers' => $addedPassengers, 'status' => 1]);
         }
         catch (\Exception $e) {
             // Log the error
@@ -50,13 +52,13 @@ class PassengersController extends Controller
         try
         {
             // Retrieve the booking
-            $passenger = Passenger::where('passenger_id', $passengerId)->first();
+            $passenger = Passenger::where('id', $passengerId)->first();
 
             if (!$passenger) {
-                return response()->json(['error' => 'Booking not found.'], 404);
+                return response()->json(['error' => 'Passenger not found.'], 404);
             }
 
-            // Delete the booking
+            // Delete the passenger
             $passenger->delete();
 
             return response()->json(['info' =>"Passenger deleted successfully", 'status' => 1]);

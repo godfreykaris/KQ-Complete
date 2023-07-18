@@ -19,6 +19,7 @@ const Data: React.FC = () => {
     { id: 8, label: 'Register A User', url: 'http://127.0.0.1:8000/users/register'},
     { id: 9, label: 'Registerd User Booking Inquiry', url: 'http://127.0.0.1:8000/booking_inquiry/registered_user'},
     { id: 10, label: 'Add Passengers', url: 'http://127.0.0.1:8000/passengers/add/{booking_reference}'},
+    { id: 11, label: 'Delete Passenger', url: 'http://127.0.0.1:8000/passengers/delete/{passengerId}'},
     
   ]);
   
@@ -80,7 +81,13 @@ const Data: React.FC = () => {
       },
       body: JSON.stringify(bookingData),
     })
-      .then(response => response.json())
+      .then(response => {
+        if (response.headers.get('content-type')?.includes('application/json')) {
+          return response.json(); // Extract the response as JSON
+        } else {
+          return response.text(); // Extract the response as text
+        }
+    })
       .then(data => setData(data))
       .catch(error => console.error(error));
 
@@ -113,7 +120,13 @@ const Data: React.FC = () => {
         },
         body: JSON.stringify(bookingData),
       })
-        .then((response) => response.json())
+        .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
         .then((data) => setData(data))
         .catch((error) => console.error(error));
     }
@@ -136,7 +149,13 @@ const Data: React.FC = () => {
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
       },
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.headers.get('content-type')?.includes('application/json')) {
+          return response.json(); // Extract the response as JSON
+        } else {
+          return response.text(); // Extract the response as text
+        }
+    })
       .then((data) => setData(data))
       .catch((error) => console.error(error));
   }
@@ -169,7 +188,13 @@ const guestBookingInquiry = () => {
       },
       body: JSON.stringify(bookingInquiryData),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.headers.get('content-type')?.includes('application/json')) {
+          return response.json(); // Extract the response as JSON
+        } else {
+          return response.text(); // Extract the response as text
+        }
+    })
       .then((data) => setData(data))
       .catch((error) => console.error(error));
   }
@@ -201,7 +226,13 @@ const registerUser = () => {
       },
       body: JSON.stringify(registerUserData),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.headers.get('content-type')?.includes('application/json')) {
+          return response.json(); // Extract the response as JSON
+        } else {
+          return response.text(); // Extract the response as text
+        }
+    })
       .then((data) => setData(data))
       .catch((error) => console.error(error));
   }
@@ -235,7 +266,13 @@ const accountBasedBookingInquiry = () => {
       },
       body: JSON.stringify(bookingInquiryData),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.headers.get('content-type')?.includes('application/json')) {
+          return response.json(); // Extract the response as JSON
+        } else {
+          return response.text(); // Extract the response as text
+        }
+    })
       .then((data) => setData(data))
       .catch((error) => console.error(error));
   }
@@ -272,7 +309,43 @@ const addPassengers = () => {
       },
       body: JSON.stringify({ passengers: passengersData }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
+const deletePassenger = () => {
+  
+  const deletePassengerUrl = links.find((link) => link.id === 11)?.url;
+
+  if (deletePassengerUrl) {
+    fetch(deletePassengerUrl, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      }
+    })
+      .then((response) => {
+        if (response.headers.get('content-type')?.includes('application/json')) {
+          return response.json(); // Extract the response as JSON
+        } else {
+          return response.text(); // Extract the response as text
+        }
+    })
       .then((data) => setData(data))
       .catch((error) => console.error(error));
   }
@@ -320,6 +393,10 @@ const addPassengers = () => {
                 <button onClick={addPassengers} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
                 </button>
+              ) : link.label === 'Delete Passenger' ? (
+                <button onClick={deletePassenger} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
               ) :(
                 <button onClick={() => fetchData(link.url)} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
@@ -341,7 +418,11 @@ const addPassengers = () => {
       </div>
       <div style={{ width: '50%', paddingLeft: '1rem' }}>
         <h2>Output:</h2>
-        <pre>{JSON.stringify(data, null, 2)}</pre>
+        {typeof data === 'object' ? (
+           <pre>{JSON.stringify(data, null, 2)}</pre> // Render as formatted JSON
+         ) : (
+           <p>{data}</p> // Render as plain text
+        )}
       </div>
     </div>
   );

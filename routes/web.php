@@ -41,6 +41,6 @@ Route::delete('/bookings/{bookingReference}', [BookingsController::class, 'destr
 Route::post('/booking_inquiry/guest', [GuestBookingInquiryController::class, 'store'])->name('guest_booking_inquiry.store');
 Route::post('/booking_inquiry/registered_user', [AccountBasedBookingInquiriesController::class, 'store'])->name('account_based_booking_inquiry.store');
 
-Route::post('/passengers/add/{booking_reference}', [PassengersController::class, 'addPassenger'])->name('passengers.add');
-Route::delete('/passengers/delete/{passengerId}', [PassengerController::class, 'deletePassenger'])->name('passengers.delete');
-Route::put('/passengers/change/{passengerId}', [PassengerController::class, 'updatePassenger'])->name('passengers.update');
+Route::post('/passengers/add/{booking_reference}', [PassengersController::class, 'addPassengers'])->name('passengers.add');
+Route::delete('/passengers/delete/{passengerId}', [PassengersController::class, 'deletePassenger'])->name('passengers.delete');
+Route::put('/passengers/change/{passengerId}', [PassengersController::class, 'updatePassenger'])->name('passengers.update');
