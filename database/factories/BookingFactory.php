@@ -24,6 +24,7 @@ class BookingFactory extends Factory
             
             'passenger_name' => fake()->name,
             'passenger_email' => fake()->safeEmail,
+            'date_of_birth' => fake()->date,
             'booking_reference' => fake()->unique()->regexify('[A-Z0-9]{6}'),
             'booking_date' => fake()->dateTime(),
             'flight_id' => Flight::pluck('id')->random(),

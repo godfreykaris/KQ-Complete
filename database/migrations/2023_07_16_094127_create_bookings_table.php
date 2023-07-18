@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('seat_id')->constrained('seats');
             $table->string('passenger_name');
             $table->string('passenger_email');
+            $table->date('date_of_birth');
             $table->string('booking_reference');
             $table->dateTime('booking_date');
             $table->timestamps();
