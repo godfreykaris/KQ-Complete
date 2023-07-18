@@ -18,6 +18,8 @@ const Data: React.FC = () => {
     { id: 7, label: 'Guest Booking Inquiry', url: 'http://127.0.0.1:8000/booking_inquiry/guest'},
     { id: 8, label: 'Register A User', url: 'http://127.0.0.1:8000/users/register'},
     { id: 9, label: 'Registerd User Booking Inquiry', url: 'http://127.0.0.1:8000/booking_inquiry/registered_user'},
+    { id: 10, label: 'Add Passengers', url: 'http://127.0.0.1:8000/passengers/add/{booking_reference}'},
+    
   ]);
   
   const fetchData = (url: string) => {
@@ -81,6 +83,12 @@ const Data: React.FC = () => {
       .then(response => response.json())
       .then(data => setData(data))
       .catch(error => console.error(error));
+
+    // Scroll to the top of the page to view the output
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
   };
 
   const changeBooking = () => {
@@ -109,6 +117,12 @@ const Data: React.FC = () => {
         .then((data) => setData(data))
         .catch((error) => console.error(error));
     }
+
+    // Scroll to the top of the page to view the output
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
   };
 
   const deleteBooking = () => {
@@ -126,6 +140,12 @@ const Data: React.FC = () => {
       .then((data) => setData(data))
       .catch((error) => console.error(error));
   }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
 };
 
 const guestBookingInquiry = () => {
@@ -153,6 +173,13 @@ const guestBookingInquiry = () => {
       .then((data) => setData(data))
       .catch((error) => console.error(error));
   }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+
 };
 
 const registerUser = () => {
@@ -178,6 +205,12 @@ const registerUser = () => {
       .then((data) => setData(data))
       .catch((error) => console.error(error));
   }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
 };
 
 const accountBasedBookingInquiry = () => {
@@ -206,6 +239,49 @@ const accountBasedBookingInquiry = () => {
       .then((data) => setData(data))
       .catch((error) => console.error(error));
   }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
+const addPassengers = () => {
+  const passengersData = [
+    {
+      name: 'John Doe',
+      date_of_birth: '2022-08-12', // Convert the date format to 'YYYY-MM-DD'
+      // Add other passenger details
+    },
+    {
+      name: 'Jane Smith',
+      date_of_birth: '2023-10-15', // Convert the date format to 'YYYY-MM-DD'
+      // Add other passenger details
+    },
+  ];
+
+  const addPassengersUrl = links.find((link) => link.id === 10)?.url;
+
+  if (addPassengersUrl) {
+    fetch(addPassengersUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify({ passengers: passengersData }),
+    })
+      .then((response) => response.json())
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
 };
 
   return (
@@ -238,6 +314,10 @@ const accountBasedBookingInquiry = () => {
                 </button>
               ) : link.label === 'Registerd User Booking Inquiry' ? (
                 <button onClick={accountBasedBookingInquiry} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Add Passengers' ? (
+                <button onClick={addPassengers} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
                 </button>
               ) :(
