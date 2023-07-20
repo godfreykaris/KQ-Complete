@@ -6,6 +6,8 @@ namespace Database\Seeders;
 
 use App\Models\Booking;
 use App\Models\Employee;
+use App\Models\EmployeeQualification;
+use App\Models\EmployeeSkill;
 use App\Models\Flight;
 use App\Models\Qualification;
 use App\Models\Seat;
@@ -34,6 +36,8 @@ class DatabaseSeeder extends Seeder
         Ticket::factory(40)->create();
         Booking::factory(40)->create();
         Employee::factory(20)->create();
+        EmployeeQualification::factory(10)->create();
+        EmployeeSkill::factory(10)->create();
     
     }
 }
