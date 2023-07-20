@@ -86,29 +86,4 @@ class EmployeesController extends Controller
         return response()->json(['message' => 'Employee deleted successfully']);
     }
 
-    // Match employees with job openings based on qualifications and skills
-    public function matchEmployeesToOpenings(Request $request)
-    {
-        $request->validate([
-            'job_opening_id' => 'required|exists:job_openings,id',
-        ]);
-
-        $jobOpeningId = $request->input('job_opening_id');
-
-        $matchedEmployees = Employee::whereHas('jobTitle', function ($query) use ($jobOpeningId) {
-            $query->where('id', $jobOpeningId);
-        })->where(function ($query) use ($jobOpeningId) {
-            $query->whereHas('qualifications', function ($query) use ($jobOpeningId) {
-                $query->whereHas('jobTitles', function ($query) use ($jobOpeningId) {
-                    $query->where('id', $jobOpeningId);
-                });
-            })->orWhereHas('skills', function ($query) use ($jobOpeningId) {
-                $query->whereHas('jobTitles', function ($query) use ($jobOpeningId) {
-                    $query->where('id', $jobOpeningId);
-                });
-            });
-        })->get();
-
-        return response()->json($matchedEmployees);
-    }
 }

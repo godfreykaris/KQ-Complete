@@ -7,6 +7,7 @@ use App\Http\Controllers\FlightsController;
 use App\Http\Controllers\TicketsController;
 use App\Http\Controllers\BookingsController;
 use App\Http\Controllers\GuestBookingInquiryController;
+use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PassengersController;
 use App\Http\Controllers\UsersController;
 use App\Models\AccountBasedBookingInquiry;
@@ -44,3 +45,5 @@ Route::post('/booking_inquiry/registered_user', [AccountBasedBookingInquiriesCon
 Route::post('/passengers/add/{booking_reference}', [PassengersController::class, 'addPassengers'])->name('passengers.add');
 Route::delete('/passengers/delete/{passengerId}', [PassengersController::class, 'deletePassenger'])->name('passengers.delete');
 Route::put('/passengers/change/{passengerId}', [PassengersController::class, 'updatePassenger'])->name('passengers.update');
+
+Route::get('/openings/match_employees/{openingId}', [OpeningController::class, 'getMatchingEmployees'])->name('openings.match_employees');
