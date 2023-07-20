@@ -10,6 +10,8 @@ use App\Models\EmployeeQualification;
 use App\Models\EmployeeSkill;
 use App\Models\Flight;
 use App\Models\Opening;
+use App\Models\OpeningQualification;
+use App\Models\OpeningSkill;
 use App\Models\Qualification;
 use App\Models\Seat;
 use App\Models\Skill;
@@ -36,10 +38,11 @@ class DatabaseSeeder extends Seeder
         Flight::factory(30)->create();
         Ticket::factory(40)->create();
         Booking::factory(40)->create();
-        Employee::factory(20)->create();
-        EmployeeQualification::factory(10)->create();
-        EmployeeSkill::factory(10)->create();
-        Opening::factory(3)->create();
-    
+        Employee::factory(100)->create();
+        EmployeeQualification::factory(200)->create();
+        EmployeeSkill::factory(200)->create();
+        Opening::factory(20)->create();
+        OpeningQualification::factory(50)->create();
+        OpeningSkill::factory(50)->create();
     }
 }

@@ -21,14 +21,27 @@ const Data: React.FC = () => {
     { id: 10, label: 'Add Passengers', url: 'http://127.0.0.1:8000/passengers/add/{booking_reference}'},
     { id: 11, label: 'Delete Passenger', url: 'http://127.0.0.1:8000/passengers/delete/{passengerId}'},
     { id: 12, label: 'Change Passenger', url: 'http://127.0.0.1:8000/passengers/change/{passengerId}'},
+    { id: 13, label: 'Match Employee', url: 'http://127.0.0.1:8000/openings/match_employees/{openingId}'},
     
   ]);
   
   const fetchData = (url: string) => {
     fetch(url)
-      .then(response => response.json())
+      .then(response =>  {
+        if (response.headers.get('content-type')?.includes('application/json')) {
+          return response.json(); // Extract the response as JSON
+        } else {
+          return response.text(); // Extract the response as text
+        }
+    })
       .then(data => setData(data))
       .catch(error => console.error(error));
+
+      // Scroll to the top of the page to view the output
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
   };
 
   const handleLabelChange = (event: ChangeEvent<HTMLInputElement>, id: number) => {

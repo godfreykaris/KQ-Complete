@@ -16,7 +16,11 @@ class OpeningController extends Controller
     public function getMatchingEmployees($openingId)
     {
         // Retrieve the opening by ID
-        $opening = Opening::findOrFail($openingId);
+        $opening = Opening::where('id', $openingId)->first();
+
+        if (!$opening) {
+            return response()->json(['error' => 'Opening not found.'], 404);
+        }
 
         // Retrieve all employees who meet the qualifications and skills required for the opening
         $matchingEmployees = $opening->getMatchingEmployees();

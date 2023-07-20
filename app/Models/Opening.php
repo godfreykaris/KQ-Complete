@@ -12,12 +12,12 @@ class Opening extends Model
     // Define the relationships with qualifications and skills
     public function qualifications()
     {
-        return $this->belongsToMany(Qualification::class);
+        return $this->belongsToMany(Qualification::class, 'opening_qualifications');
     }
 
     public function skills()
     {
-        return $this->belongsToMany(Skill::class);
+        return $this->belongsToMany(Skill::class, 'opening_skills');
     }
 
     // Method to get matching employees
