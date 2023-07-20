@@ -5,8 +5,11 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 use App\Models\Booking;
+use App\Models\Employee;
 use App\Models\Flight;
+use App\Models\Qualification;
 use App\Models\Seat;
+use App\Models\Skill;
 use App\Models\Ticket;
 use Illuminate\Database\Seeder;
 
@@ -23,9 +26,14 @@ class DatabaseSeeder extends Seeder
         $this->call(DestinationsTableSeeder::class);
         $this->call(FlightStatusesTableSeeder::class);
         $this->call(BookingInquiryTypesSeeder::class);
+        $this->call(JobTitlesTableSeeder::class);
+        $this->call(QualificationsTableSeeder::class);
+        $this->call(SkillsTableSeeder::class);
         Seat::factory(100)->create();
         Flight::factory(30)->create();
         Ticket::factory(40)->create();
         Booking::factory(40)->create();
+        Employee::factory(20)->create();
+    
     }
 }
