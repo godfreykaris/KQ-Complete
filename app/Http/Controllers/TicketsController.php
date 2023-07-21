@@ -65,13 +65,15 @@ class TicketsController extends Controller
             }
 
             //Get the passengers under the found booking
-            $passengers = Passenger::where('booking_id',$booking->id)->get();
+            $passengers = Passenger::with('seat')->where('booking_id', $booking->id)->get();
 
             //Make sure we have valid passengers
             if(!$passengers)
             {
                 return response()->json(['error' => 'No passengers'], 500);
             }
+           
+                
 
             
             // Ticket data to be passed to the PDF template

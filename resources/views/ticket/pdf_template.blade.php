@@ -79,12 +79,13 @@
         <tr>
             <th>Passenger Name</th>
             <th>Date of Birth</th>
+            <th>Seat Number</th>
         </tr>
         @foreach ($passengers as $passenger)
             <tr>
                 <td>{{ $passenger->name }}</td>
                 <td>{{ $passenger->date_of_birth }}</td>
-                <td>{{ $passenger->seat_id }}</td>
+                <td>{{ $passenger->seat->seat_number }}</td>
             </tr>
         @endforeach
     </table>

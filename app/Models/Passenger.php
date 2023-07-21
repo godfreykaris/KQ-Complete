@@ -15,4 +15,9 @@ class Passenger extends Model
         'date_of_birth',
         'seat_id',
     ];
+
+    public function seat()
+    {
+        return $this->belongsTo(Seat::class);
+    }
 }
