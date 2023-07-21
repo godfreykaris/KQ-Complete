@@ -54,10 +54,6 @@
             <span>{{ $bookingEmail }}</span>
         </div>
         <div>
-            <span class="label">Ticket Price:</span>
-            <span>{{ $ticketPrice }}</span>
-        </div>
-        <div>
             <span class="label">Booking Reference:</span>
             <span>{{ $bookingReference }}</span>
         </div>
@@ -75,10 +71,6 @@
                 <span class="label">Flight:</span>
                 <span>{{ $flight ? $flight : 'N/A' }}</span>
             </div>
-            <div>
-                <span class="label">Seat:</span>
-                <span>{{ $seat ? $seat : 'N/A' }}</span>
-            </div>
         </div>
     </div>
 
@@ -92,6 +84,7 @@
             <tr>
                 <td>{{ $passenger->name }}</td>
                 <td>{{ $passenger->date_of_birth }}</td>
+                <td>{{ $passenger->seat_id }}</td>
             </tr>
         @endforeach
     </table>

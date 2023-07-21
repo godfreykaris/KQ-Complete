@@ -94,52 +94,52 @@ class BookingsController extends Controller
 
                 }                
             
-                // Create a new booking
-                $booking = Booking::create([
-                    // 'flight_id' => $bookingData['flight_id'],
-                    // 'flight_class_id' => $bookingData['class_id'],
-                    // 'email' => $bookingData['passenger_email'],
-                    'booking_reference' => $this->generateBookingReference(),
-                    'booking_date' => fake()->dateTime(),
+                // // Create a new booking
+                // $booking = Booking::create([
+                //     // 'flight_id' => $bookingData['flight_id'],
+                //     // 'flight_class_id' => $bookingData['class_id'],
+                //     // 'email' => $bookingData['passenger_email'],
+                //     'booking_reference' => $this->generateBookingReference(),
+                //     'booking_date' => fake()->dateTime(),
 
-                    /**For testing only */
-                    'flight_id' => Flight::pluck('id')->random(),
-                    'flight_class_id' => FlightStatus::pluck('id')->random(),          
-                    'email' => fake()->safeEmail,
+                //     /**For testing only */
+                //     'flight_id' => Flight::pluck('id')->random(),
+                //     'flight_class_id' => FlightStatus::pluck('id')->random(),          
+                //     'email' => fake()->safeEmail,
                     
-                ]);
+                // ]);
             
-                // Generate a ticket for the booking
-                $ticket = Ticket::create([
-                    'ticket_number' => $this->generateTicketNumber(),
-                    'ticket_price' => $this->calculateTicketPrice(),
-                    'booking_reference' => $booking->booking_reference,
-                    'boarding_pass' => $this->generateBoardingPass(),
-                    'flight_status_id' => $this->getFlightStatus(),
-                    'flight_id' => $booking->flight_id,
-                    ]);
+                // // Generate a ticket for the booking
+                // $ticket = Ticket::create([
+                //     'ticket_number' => $this->generateTicketNumber(),
+                //     'ticket_price' => $this->calculateTicketPrice(),
+                //     'booking_reference' => $booking->booking_reference,
+                //     'boarding_pass' => $this->generateBoardingPass(),
+                //     'flight_status_id' => $this->getFlightStatus(),
+                //     'flight_id' => $booking->flight_id,
+                //     ]);
 
                 
-                // Create and save the new passengers
-                $addedPassengers = [];
-                $counter = 0;
-                foreach ($bookingData['passengers'] as $passengerData) {
+                // // Create and save the new passengers
+                // $addedPassengers = [];
+                // $counter = 0;
+                // foreach ($bookingData['passengers'] as $passengerData) {
 
-                    $passengerData['seat_id'] = $seats[$counter]->id; // For testing only
+                //     $passengerData['seat_id'] = $seats[$counter]->id; // For testing only
                     
-                    $passenger = new Passenger($passengerData);
+                //     $passenger = new Passenger($passengerData);
                     
-                    $booking->passengers()->save($passenger);
-                    $addedPassengers[] = $passenger->toArray(); // Convert passenger object to an array and store it
+                //     $booking->passengers()->save($passenger);
+                //     $addedPassengers[] = $passenger->toArray(); // Convert passenger object to an array and store it
 
-                    // Update the seat availability
-                    DB::table('seats')->where('id', $passenger->seat_id)->update(['is_available' => false]);
+                //     // Update the seat availability
+                //     DB::table('seats')->where('id', $passenger->seat_id)->update(['is_available' => false]);
 
-                    $counter++;
-                }
+                //     $counter++;
+                // }
                             
-                // Return the created booking and ticket details
-                return response()->json(['booking' => $booking, 'ticket' => $ticket, 'passengers' => $addedPassengers, 'status' => 1]);
+                // // Return the created booking and ticket details
+                // return response()->json(['booking' => $booking, 'ticket' => $ticket, 'passengers' => $addedPassengers, 'status' => 1]);
 
         } 
         catch (\Exception $e) 
@@ -148,10 +148,10 @@ class BookingsController extends Controller
             Log::error($e->getMessage());
         
             // For debugging
-            //return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
 
             // Return the error response
-            return response()->json(['error' => 'An error occurred. '], 500);
+           // return response()->json(['error' => 'An error occurred. '], 500);
         }
     }
 
