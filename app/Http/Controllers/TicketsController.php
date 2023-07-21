@@ -79,6 +79,7 @@ class TicketsController extends Controller
                 'ticket' => $ticket,
                 'ticketNumber' => $ticket->ticket_number,
                 'bookingReference' => $ticket->booking_reference,
+                'bookingEmail' => $booking->email,
                 'boardingPass' => $ticket->boarding_pass,
                 'flightStatus' => FlightStatus::find($ticket->flight_status_id)->name,
                 'flight' => Flight::find($ticket->flight_id)->flight_number,
@@ -98,9 +99,9 @@ class TicketsController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            //return response()->json(['error' => 'An error occurred. '.$e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred. '.$e->getMessage()], 500);
 
-            return response()->json(['error' => 'An error occurred.'], 500);
+            //return response()->json(['error' => 'An error occurred.'], 500);
         }
        
     }

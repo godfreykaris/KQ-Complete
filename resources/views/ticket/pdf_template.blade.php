@@ -50,12 +50,8 @@
             <span>{{ $ticketNumber }}</span>
         </div>
         <div>
-            <span class="label">Passenger Name:</span>
-            <span>{{ $passengerName }}</span>
-        </div>
-        <div>
-            <span class="label">Passenger Email:</span>
-            <span>{{ $passengerEmail }}</span>
+            <span class="label">Booking Email:</span>
+            <span>{{ $bookingEmail }}</span>
         </div>
         <div>
             <span class="label">Ticket Price:</span>
