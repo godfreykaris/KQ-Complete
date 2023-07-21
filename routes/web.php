@@ -32,6 +32,7 @@ Route::post('/users/register', [UsersController::class, 'register'])->name('user
 Route::get('/flights', [FlightsController::class, 'index']);
 
 Route::get('/ticket/{ticket_number}', [TicketsController::class, 'show']);
+Route::get('/tickets/{ticket_number}/report', [TicketsController::class, 'generateTicketReport'])->name('tickets.report');
 
 Route::get('/available_destinations/{departure_destination}', [DestinationsController::class, 'show']);
 

@@ -15,10 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('flight_id')->constrained('flights');
             $table->foreignId('flight_class_id')->constrained('flight_classes');
-            $table->foreignId('seat_id')->constrained('seats');
-            $table->string('passenger_name');
-            $table->string('passenger_email');
-            $table->date('date_of_birth');
+            $table->string('email');
             $table->string('booking_reference');
             $table->dateTime('booking_date');
             $table->timestamps();

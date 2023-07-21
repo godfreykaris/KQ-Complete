@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->date('date_of_birth');
+            $table->foreignId('seat_id')->constrained('seats')->onDelete('cascade');
             $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade');
             $table->timestamps();
         });

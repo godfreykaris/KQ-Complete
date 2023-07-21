@@ -11,14 +11,22 @@ class Ticket extends Model
 
     protected $fillable = [
         'ticket_number',
-        'passenger_name',
-        'passenger_email',
-        'ticket_price',
         'booking_reference',
         'boarding_pass',
         'flight_status_id',
         'flight_id',
-        'seat_id',
     ];
+
+    public function flightStatus()
+    {
+        return $this->belongsTo(FlightStatus::class, 'flight_status_id');
+    }
+
+    public function flight()
+    {
+        return $this->belongsTo(Flight::class, 'flight_id');
+    }
+
+    
     
 }

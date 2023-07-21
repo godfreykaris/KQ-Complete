@@ -14,7 +14,7 @@ class AccountBasedBookingInquiriesController extends Controller
     {
             try 
             {
-                $validatedData = $request->validate([
+                $inquiryData = $request->validate([
                     'name' => 'required',
                     'email' => 'required|email',
                     'user_id' => 'required|exists:users,id',
@@ -24,12 +24,12 @@ class AccountBasedBookingInquiriesController extends Controller
                 ]);
         
                 $accountBasedBookingInquiry = AccountBasedBookingInquiry::create([
-                            // 'name' => $validatedData['name'],
-                            // 'email' => $validatedData['email'],
-                            // 'user_id' => $validatedData['user_id'],
-                            // 'booking_inquiry_type_id' => $validatedData['inquiry_type_id'],          
-                            // 'subject' => $validatedData['subject'],
-                            // 'message' => $validatedData['message'],
+                            // 'name' => $inquiryData['name'],
+                            // 'email' => $inquiryData['email'],
+                            // 'user_id' => $inquiryData['user_id'],
+                            // 'booking_inquiry_type_id' => $inquiryData['inquiry_type_id'],          
+                            // 'subject' => $inquiryData['subject'],
+                            // 'message' => $inquiryData['message'],
         
                              /**For testing only */
                             'name' => fake()->name,
@@ -46,7 +46,11 @@ class AccountBasedBookingInquiriesController extends Controller
                 Log::error($e->getMessage());
             
                 // Return the error response
-                return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+                
+                // For Debugging
+                // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+
+                return response()->json(['error' => 'An error occurred.'], 500);
             }
 
         return response()->json(['booking_inquiry' => $accountBasedBookingInquiry, 'status' => 1, 'value' => "User booking inquiry sent successfully"]);

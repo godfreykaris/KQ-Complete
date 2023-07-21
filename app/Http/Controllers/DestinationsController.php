@@ -14,6 +14,7 @@ class DestinationsController extends Controller
             //Ge the departure destination id
             $departure_destination_details = DB::select('SELECT * FROM destinations WHERE name=? LIMIT 1', [$departure_destination]);
 
+            // Make sure the departure destination exists in the database
             if (!empty($departure_destination_details)) 
             {
                 $departure_destination_id = $departure_destination_details[0]->id;
@@ -21,7 +22,7 @@ class DestinationsController extends Controller
             } 
             else 
             {
-                return response()->json(['error' => 'Unavaliable departure destination!'], 500);
+                return response()->json(['error' => 'Departure destination does not exist!'], 500);
 
             }
             
@@ -33,6 +34,10 @@ class DestinationsController extends Controller
             // Log the exception or handle it as needed
             // For example:
             Log::error($e->getMessage());
+
+            // For debugging
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+
             return response()->json(['error' => 'An error occurred.'], 500);
         }
     }

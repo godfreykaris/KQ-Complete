@@ -10,6 +10,7 @@ use App\Models\FlightStatus;
 use App\Models\Flight;
 use App\Models\Seat;
 use App\Models\FlightClass;
+use App\Models\Passenger;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -18,114 +19,139 @@ use Illuminate\Support\Str;
 
 class BookingsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function generateBookingReference()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return fake()->unique()->regexify('[A-Z0-9]{6}');
     }
 
     public function generateTicketNumber()
     {
         // Generate a unique ticket number
-        return Str::random(10);
+        return fake()->unique()->regexify('[A-Z]{2}\d{6}');
     }
+
+    public function generateBoardingPass()
+    {
+        return fake()->unique()->regexify('[A-Z0-9]{10}');
+    }
+
+    public function calculateTicketPrice()
+    {
+        return fake()->randomFloat(2, 100, 1000);
+    }
+
+    public function getFlightStatus()
+    {
+        return FlightStatus::where('name', 'On-time')->first()->id;
+    }
+
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        
+    {       
 
         try 
         {
-                        // Validate the request data
-                $validatedData = $request->validate([
+                // Validate the request data
+                $bookingData = $request->validate([
                     'flight_id' => 'required|exists:flights,id',
-                    'class_id' => 'required|exists:flight_classes,id',
-                    'seat_id' => 'required|exists:seats,id',
-                
-                    'passenger_name' => 'required|string',
-                    'passenger_email' => 'required|email',
-                    'date_of_birth' => 'required|date',
+                    'class_id' => 'required|exists:flight_classes,id',                    
+                    'email' => 'required|email',
+
+                    'passengers' => 'required|array',
+                    'passengers.*.name' => 'required|string',
+                    'passengers.*.date_of_birth' => 'required|date',
+                    'passengers.*.seat_id' => 'required|exists:seats,id',
                 
                 ]);
             
                 // Retrieve the selected flight and check if it's available
-                $flight = DB::table('flights')->where('id', $validatedData['flight_id'])->first();
-                if (!$flight) {
+                $flight = DB::table('flights')->where('id', $bookingData['flight_id'])->first();
+                if (!$flight)
+                {
                     return response()->json(['error' => 'Invalid flight selection.'], 400);
                 }
                 
-                // Check if the selected seat is available
-                //$seat = DB::table('seats')->where('id', $validatedData['seat_id'])->first();
+                // Check if the selected seats is available
+                $seats = []; // For storing the available seats
+                foreach ($bookingData['passengers'] as $passengerData) 
+                {
+                    //$seat = DB::table('seats')->where('id', $passengerData['seat_id'])->first();
 
-                /** For testing only */
-                $seat = DB::table('seats')->where('id', Seat::where('is_available', true)->first()->id)->first();
+                    /** For testing only */
+                    $seat = DB::table('seats')->where('id', Seat::where('is_available', true)->first()->id)->first();
 
-                if (!$seat || !$seat->is_available) {
-                    return response()->json(['error' => 'Selected seat is not available.'], 400);
-                }
+                    if (!$seat || !$seat->is_available) {
+                        return response()->json(['error' => 'Selected seat for ' . $passengerData['name'] . ' is not available.'], 400);
+                    }
+
+                    $seats[] = $seat; //Append the seats
+
+                    // Update the seat availability
+                    DB::table('seats')->where('id', $seat->id)->update(['is_available' => false]);
+
+                }                
             
                 // Create a new booking
                 $booking = Booking::create([
-                    // 'flight_id' => $validatedData['flight_id'],
-                    // 'flight_class_id' => $validatedData['class_id'],
-                    // 'seat_id' => $validatedData['seat_id'],   
-                    //'date_of_birth' => $validatedData['date_of_birth'],       
-                    // 'passenger_name' => $validatedData['passenger_name'],
-                    // 'passenger_email' => $validatedData['passenger_email'],
+                    // 'flight_id' => $bookingData['flight_id'],
+                    // 'flight_class_id' => $bookingData['class_id'],
+                    // 'email' => $bookingData['passenger_email'],
+                    'booking_reference' => $this->generateBookingReference(),
+                    'booking_date' => fake()->dateTime(),
 
                     /**For testing only */
                     'flight_id' => Flight::pluck('id')->random(),
-                    'flight_class_id' => FlightStatus::pluck('id')->random(),
-                    'seat_id' => $seat->id,          
-                    'passenger_name' => fake()->name,
-                    'passenger_email' => fake()->safeEmail,
-                    'date_of_birth' => fake()->date,
-                    'booking_reference' => fake()->unique()->regexify('[A-Z0-9]{6}'),
-                    'booking_date' => fake()->dateTime(),
+                    'flight_class_id' => FlightStatus::pluck('id')->random(),          
+                    'email' => fake()->safeEmail,
+                    
                 ]);
             
                 // Generate a ticket for the booking
-
                 $ticket = Ticket::create([
-                    'ticket_number' => fake()->unique()->regexify('[A-Z]{2}\d{6}'),
-                    'passenger_name' => $booking->passenger_name,
-                    'passenger_email' => $booking->passenger_email,
-                    ///Date of birth
-                    'ticket_price' => fake()->randomFloat(2, 100, 1000),
+                    'ticket_number' => $this->generateTicketNumber(),
+                    'ticket_price' => $this->calculateTicketPrice(),
                     'booking_reference' => $booking->booking_reference,
-                    'boarding_pass' => fake()->unique()->regexify('[A-Z0-9]{10}'),
-                    'flight_status_id' => FlightStatus::where('name', 'On-time')->first()->id, // Replace 'On-time' with the appropriate flight status name
+                    'boarding_pass' => $this->generateBoardingPass(),
+                    'flight_status_id' => $this->getFlightStatus(),
                     'flight_id' => $booking->flight_id,
-                    'seat_id' => $booking->seat_id,
-                ]);
-            
-                // Update the seat availability
-                DB::table('seats')->where('id', $validatedData['seat_id'])->update(['is_available' => false]);
-            
-                // Optionally, you can perform additional actions or validations here
-            
+                    ]);
+
+                
+                // Create and save the new passengers
+                $addedPassengers = [];
+                $counter = 0;
+                foreach ($bookingData['passengers'] as $passengerData) {
+
+                    $passengerData['seat_id'] = $seats[$counter]->id; // For testing only
+                    
+                    $passenger = new Passenger($passengerData);
+                    
+                    $booking->passengers()->save($passenger);
+                    $addedPassengers[] = $passenger->toArray(); // Convert passenger object to an array and store it
+
+                    // Update the seat availability
+                    DB::table('seats')->where('id', $passenger->seat_id)->update(['is_available' => false]);
+
+                    $counter++;
+                }
+                            
                 // Return the created booking and ticket details
-                return response()->json(['booking' => $booking, 'ticket' => $ticket, 'status' => 1]);
+                return response()->json(['booking' => $booking, 'ticket' => $ticket, 'passengers' => $addedPassengers, 'status' => 1]);
+
         } 
-        catch (\Exception $e) {
+        catch (\Exception $e) 
+        {
             // Log the error
             Log::error($e->getMessage());
         
+            // For debugging
+            //return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+
             // Return the error response
-            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred. '], 500);
         }
     }
 
@@ -138,14 +164,7 @@ class BookingsController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
+    
     /**
      * Update the specified resource in storage.
      */
@@ -160,70 +179,63 @@ class BookingsController extends Controller
             }
 
             // Validate the request data
-            $validatedData = $request->validate([
+            $bookingData = $request->validate([
                 'flight_id' => 'required|exists:flights,id',
-                'class_id' => 'required|exists:flight_classes,id',
-                'seat_id' => 'required|exists:seats,id',
-                'passenger_name' => 'required|string',
-                'passenger_email' => 'required|email',
-                'date_of_birth' => 'required|date',
+                'class_id' => 'required|exists:flight_classes,id',                    
+                'email' => 'required|email',
+
+                'passengers' => 'required|array',
+                'passengers.*.name' => 'required|string',
+                'passengers.*.date_of_birth' => 'required|date',
+                'passengers.*.seat_id' => 'required|exists:seats,id',
             ]);
 
             // Retrieve the selected flight and check if it's available
-            $flight = Flight::find($validatedData['flight_id']);
+            $flight = Flight::find($bookingData['flight_id']);
             if (!$flight) {
                 return response()->json(['error' => 'Invalid flight selection.'], 400);
             }
 
             // Check if the selected seat is available
-            //$seat = DB::table('seats')->where('id', $validatedData['seat_id'])->first();
+            //$seat = DB::table('seats')->where('id', $bookingData['seat_id'])->first();
 
-            /** For testing only */
-            $seat = DB::table('seats')->where('id', Seat::where('is_available', true)->first()->id)->first();
+            foreach ($bookingData['passengers'] as $passengerData) 
+            {
+                /** For testing only */
+                $seat = DB::table('seats')->where('id', Seat::where('is_available', true)->first()->id)->first();
 
-            if (!$seat || !$seat->is_available) {
-                return response()->json(['error' => 'Selected seat is not available.'], 400);
-            }
+                if (!$seat || !$seat->is_available) {
+                    return response()->json(['error' => 'Selected seat is not available.'], 400);
+                }
+
+            } 
 
             // Update the booking
             $booking->update([
-                // 'flight_id' => $validatedData['flight_id'],
-                // 'flight_class_id' => $validatedData['class_id'],
-                // 'seat_id' => $validatedData['seat_id'],
-                // 'passenger_name' => $validatedData['passenger_name'],
-                // 'passenger_email' => $validatedData['passenger_email'],
-                // 'date_of_birth' => $validatedData['date_of_birth'],
+                // 'flight_id' => $bookingData['flight_id'],
+                // 'flight_class_id' => $bookingData['class_id'],
+                // 'seat_id' => $bookingData['seat_id'],
+                // 'passenger_name' => $bookingData['passenger_name'],
+                // 'passenger_email' => $bookingData['passenger_email'],
+                // 'date_of_birth' => $bookingData['date_of_birth'],
 
                 /**For testing only */
                 'flight_id' => Flight::pluck('id')->random(),
-                'flight_class_id' => FlightStatus::pluck('id')->random(),
-                'seat_id' => $seat->id,          
-                'passenger_name' => fake()->name,
-                'passenger_email' => fake()->safeEmail,
-                'date_of_birth' => fake()->date,
+                'flight_class_id' => FlightStatus::pluck('id')->random(),         
+                'email' => fake()->safeEmail,
             ]);
 
             // Update the associated ticket if necessary
             $ticket = Ticket::where('booking_reference', $bookingReference)->first();
             if ($ticket) {
                 $ticket->update([
-                    'passenger_name' => $booking->passenger_name,
-                    'passenger_email' => $booking->passenger_email,
                     'flight_id' => $booking->flight_id,
-                    'seat_id' => $booking->seat_id,
 
                 ]);
             }
             else
             {
                 return response()->json(['error' => 'Ticket not found. '], 500);
-            }
-
-
-            // Update the seat availability
-            if ($seat->id !== $booking->seat_id) {
-                $seat->update(['is_available' => false]);
-                Seat::where('id', $booking->seat_id)->update(['is_available' => true]);
             }
 
             // Optionally, you can perform additional actions or validations here
@@ -234,14 +246,17 @@ class BookingsController extends Controller
             // Log the error
             Log::error($e->getMessage());
 
+            // For debugging
+            //return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+
             // Return the error response
-            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred. '], 500);
         }
     }
 
 
     /**
-     * Remove the specified resource from storage.
+     * Delete the booking associated with the booking reference
      */
     public function destroy(string $bookingReference)
     {
@@ -249,17 +264,19 @@ class BookingsController extends Controller
             // Retrieve the booking
             $booking = Booking::where('booking_reference', $bookingReference)->first();
 
-            if (!$booking) {
+            //Make sure it is a valid booking
+            if (!$booking) 
+            {
                 return response()->json(['error' => 'Booking not found.'], 404);
             }
 
-            // Update the associated ticket if necessary
+            // Get the associated ticket
             $ticket = Ticket::where('booking_reference', $bookingReference)->first();
             
+            // Make sure it is a valid ticket
             if ($ticket)
             {
-                $seat_id = $ticket->seat_id;
-
+                // Delete it
                 $ticket->delete();
             }
             else
@@ -267,19 +284,14 @@ class BookingsController extends Controller
                 return response()->json(['error' => 'Ticket not found. '], 500);
             }
 
-
-            // Check if the selected seat is available
-            //$seat = DB::table('seats')->where('id', $validatedData['seat_id'])->first();
-
             
-            // Update the seat availability
-            if ($seat_id) 
-            {               
-                Seat::where('id', $seat_id)->update(['is_available' => true]);
-            }
-            else
+            //Get the passengers associated with this booking
+            $booking_passengers = Passenger::where('booking_id', $booking->id)->get();
+            
+            //Make their seats availability to true
+            foreach($booking_passengers as $passenger)
             {
-                return response()->json(['error' => 'Seat not found. '], 500);
+                DB::table('seats')->where('id', $passenger->seat_id)->update(['is_available' => true]);
             }
 
             // Delete the associated passengers
@@ -288,16 +300,20 @@ class BookingsController extends Controller
             // Delete the booking
             $booking->delete();
 
-            
-
             // Return a success response
             return response()->json(['message' => 'Booking deleted successfully.']);
-        } catch (\Exception $e) {
+
+        } 
+        catch (\Exception $e) 
+        {
             // Log the error
             Log::error($e->getMessage());
 
+            // For debugging
+            //return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+
             // Return the error response
-            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred. '], 500);
         }
     }
 }

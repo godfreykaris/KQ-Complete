@@ -22,14 +22,11 @@ class BookingFactory extends Factory
     {
         return [
             
-            'passenger_name' => fake()->name,
-            'passenger_email' => fake()->safeEmail,
-            'date_of_birth' => fake()->date,
+            'email' => fake()->safeEmail,
             'booking_reference' => fake()->unique()->regexify('[A-Z0-9]{6}'),
             'booking_date' => fake()->dateTime(),
             'flight_id' => Flight::pluck('id')->random(),
             'flight_class_id' => FlightClass::pluck('id')->random(),
-            'seat_id' => Seat::pluck('id')->random(),
         ];
     }
 }

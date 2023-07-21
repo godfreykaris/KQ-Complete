@@ -12,10 +12,7 @@ class Booking extends Model
     protected $fillable = [
         'flight_id',
         'flight_class_id',
-        'seat_id',
-        'passenger_name',
-        'passenger_email',
-        'date_of_birth',
+        'email',
         'booking_reference',
         'booking_date',
         

@@ -22,27 +22,52 @@ const Data: React.FC = () => {
     { id: 11, label: 'Delete Passenger', url: 'http://127.0.0.1:8000/passengers/delete/{passengerId}'},
     { id: 12, label: 'Change Passenger', url: 'http://127.0.0.1:8000/passengers/change/{passengerId}'},
     { id: 13, label: 'Match Employee', url: 'http://127.0.0.1:8000/openings/match_employees/{openingId}'},
+    { id: 14, label: 'Print Ticket Report', url: 'http://127.0.0.1:8000/tickets/{ticket_number}/report'},
     
   ]);
   
   const fetchData = (url: string) => {
     fetch(url)
-      .then(response =>  {
-        if (response.headers.get('content-type')?.includes('application/json')) {
+      .then((response) => {
+        if (response.headers.get('content-type')?.includes('application/pdf')) {
+          return response.blob(); // Extract the response as a Blob
+        } else if (response.headers.get('content-type')?.includes('application/json')) {
           return response.json(); // Extract the response as JSON
         } else {
           return response.text(); // Extract the response as text
         }
-    })
-      .then(data => setData(data))
-      .catch(error => console.error(error));
-
-      // Scroll to the top of the page to view the output
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth',
-      });
+      })
+      .then((data) => {
+        // If the response is a Blob (PDF file), display it in an iframe
+        if (data instanceof Blob) {
+          const url = URL.createObjectURL(data);
+          const iframe = document.createElement('iframe');
+          iframe.src = url;
+          iframe.width = '100%';
+          iframe.height = '600px'; // Set the desired height for the iframe
+  
+          // Append the iframe to a container on your web page
+          const pdfContainer = document.getElementById('output-container');
+          if(pdfContainer)
+          {
+            pdfContainer.innerHTML = ''; // Clear previous content, if any
+            pdfContainer.appendChild(iframe);
+          }
+          
+        } else {
+          setData(data); // Process other types of responses (JSON or text) as you were doing before
+        }
+      })
+      .catch((error) => console.error(error));
+  
+    // Scroll to the top of the page to view the output
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
   };
+  
+  
 
   const handleLabelChange = (event: ChangeEvent<HTMLInputElement>, id: number) => {
     const updatedLinks = links.map(link => {
@@ -80,10 +105,21 @@ const Data: React.FC = () => {
     const bookingData = {
       flight_id: 1,
       class_id: 1,
-      seat_id: 3,
-      passenger_name: 'John Doe',
-      passenger_email: 'johndoe@example.com',
-      date_of_birth: "8/12/22",
+      email: 'johndoe@example.com',      
+      passengers : [
+        {
+          name: 'John Doe',
+          date_of_birth: '2022-08-12', // Convert the date format to 'YYYY-MM-DD'
+          seat_id: 1,
+          // Add other passenger details
+        },
+        {
+          name: 'Jane Smith',
+          date_of_birth: '2023-10-15', // Convert the date format to 'YYYY-MM-DD'
+          seat_id: 1,
+          // Add other passenger details
+        },
+      ],
       // Add other booking details
     };
 
@@ -470,7 +506,7 @@ const changePassenger = () => {
           </div>
         ))}
       </div>
-      <div style={{ width: '50%', paddingLeft: '1rem' }}>
+      <div id='output-container' style={{ width: '50%', paddingLeft: '1rem' }}>
         <h2>Output:</h2>
         {typeof data === 'object' ? (
            <pre>{JSON.stringify(data, null, 2)}</pre> // Render as formatted JSON
