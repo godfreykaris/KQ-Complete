@@ -104,7 +104,6 @@ const Data: React.FC = () => {
   const addBooking = () => {
     const bookingData = {
       flight_id: 1,
-      class_id: 1,
       email: 'johndoe@example.com',      
       passengers : [
         {
@@ -151,11 +150,21 @@ const Data: React.FC = () => {
   const changeBooking = () => {
     const bookingData = {
       flight_id: 1,
-      class_id: 1,
-      seat_id: 3,
-      passenger_name: 'John Doe',
-      passenger_email: 'johndoe@example.com',
-      date_of_birth: "8/12/22",
+      email: 'johndoe@example.com',
+      passengers : [
+        {
+          name: 'John Doe',
+          date_of_birth: '2022-08-12', // Convert the date format to 'YYYY-MM-DD'
+          seat_id: 1,
+          // Add other passenger details
+        },
+        {
+          name: 'Jane Smith',
+          date_of_birth: '2023-10-15', // Convert the date format to 'YYYY-MM-DD'
+          seat_id: 1,
+          // Add other passenger details
+        },
+      ]
       // Add other booking details
     };
 

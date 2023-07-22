@@ -26,7 +26,6 @@ class BookingFactory extends Factory
             'booking_reference' => fake()->unique()->regexify('[A-Z0-9]{6}'),
             'booking_date' => fake()->dateTime(),
             'flight_id' => Flight::pluck('id')->random(),
-            'flight_class_id' => FlightClass::pluck('id')->random(),
         ];
     }
 }
