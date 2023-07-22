@@ -61,8 +61,8 @@ class BookingsController extends Controller
 
                     'passengers' => 'required|array',
                     'passengers.*.name' => 'required|string',
-                    'passengers.*.passport_number' => 'required|string',
-                    'passengers.*.identification_number' => 'required|string',
+                    'passengers.*.passport_number' => 'string',
+                    'passengers.*.identification_number' => 'string',
                     'passengers.*.date_of_birth' => 'required|date',
                     'passengers.*.seat_id' => 'required|exists:seats,id',                
                 ]);
@@ -78,6 +78,17 @@ class BookingsController extends Controller
                 $seats = []; // For storing the available seats
                 foreach ($bookingData['passengers'] as $passengerData) 
                 {
+                    // Make sure all the correct identification details are provided
+                    if(!isset($passengerData['passport_number']) && !$passengerData['identification_number'])
+                    {
+                        return response()->json(['error' => 'Must provide passport number(international or domestic travels) or identification number(domestic travels) for ' . $passengerData['name'] . ' for international travels'], 400);
+                    }
+                
+                    if($flight->is_international && !isset($passengerData['passport_number']))
+                    {
+                        return response()->json(['error' => 'Must provide passport number for ' . $passengerData['name'] . ' for international travels'], 400);
+                    }
+
                     //$seat = DB::table('seats')->where('id', $passengerData['seat_id'])->first();
 
                     /** For testing only */
@@ -134,8 +145,12 @@ class BookingsController extends Controller
 
                     // For testing only
                     $passengerData['seat_id'] = $seats[$counter]->id; 
-                    $passengerData['passport_number']  = fake()->numerify('############');
-                    $passengerData['identification_number']  = fake()->numerify('############');
+                    
+                    // For testing only
+                    if($passengerData['passport_number'])
+                        $passengerData['passport_number'] = fake()->numerify('##########'); // For testing only
+                    if($passengerData['identification_number'])
+                        $passengerData['identification_number'] = fake()->numerify('##########'); // For testing only
                                     
                     $passenger = new Passenger($passengerData);
                     
@@ -198,8 +213,8 @@ class BookingsController extends Controller
                 'passengers' => 'required|array',
                 'passengers.*.passenger_id' => 'required|string',
                 'passengers.*.name' => 'required|string',
-                'passengers.*.passport_number' => 'required|string',
-                'passengers.*.identification_number' => 'required|string',
+                'passengers.*.passport_number' => 'string',
+                'passengers.*.identification_number' => 'string',
                 'passengers.*.date_of_birth' => 'required|date',
                 'passengers.*.seat_id' => 'required|exists:seats,id',   
             ]);
@@ -210,9 +225,22 @@ class BookingsController extends Controller
                 return response()->json(['error' => 'Invalid flight selection.'], 400);
             }
 
-            // Check if the selected seat is available
+           
             foreach ($bookingData['passengers'] as $passengerData) 
             {
+                // Make sure all the correct identification details are provided
+                if(!$passengerData['passport_number'] && !$passengerData['identification_number'])
+                {
+                    return response()->json(['error' => 'Must provide passport number(international or domestic travels) or identification number(domestic travels) for ' . $passengerData['name'] . ' for international travels'], 400);
+                }
+
+                if($flight->is_international && !$passengerData['passport_number'])
+                {
+                    return response()->json(['error' => 'Must provide passport number for ' . $passengerData['name'] . ' for international travels'], 400);
+                }
+                
+                // Check if the selected seat is available
+
                 /** For testing only */
                 $available_seat = Seat::where('is_available', true)->first();
                 if($available_seat)
@@ -263,7 +291,7 @@ class BookingsController extends Controller
              $updatedPassengers = [];
 
              // For testing only
-             $existingPassengerDetails = Passenger::where('booking_reference', $bookingReference)->get(); // We need to get use existing ids for testing
+             $existingPassengerDetails = Passenger::where('booking_id', $booking->id)->get(); // We need to get use existing ids for testing
              $passengerIDs = [];
              foreach($existingPassengerDetails as $passengerDetails)
              {
@@ -276,7 +304,7 @@ class BookingsController extends Controller
              {
                  //$passenger = Passenger::find($passengerData['passenger_id']);
                  // For testing only
-                 $passenger = Passenger::find($passengerIDs[$counter]);
+                 $passenger = Passenger::where('passenger_id' , $passengerIDs[$counter])->first();
 
                  if($passenger)
                  {
@@ -297,17 +325,22 @@ class BookingsController extends Controller
                         DB::table('seats')->where('id', $current_seat_id)->update(['is_available' => false]);
                     }
 
-                 }
+                    $passengerData['seat_id'] = $current_seat_id; // For testing only
+                    $passengerData['passenger_id'] = $passengerIDs[$counter]; // For testing only
+                    $passengerData['name'] = fake()->name; // For testing only
+                    $passengerData['date_of_birth'] = fake()->date; // For testing only
 
-                 $passengerData['seat_id'] = $current_seat_id; // For testing only
-                                  
-                 $passenger = new Passenger($passengerData);
-                 
-                 if ($passenger && !$booking->passengers->contains($passenger))
-                {
+                    if($passengerData['passport_number'])
+                        $passengerData['passport_number'] = fake()->numerify('##########'); // For testing only
+                    if($passengerData['identification_number'])
+                        $passengerData['identification_number'] = fake()->numerify('##########'); // For testing only
+
+                    $passenger->fill($passengerData);                    
                     $booking->passengers()->save($passenger);
                     $updatedPassengers[] = $passenger;
-                }
+
+                 }
+              
 
                  $counter++;
              }
@@ -322,10 +355,10 @@ class BookingsController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            //return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
 
             // Return the error response
-            return response()->json(['error' => 'An error occurred. '], 500);
+            //return response()->json(['error' => 'An error occurred. '], 500);
         }
     }
 

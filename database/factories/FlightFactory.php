@@ -27,6 +27,7 @@ class FlightFactory extends Factory
             'departure_time' => $departureTime,
             'arrival_time' => $arrivalTime,
             'airline' => fake()->company(),
+            'is_international' => fake()->boolean(30),
             'departure_destination_id' => Destination::pluck('id')->random(),
             'arrival_destination_id' => Destination::pluck('id')->random(),
             'plane_id' => Plane::pluck('id')->random(),
