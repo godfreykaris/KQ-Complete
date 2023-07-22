@@ -109,12 +109,16 @@ const Data: React.FC = () => {
         {
           name: 'John Doe',
           date_of_birth: '2022-08-12', // Convert the date format to 'YYYY-MM-DD'
+          passport_number: "jdfhvjvs",
+          identification_number: "jfkvdfb",
           seat_id: 1,
           // Add other passenger details
         },
         {
           name: 'Jane Smith',
           date_of_birth: '2023-10-15', // Convert the date format to 'YYYY-MM-DD'
+          passport_number: "jdfhvjvs",
+          identification_number: "jfkvdfb",
           seat_id: 1,
           // Add other passenger details
         },
@@ -153,14 +157,20 @@ const Data: React.FC = () => {
       email: 'johndoe@example.com',
       passengers : [
         {
+          passenger_id: "djkdvdfjk",
           name: 'John Doe',
           date_of_birth: '2022-08-12', // Convert the date format to 'YYYY-MM-DD'
+          passport_no: "jdfhvjvs",
+          identification_no: "jfkvdfb",
           seat_id: 1,
           // Add other passenger details
         },
         {
+          passenger_id: "djkdvdfjk",
           name: 'Jane Smith',
           date_of_birth: '2023-10-15', // Convert the date format to 'YYYY-MM-DD'
+          passport_no: "jdfhvjvs",
+          identification_no: "jfkvdfb",
           seat_id: 1,
           // Add other passenger details
         },

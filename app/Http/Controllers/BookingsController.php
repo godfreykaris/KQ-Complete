@@ -61,6 +61,8 @@ class BookingsController extends Controller
 
                     'passengers' => 'required|array',
                     'passengers.*.name' => 'required|string',
+                    'passengers.*.passport_number' => 'required|string',
+                    'passengers.*.identification_number' => 'required|string',
                     'passengers.*.date_of_birth' => 'required|date',
                     'passengers.*.seat_id' => 'required|exists:seats,id',                
                 ]);
@@ -130,10 +132,15 @@ class BookingsController extends Controller
                 $counter = 0;
                 foreach ($bookingData['passengers'] as $passengerData) {
 
-                    $passengerData['seat_id'] = $seats[$counter]->id; // For testing only
-                    
+                    // For testing only
+                    $passengerData['seat_id'] = $seats[$counter]->id; 
+                    $passengerData['passport_number']  = fake()->numerify('############');
+                    $passengerData['identification_number']  = fake()->numerify('############');
+                                    
                     $passenger = new Passenger($passengerData);
                     
+                    $passenger->passenger_id = fake()->unique()->regexify('[A-Z0-9]{6}');
+
                     $booking->passengers()->save($passenger);
                     $addedPassengers[] = $passenger->toArray(); // Convert passenger object to an array and store it
 
@@ -189,9 +196,12 @@ class BookingsController extends Controller
                 'email' => 'required|email',
 
                 'passengers' => 'required|array',
+                'passengers.*.passenger_id' => 'required|string',
                 'passengers.*.name' => 'required|string',
+                'passengers.*.passport_number' => 'required|string',
+                'passengers.*.identification_number' => 'required|string',
                 'passengers.*.date_of_birth' => 'required|date',
-                'passengers.*.seat_id' => 'required|exists:seats,id',
+                'passengers.*.seat_id' => 'required|exists:seats,id',   
             ]);
 
             // Retrieve the selected flight and check if it's available
@@ -201,8 +211,6 @@ class BookingsController extends Controller
             }
 
             // Check if the selected seat is available
-            //$seat = DB::table('seats')->where('id', $bookingData['seat_id'])->first();
-
             foreach ($bookingData['passengers'] as $passengerData) 
             {
                 /** For testing only */
@@ -249,21 +257,57 @@ class BookingsController extends Controller
             {
                 return response()->json(['error' => 'Ticket not found. '], 500);
             }
-            
+
+               
              // Update the passenges
              $updatedPassengers = [];
-             $counter = 0;
-             foreach ($bookingData['passengers'] as $passengerData) {
 
-                 $passengerData['seat_id'] = $seats[$counter]->id; // For testing only
-                 
+             // For testing only
+             $existingPassengerDetails = Passenger::where('booking_reference', $bookingReference)->get(); // We need to get use existing ids for testing
+             $passengerIDs = [];
+             foreach($existingPassengerDetails as $passengerDetails)
+             {
+                $passengerIDs[] = $passengerDetails['passenger_id'];
+             }
+
+
+             $counter = 0;
+             foreach ($bookingData['passengers'] as $passengerData) 
+             {
+                 //$passenger = Passenger::find($passengerData['passenger_id']);
+                 // For testing only
+                 $passenger = Passenger::find($passengerIDs[$counter]);
+
+                 if($passenger)
+                 {
+                    //Get the previous seat id
+                    $previous_seat_id = $passenger->seat_id;
+
+                    //If the seat id changed, change the availability of the previous and current seat                    
+                    //$current_seat_id = $passengerData['seat_id'];
+                  
+                    $current_seat_id = $seats[$counter]->id;  // For testing only
+
+                    if($previous_seat_id  != $current_seat_id)
+                    {
+                        // Update the availability of the previous seat
+                        DB::table('seats')->where('id', $previous_seat_id)->update(['is_available' => true]);
+
+                        // Update the availability of the current seat
+                        DB::table('seats')->where('id', $current_seat_id)->update(['is_available' => false]);
+                    }
+
+                 }
+
+                 $passengerData['seat_id'] = $current_seat_id; // For testing only
+                                  
                  $passenger = new Passenger($passengerData);
                  
-                 $booking->passengers()->save($passenger);
-                 $updatedPassengers[] = $passenger->toArray(); // Convert passenger object to an array and store it
-
-                 // Update the seat availability
-                 DB::table('seats')->where('id', $passenger->seat_id)->update(['is_available' => false]);
+                 if ($passenger && !$booking->passengers->contains($passenger))
+                {
+                    $booking->passengers()->save($passenger);
+                    $updatedPassengers[] = $passenger;
+                }
 
                  $counter++;
              }

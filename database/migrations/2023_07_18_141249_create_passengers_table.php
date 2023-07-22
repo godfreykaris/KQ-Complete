@@ -13,8 +13,17 @@ return new class extends Migration
     {
         Schema::create('passengers', function (Blueprint $table) {
             $table->id();
+            $table->string('passenger_id')->unique();
             $table->string('name');
             $table->date('date_of_birth');
+
+            /* Add the identification_number column for doemstic travels. This can be ID number for
+              adults  and birth certificate number for children*/
+            $table->string('identification_number')->nullable();
+            
+            // Add the passport_number column for international travel (both adults and children)
+            $table->string('passport_number')->nullable();
+            
             $table->foreignId('seat_id')->constrained('seats')->onDelete('cascade');
             $table->foreignId('booking_id')->constrained('bookings')->onDelete('cascade');
             $table->timestamps();
