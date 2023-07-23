@@ -20,7 +20,7 @@ class TicketsController extends Controller
     {
         try 
         {
-            $ticket = DB::select('SELECT t.ticket_number, t.booking_reference, t.boarding_pass, fst.name AS flight_status, f.flight_number AS flight_number
+            $ticket = DB::select('SELECT t.ticket_number, t.ticket_price, t.booking_reference, t.boarding_pass, fst.name AS flight_status, f.flight_number AS flight_number
                                     FROM tickets t
                                     JOIN flight_statuses fst ON t.flight_status_id = fst.id
                                     JOIN flights f ON t.flight_id = f.id
@@ -80,6 +80,7 @@ class TicketsController extends Controller
             $ticketData = [
                 'ticket' => $ticket,
                 'ticketNumber' => $ticket->ticket_number,
+                'ticketPrice' =>$ticket->ticket_price,
                 'bookingReference' => $ticket->booking_reference,
                 'bookingEmail' => $booking->email,
                 'boardingPass' => $ticket->boarding_pass,

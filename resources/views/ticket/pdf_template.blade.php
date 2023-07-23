@@ -50,6 +50,10 @@
             <span>{{ $ticketNumber }}</span>
         </div>
         <div>
+            <span class="label">Ticket Price:</span>
+            <span>{{ $ticketPrice }}</span>
+        </div>
+        <div>
             <span class="label">Booking Email:</span>
             <span>{{ $bookingEmail }}</span>
         </div>

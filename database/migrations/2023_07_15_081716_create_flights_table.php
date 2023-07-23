@@ -19,6 +19,7 @@ return new class extends Migration
             $table->time('duration')->virtualAs('TIMEDIFF(arrival_time, departure_time)');
             $table->string('airline');
             $table->boolean('is_international')->default(true);
+            $table->foreignId('flight_status_id')->constrained('flight_statuses')->onDelete('cascade');
             $table->foreignId('departure_destination_id')->constrained('destinations')->onDelete('cascade');
             $table->foreignId('arrival_destination_id')->constrained('destinations')->onDelete('cascade');
             $table->foreignId('plane_id')->constrained('planes')->onDelete('cascade');

@@ -11,6 +11,7 @@ class Ticket extends Model
 
     protected $fillable = [
         'ticket_number',
+        'ticket_price',
         'booking_reference',
         'boarding_pass',
         'flight_status_id',

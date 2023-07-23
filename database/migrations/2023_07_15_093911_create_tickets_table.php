@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
             $table->string('ticket_number')->unique();
+            $table->float('ticket_price');
             $table->string('booking_reference');
             $table->string('boarding_pass');
             $table->foreignId('flight_status_id')->constrained('flight_statuses')->onDelete('cascade');

@@ -6,10 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Models\Booking;
 use App\Models\Ticket;
-use App\Models\FlightStatus;
 use App\Models\Flight;
 use App\Models\Seat;
-use App\Models\FlightClass;
 use App\Models\Passenger;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\DB;
@@ -19,30 +17,83 @@ use Illuminate\Support\Str;
 
 class BookingsController extends Controller
 {
+
     public function generateBookingReference()
     {
-        return fake()->unique()->regexify('[A-Z0-9]{6}');
+        $bookingReference = 'KQ-BR-' . strtoupper(Str::random(8));
+
+        // Check if the generated booking reference already exists in the database
+        while (Booking::where('booking_reference', $bookingReference)->exists()) 
+        {
+            $bookingReference = 'KQ-BR-' . strtoupper(Str::random(8));
+        }
+    
+           
+        return $bookingReference;
     }
 
     public function generateTicketNumber()
     {
-        // Generate a unique ticket number
-        return fake()->unique()->regexify('[A-Z]{2}\d{6}');
+        $ticketPrefix = 'KQ-TK-'; 
+        $randomNumber = mt_rand(100000, 999999); // Generate a random 6-digit number
+        
+        $ticketNumber = $ticketPrefix . $randomNumber;
+
+        // Check if the generated ticket number already exists in the database
+        while (Ticket::where('ticket_number', $ticketNumber)->exists()) 
+        {
+            $randomNumber = mt_rand(100000, 999999);
+            $ticketNumber = $ticketPrefix . $randomNumber;
+        }
+
+        
+        return $ticketNumber;
     }
 
+    
     public function generateBoardingPass()
     {
-        return fake()->unique()->regexify('[A-Z0-9]{10}');
+        $boardingPass = 'KQ-BP-' . strtoupper(Str::random(10));
+
+
+        // Check if the generated boarding pass already exists in the database
+        while (Ticket::where('boarding_pass', $boardingPass)->exists()) 
+        {
+            $boardingPass = 'KQ-BP-' . strtoupper(Str::random(10));
+        }
+    
+           
+        return $boardingPass;
     }
 
-    public function calculateTicketPrice()
+    public function calculateTicketPrice($bookingId)
     {
-        return fake()->randomFloat(2, 100, 1000);
+        // Get the passengers associated with the booking
+        $passengers = Passenger::where('booking_id', $bookingId)->get();
+
+        $ticketPrice = 0.0;
+
+        foreach($passengers as $passenger)
+        {
+            // Get the passenger's seat price
+            $seatPrice = Seat::where('id', $passenger->seat_id)->first()->seat_price;
+
+            $ticketPrice += $seatPrice;
+        }
+
+        return $ticketPrice;
     }
 
-    public function getFlightStatus()
+    public function getFlightStatus($flightId)
     {
-        return FlightStatus::where('name', 'On-time')->first()->id;
+        // Get the flight status id
+        $flightStatusId = Flight::where('id', $flightId)->first()->flight_status_id;
+
+        // Make sure the flight status is valid
+        if($flightStatusId)
+            return $flightStatusId;
+        else
+            return null;
     }
 
 
@@ -74,36 +125,36 @@ class BookingsController extends Controller
                     return response()->json(['error' => 'Invalid flight selection.'], 400);
                 }
                 
-                // Check if the selected seats is available
+                // Check if the selected seats are available
                 $seats = []; // For storing the available seats
                 foreach ($bookingData['passengers'] as $passengerData) 
                 {
                     // Make sure all the correct identification details are provided
                     if(!isset($passengerData['passport_number']) && !$passengerData['identification_number'])
                     {
-                        return response()->json(['error' => 'Must provide passport number(international or domestic travels) or identification number(domestic travels) for ' . $passengerData['name'] . ' for international travels'], 400);
+                        return response()->json(['error' => 'You must provide the passport number(international or domestic travels) or identification number(domestic travels) for ' . $passengerData['name'] . ' .'], 400);
                     }
                 
                     if($flight->is_international && !isset($passengerData['passport_number']))
                     {
-                        return response()->json(['error' => 'Must provide passport number for ' . $passengerData['name'] . ' for international travels'], 400);
+                        return response()->json(['error' => 'You must provide the passport number for ' . $passengerData['name'] . ' for international travels'], 400);
                     }
 
                     //$seat = DB::table('seats')->where('id', $passengerData['seat_id'])->first();
 
                     /** For testing only */
-                    $available_seat = Seat::where('is_available', true)->first();
-                    if($available_seat)
+                    $availableSeat = Seat::where('is_available', true)->first();
+                    if($availableSeat)
                     {
-                        $seat = DB::table('seats')->where('id', $available_seat->id)->first();
+                        $seat = DB::table('seats')->where('id', $availableSeat->id)->first();
 
                         if (!$seat || !$seat->is_available) {
                             return response()->json(['error' => 'Selected seat for ' . $passengerData['name'] . ' is not available.'], 400);
                         }
     
-                        $seats[] = $seat; //Append the seats
+                        $seats[] = $seat; //Append the seat
     
-                        // Update the seat availability
+                        // Update the seat's availability
                         DB::table('seats')->where('id', $seat->id)->update(['is_available' => false]);
                     }
                     else
@@ -126,18 +177,7 @@ class BookingsController extends Controller
                     'email' => fake()->safeEmail,
                     
                 ]);
-            
-                // Generate a ticket for the booking
-                $ticket = Ticket::create([
-                    'ticket_number' => $this->generateTicketNumber(),
-                    'ticket_price' => $this->calculateTicketPrice(),
-                    'booking_reference' => $booking->booking_reference,
-                    'boarding_pass' => $this->generateBoardingPass(),
-                    'flight_status_id' => $this->getFlightStatus(),
-                    'flight_id' => $booking->flight_id,
-                    ]);
-
-                
+                            
                 // Create and save the new passengers
                 $addedPassengers = [];
                 $counter = 0;
@@ -159,11 +199,37 @@ class BookingsController extends Controller
                     $booking->passengers()->save($passenger);
                     $addedPassengers[] = $passenger->toArray(); // Convert passenger object to an array and store it
 
-                    // Update the seat availability
+                    // Update the seat's availability
                     DB::table('seats')->where('id', $passenger->seat_id)->update(['is_available' => false]);
 
                     $counter++;
                 }
+
+                /* Generate a ticket for the booking after adding the passengers
+                   to facilitate ticket price calculation */
+
+                // Generate the ticket number
+                $ticketNumber = $this->generateTicketNumber();
+
+                // Get the flight status id
+                $flightStatusId = $this->getFlightStatus($booking->flight_id);
+                if($flightStatusId == null)
+                    return response()->json(['error' => 'An error occurred when setting the flight status'], 400);
+
+                // Get the ticket price
+                $ticketPrice = $this->calculateTicketPrice($booking->booking_id);
+
+                // Generate the boarding pass
+                $boardingPass = $this->generateBoardingPass();
+
+                $ticket = Ticket::create([
+                    'ticket_number' => $ticketNumber,
+                    'ticket_price' => $ticketPrice,
+                    'booking_reference' => $booking->booking_reference,
+                    'boarding_pass' => $boardingPass,
+                    'flight_status_id' => $flightStatusId,
+                    'flight_id' => $booking->flight_id,
+                    ]);
                             
                 // Return the created booking and ticket details
                 return response()->json(['booking' => $booking, 'ticket' => $ticket, 'passengers' => $addedPassengers, 'status' => 1]);
@@ -197,11 +263,13 @@ class BookingsController extends Controller
      */
     public function update(Request $request, string $bookingReference)
     {
-        try {
+        try 
+        {
             // Retrieve the booking
             $booking = Booking::where('booking_reference', $bookingReference)->first();
 
-            if (!$booking) {
+            if (!$booking) 
+            {
                 return response()->json(['error' => 'Booking not found.'], 404);
             }
 
@@ -221,8 +289,9 @@ class BookingsController extends Controller
 
             // Retrieve the selected flight and check if it's available
             $flight = Flight::find($bookingData['flight_id']);
-            if (!$flight) {
-                return response()->json(['error' => 'Invalid flight selection.'], 400);
+            if (!$flight) 
+            {
+                return response()->json(['error' => 'The selected flight does not exist.'], 400);
             }
 
            
@@ -242,10 +311,10 @@ class BookingsController extends Controller
                 // Check if the selected seat is available
 
                 /** For testing only */
-                $available_seat = Seat::where('is_available', true)->first();
-                if($available_seat)
+                $availableSeat = Seat::where('is_available', true)->first();
+                if($availableSeat)
                 {
-                    $seat = DB::table('seats')->where('id', $available_seat->id)->first();
+                    $seat = DB::table('seats')->where('id', $availableSeat->id)->first();
 
                     if (!$seat || !$seat->is_available) {
                         return response()->json(['error' => 'Selected seat for ' . $passengerData['name'] . ' is not available.'], 400);
@@ -273,20 +342,7 @@ class BookingsController extends Controller
                 'email' => fake()->safeEmail,
             ]);
 
-            // Update the associated ticket if necessary
-            $ticket = Ticket::where('booking_reference', $bookingReference)->first();
-            if ($ticket) {
-                $ticket->update([
-                    'flight_id' => $booking->flight_id,
-
-                ]);
-            }
-            else
-            {
-                return response()->json(['error' => 'Ticket not found. '], 500);
-            }
-
-               
+            
              // Update the passenges
              $updatedPassengers = [];
 
@@ -345,6 +401,32 @@ class BookingsController extends Controller
                  $counter++;
              }
 
+             /* Update a ticket for the booking after adding the passengers
+                to facilitate ticket price calculation */
+
+              // Get the ticket price
+              $ticketPrice = $this->calculateTicketPrice($booking->booking_id);
+
+              // Get the flight status id
+              $flightStatusId = $this->getFlightStatus($booking->flight_id);
+              if($flightStatusId == null)
+                  return response()->json(['error' => 'An error occurred when setting the flight status'], 400);
+
+              // Update the associated ticket if necessary
+              $ticket = Ticket::where('booking_reference', $bookingReference)->first();
+              if ($ticket) 
+              {
+                  $ticket->update([
+                      'flight_id' => $booking->flight_id,
+                      'ticket_price' => $ticketPrice,
+                      'flight_status_id' => $flightStatusId,
+                  
+                  ]);
+              }
+              else
+              {
+                  return response()->json(['error' => 'Ticket not found. '], 500);
+              }
 
             // Return the updated booking details
             return response()->json(['booking' => $booking, 'ticket' => $ticket, 'passengers' => $updatedPassengers, 'status' => 1]);
@@ -368,7 +450,8 @@ class BookingsController extends Controller
      */
     public function destroy(string $bookingReference)
     {
-        try {
+        try 
+        {
             // Retrieve the booking
             $booking = Booking::where('booking_reference', $bookingReference)->first();
 
@@ -409,7 +492,7 @@ class BookingsController extends Controller
             $booking->delete();
 
             // Return a success response
-            return response()->json(['message' => 'Booking deleted successfully.']);
+            return response()->json(['message' => 'Booking deleted successfully.', 'status' => 1]);
 
         } 
         catch (\Exception $e) 
