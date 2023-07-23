@@ -76,7 +76,7 @@ class BookingsController extends Controller
         foreach($passengers as $passenger)
         {
             // Get the passenger's seat price
-            $seatPrice = Seat::where('id', $passenger->seat_id)->first()->seat_price;
+            $seatPrice = Seat::where('id', $passenger->seat_id)->first()->price;
 
             $ticketPrice += $seatPrice;
         }
@@ -96,6 +96,7 @@ class BookingsController extends Controller
             return null;
     }
 
+    
 
     /**
      * Store a newly created resource in storage.
@@ -194,7 +195,7 @@ class BookingsController extends Controller
                                     
                     $passenger = new Passenger($passengerData);
                     
-                    $passenger->passenger_id = fake()->unique()->regexify('[A-Z0-9]{6}');
+                    $passenger->passenger_id = $passenger->generatePassengerId();
 
                     $booking->passengers()->save($passenger);
                     $addedPassengers[] = $passenger->toArray(); // Convert passenger object to an array and store it
@@ -217,7 +218,7 @@ class BookingsController extends Controller
                     return response()->json(['error' => 'An error occurred when setting the flight status'], 400);
 
                 // Get the ticket price
-                $ticketPrice = $this->calculateTicketPrice($booking->booking_id);
+                $ticketPrice = $this->calculateTicketPrice($booking->id);
 
                 // Generate the boarding pass
                 $boardingPass = $this->generateBoardingPass();
@@ -405,7 +406,7 @@ class BookingsController extends Controller
                 to facilitate ticket price calculation */
 
               // Get the ticket price
-              $ticketPrice = $this->calculateTicketPrice($booking->booking_id);
+              $ticketPrice = $this->calculateTicketPrice($booking->id);
 
               // Get the flight status id
               $flightStatusId = $this->getFlightStatus($booking->flight_id);

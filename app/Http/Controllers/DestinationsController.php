@@ -18,7 +18,7 @@ class DestinationsController extends Controller
             if (!empty($departure_destination_details)) 
             {
                 $departure_destination_id = $departure_destination_details[0]->id;
-                $available_destinations = DB::select('SELECT DISTINCT ad.name AS arrival_destination_name FROM flights f  JOIN destinations ad ON f.arrival_destination_id = ad.id WHERE f.departure_destination_id = ?', [$departure_destination_id]);
+                $available_destinations = DB::select('SELECT DISTINCT ad.name FROM flights f  JOIN destinations ad ON f.arrival_destination_id = ad.id WHERE f.departure_destination_id = ?', [$departure_destination_id]);
             } 
             else 
             {

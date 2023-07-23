@@ -10,8 +10,8 @@ const Data: React.FC = () => {
   const [data, setData] = useState<any[]>([]);
   const [links, setLinks] = useState<Link[]>([
     { id: 1, label: 'Fetch Flights', url: 'http://127.0.0.1:8000/flights' },
-    { id: 2, label: 'Fetch Ticket', url: 'http://127.0.0.1:8000/ticket/NA290856' },
-    { id: 3, label: 'Available Destinations', url: 'http://127.0.0.1:8000/available_destinations/Nairobi' },
+    { id: 2, label: 'Fetch Ticket', url: 'http://127.0.0.1:8000/ticket/{ticket_number}' },
+    { id: 3, label: 'Available Destinations', url: 'http://127.0.0.1:8000/available_destinations/{departure_airport}' },
     { id: 4, label: 'Add Booking', url: 'http://127.0.0.1:8000/bookings' },
     { id: 5, label: 'Change Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}' },
     { id: 6, label: 'Delete Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}'},
@@ -357,12 +357,18 @@ const addPassengers = () => {
   const passengersData = [
     {
       name: 'John Doe',
-      date_of_birth: '2022-08-12', // Convert the date format to 'YYYY-MM-DD'
+          date_of_birth: '2022-08-12', // Convert the date format to 'YYYY-MM-DD'
+          passport_number: "jdfhvjvs",
+          identification_number: "jfkvdfb",
+          seat_id: 1,
       // Add other passenger details
     },
     {
       name: 'Jane Smith',
       date_of_birth: '2023-10-15', // Convert the date format to 'YYYY-MM-DD'
+      passport_number: "jdfhvjvs",
+      identification_number: "jfkvdfb",
+      seat_id: 1,
       // Add other passenger details
     },
   ];

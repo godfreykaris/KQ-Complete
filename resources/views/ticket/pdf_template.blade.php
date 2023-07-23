@@ -51,7 +51,7 @@
         </div>
         <div>
             <span class="label">Ticket Price:</span>
-            <span>{{ $ticketPrice }}</span>
+            <span>${{ $ticketPrice }}</span>
         </div>
         <div>
             <span class="label">Booking Email:</span>
@@ -68,13 +68,22 @@
         <div class="flight-details">
             <h3>Flight Details</h3>
             <div>
+                <span class="label">Flight Type:</span>
+                <span>{{ $flightType}}</span>
+            </div>
+            <div>
+                <span class="label">Flight Number:</span>
+                <span>{{ $flight ? $flight : 'N/A' }}</span>
+            </div>
+            <div>
                 <span class="label">Flight Status:</span>
                 <span>{{ $flightStatus }}</span>
             </div>
             <div>
-                <span class="label">Flight:</span>
-                <span>{{ $flight ? $flight : 'N/A' }}</span>
+                <span class="label">Destination:</span>
+                <span>{{ $destination ? $destination : 'N/A' }}</span>
             </div>
+
         </div>
     </div>
 
@@ -82,13 +91,15 @@
     <table class="passengers-table">
         <tr>
             <th>Passenger Name</th>
-            <th>Date of Birth</th>
+            <th>Passport Number</th>
+            <th>Identification Number</th>
             <th>Seat Number</th>
         </tr>
         @foreach ($passengers as $passenger)
             <tr>
                 <td>{{ $passenger->name }}</td>
-                <td>{{ $passenger->date_of_birth }}</td>
+                <td>{{ $passenger->passport_number == null ? N/A :  $passenger->passport_number}}</td>
+                <td>{{ $passenger->identification_number == null ? N/A :  $passenger->identification_number}}</td>
                 <td>{{ $passenger->seat->seat_number }}</td>
             </tr>
         @endforeach
