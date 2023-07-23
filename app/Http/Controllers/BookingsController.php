@@ -204,7 +204,7 @@ class BookingsController extends Controller
 
                     // Update the seat's availability
                     
-                    $seat = Seat::where('id', $passenger->seat_id);
+                    $seat = Seat::where('id', $passenger->seat_id)->first();
                     $seat->update([
                         'is_available' => false,
                     ]); 
@@ -321,7 +321,7 @@ class BookingsController extends Controller
                 $availableSeat = Seat::where('is_available', true)->first();
                 if($availableSeat)
                 {
-                    $seat = DB::table('seats')->where('id', $availableSeat->id)->first();
+                    $seat = Seat::where('id', $availableSeat->id)->first();
 
                     if (!$seat || !$seat->is_available) {
                         return response()->json(['error' => 'Selected seat for ' . $passengerData['name'] . ' is not available.'], 400);
@@ -384,7 +384,10 @@ class BookingsController extends Controller
                     if($previous_seat_id  != $current_seat_id)
                     {
                         // Update the availability of the previous seat
-                        DB::table('seats')->where('id', $previous_seat_id)->update(['is_available' => true]);
+                        $previousSeat = Seat::where('id', $previous_seat_id)->first();
+                        $seat->update([
+                            'is_available' => true,
+                        ]); 
 
                         // Update the availability of the current seat
                         DB::table('seats')->where('id', $current_seat_id)->update(['is_available' => false]);
