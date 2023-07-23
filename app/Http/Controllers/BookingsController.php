@@ -10,7 +10,6 @@ use App\Models\Flight;
 use App\Models\Seat;
 use App\Models\Passenger;
 use Barryvdh\Debugbar\Facades\Debugbar;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -385,12 +384,15 @@ class BookingsController extends Controller
                     {
                         // Update the availability of the previous seat
                         $previousSeat = Seat::where('id', $previous_seat_id)->first();
-                        $seat->update([
+                        $previousSeat->update([
                             'is_available' => true,
                         ]); 
 
                         // Update the availability of the current seat
-                        DB::table('seats')->where('id', $current_seat_id)->update(['is_available' => false]);
+                        $currentSeat = Seat::where('id', $current_seat_id)->first();
+                        $currentSeat->update([
+                            'is_available' => false,
+                        ]); 
                     }
 
                     $passengerData['seat_id'] = $current_seat_id; // For testing only
@@ -494,7 +496,10 @@ class BookingsController extends Controller
             //Make their seats availability to true
             foreach($booking_passengers as $passenger)
             {
-                DB::table('seats')->where('id', $passenger->seat_id)->update(['is_available' => true]);
+                $seat = Seat::where('id', $passenger->seat_id)->first();
+                $seat->update([
+                    'is_available' => true,
+                ]); 
             }
 
             // Delete the associated passengers

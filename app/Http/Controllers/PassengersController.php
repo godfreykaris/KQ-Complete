@@ -80,7 +80,7 @@ class PassengersController extends Controller
                 $availableSeat = Seat::where('is_available', true)->first(); 
                 if($availableSeat)
                 {
-                    $seat = DB::table('seats')->where('id', $availableSeat->id)->first(); 
+                    $seat = Seat::where('id', $availableSeat->id)->first(); 
                     
                     // For testing only
                     $passengerData['seat_id'] = $seat->id;
@@ -263,7 +263,7 @@ class PassengersController extends Controller
             $availableSeat = Seat::where('is_available', true)->first(); 
             if($availableSeat)
             {
-                $seat = DB::table('seats')->where('id', $availableSeat->id)->first(); 
+                $seat = Seat::where('id', $availableSeat->id)->first(); 
                 
                 // For testing only
                 $passengerData['seat_id'] = $seat->id;
@@ -306,7 +306,9 @@ class PassengersController extends Controller
                    return response()->json(['error' => 'The passenger\'s previous seat is invalid.'], 404);
                 }
 
-                DB::table('seats')->where('id', $previousSeat->id)->update(['is_available' => true]); 
+                $previousSeat->update([
+                    'is_available' => true,
+                ]); 
 
                 // Store the ticket prices, previous and current
                 $previousSeatPrice = $previousSeat->price;
