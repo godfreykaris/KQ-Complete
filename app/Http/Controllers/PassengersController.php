@@ -110,7 +110,9 @@ class PassengersController extends Controller
                     $addedPassengers[] = $passenger->toArray(); // Convert passenger object to an array and store it
 
                     // Update the seat's availability
-                    DB::table('seats')->where('id', $seat->id)->update(['is_available' => false]); 
+                    $seat->update([
+                'is_available' => false,
+            ]);  
                     
                     // Update the ticket price
                     $ticketPrice += $seat->price;
@@ -177,8 +179,9 @@ class PassengersController extends Controller
             }
 
             // Update the seat availability
-            DB::table('seats')->where('id', $seat->id)->update(['is_available' => true]); 
-            
+            $seat->update([
+                'is_available' => true,
+            ]);            
 
             //Update the ticket price
             $seatPrice = $seat->price;
@@ -290,7 +293,9 @@ class PassengersController extends Controller
                 }
              
                 // Update the seat availability
-                DB::table('seats')->where('id', $seat->id)->update(['is_available' => false]); 
+                $seat->update([
+                    'is_available' => false,
+                ]);  
 
                 // Update the prevoius seat availability
                 $previousSeat = Seat::where('id', $passenger->seat_id)->first();

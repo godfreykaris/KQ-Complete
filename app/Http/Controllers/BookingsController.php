@@ -120,7 +120,7 @@ class BookingsController extends Controller
                 ]);
             
                 // Retrieve the selected flight and check if it's available
-                $flight = DB::table('flights')->where('id', $bookingData['flight_id'])->first();
+                $flight = Flight::where('id', $bookingData['flight_id'])->first();
                 if (!$flight)
                 {
                     return response()->json(['error' => 'Invalid flight selection.'], 400);
@@ -147,7 +147,7 @@ class BookingsController extends Controller
                     $availableSeat = Seat::where('is_available', true)->first();
                     if($availableSeat)
                     {
-                        $seat = DB::table('seats')->where('id', $availableSeat->id)->first();
+                        $seat = Seat::where('id', $availableSeat->id)->first();
 
                         if (!$seat || !$seat->is_available) {
                             return response()->json(['error' => 'Selected seat for ' . $passengerData['name'] . ' is not available.'], 400);
@@ -156,7 +156,9 @@ class BookingsController extends Controller
                         $seats[] = $seat; //Append the seat
     
                         // Update the seat's availability
-                        DB::table('seats')->where('id', $seat->id)->update(['is_available' => false]);
+                        $seat->update([
+                            'is_available' => false,
+                        ]); 
                     }
                     else
                     {
@@ -201,7 +203,11 @@ class BookingsController extends Controller
                     $addedPassengers[] = $passenger->toArray(); // Convert passenger object to an array and store it
 
                     // Update the seat's availability
-                    DB::table('seats')->where('id', $passenger->seat_id)->update(['is_available' => false]);
+                    
+                    $seat = Seat::where('id', $passenger->seat_id);
+                    $seat->update([
+                        'is_available' => false,
+                    ]); 
 
                     $counter++;
                 }
@@ -324,7 +330,9 @@ class BookingsController extends Controller
                     $seats[] = $seat; //Append the seats
     
                     // Update the seat availability
-                    DB::table('seats')->where('id', $seat->id)->update(['is_available' => false]);
+                    $seat->update([
+                        'is_available' => false,
+                    ]); 
                 }
                 else
                 {
