@@ -436,6 +436,9 @@ const changePassenger = () => {
   const passengerData = {
     'name' : 'John Doe',
     'date_of_birth' : '2022-08-12', // Convert the date format to 'YYYY-MM-DD'
+    'passport_number': 'jdfhvjvs',
+     'identification_number': 'jfkvdfb',
+     'seat_id': 1,
     
   };
 

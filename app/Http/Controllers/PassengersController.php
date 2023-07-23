@@ -171,7 +171,7 @@ class PassengersController extends Controller
             // Update passenger's seat availability
             $seat = Seat::where('id', $passenger->seat_id)->first();
             // Make sure the seat is valid
-            if(!$seat || !$seat->is_available)
+            if(!$seat || $seat->is_available)
             {
                 return response()->json(['error' => 'The passenger\'s seat is unavailable.'], 404);
             }
@@ -208,7 +208,7 @@ class PassengersController extends Controller
         try {
             
             // Retrieve the passenger
-            $passenger = Passenger::where('id', $passengerId)->first();
+            $passenger = Passenger::where('passenger_id', $passengerId)->first();
 
             // Make sure the passenger is valid
             if (!$passenger) 
@@ -268,7 +268,8 @@ class PassengersController extends Controller
                     $passengerData['passport_number'] = fake()->numerify('##########'); // For testing only
                 if($passengerData['identification_number'])
                     $passengerData['identification_number'] = fake()->numerify('##########'); // For testing only
-            
+                
+                $passengerData['name'] = fake()->name; // For testing only
             }
             else
             {
