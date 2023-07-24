@@ -12,6 +12,11 @@ const Data: React.FC = () => {
     { id: 1, label: 'Fetch Flights', url: 'http://127.0.0.1:8000/flights' },
     { id: 2, label: 'Fetch Ticket', url: 'http://127.0.0.1:8000/ticket/{ticket_number}' },
     { id: 3, label: 'Available Destinations', url: 'http://127.0.0.1:8000/arrival_cities/{departure_city}' },
+    { id: 15, label: 'Add City', url: 'http://127.0.0.1:8000/cities/add' },
+    { id: 16, label: 'Change City', url: 'http://127.0.0.1:8000/cities/change/{cityId}' },
+    { id: 17, label: 'Delete City', url: 'http://127.0.0.1:8000/cities/delete/{cityId}' },
+    { id: 18, label: 'All Cities', url: 'http://127.0.0.1:8000/cities/all' },
+    { id: 19, label: 'Fetch City', url: 'http://127.0.0.1:8000/cities/single/{cityName}/{cityCountry}' },
     { id: 4, label: 'Add Booking', url: 'http://127.0.0.1:8000/bookings' },
     { id: 5, label: 'Change Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}' },
     { id: 6, label: 'Delete Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}'},
@@ -471,6 +476,96 @@ const changePassenger = () => {
   });
 };
 
+const addCity = () => {
+  const cityData = {
+    name: 'Washington',
+    country: 'United States of America',   
+    
+  };
+
+  const  addCityUrl = links.find((link) => link.id === 15)?.url;
+
+  if (addCityUrl) {
+    fetch(addCityUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify(cityData),
+    })
+      .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+};
+
+const changeCity = () => {
+  const cityData = {
+    name: 'Washington',
+    country: 'United States of America',   
+    
+  };
+
+  const  changeCityUrl = links.find((link) => link.id === 16)?.url;
+
+  if (changeCityUrl) {
+    fetch(changeCityUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify(cityData),
+    })
+      .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+};
+
+const deleteCity = () => {
+  
+  const deleteCityUrl = links.find((link) => link.id === 17)?.url;
+
+  if (deleteCityUrl) {
+    fetch(deleteCityUrl, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      }
+    })
+      .then((response) => {
+        if (response.headers.get('content-type')?.includes('application/json')) {
+          return response.json(); // Extract the response as JSON
+        } else {
+          return response.text(); // Extract the response as text
+        }
+    })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
   return (
     <div style={{ display: 'flex' }}>
       <div style={{ width: '50%', paddingRight: '1rem', borderRight: '1px solid #ccc' }}>
@@ -513,6 +608,18 @@ const changePassenger = () => {
                 </button>
               ) : link.label === 'Change Passenger' ? (
                 <button onClick={changePassenger} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Add City' ? (
+                <button onClick={addCity} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Change City' ? (
+                <button onClick={changeCity} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Delete City' ? (
+                <button onClick={deleteCity} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
                 </button>
               ) :(

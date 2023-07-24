@@ -6,6 +6,7 @@ use App\Http\Controllers\FlightsController;
 use App\Http\Controllers\TicketsController;
 use App\Http\Controllers\BookingsController;
 use App\Http\Controllers\CitiesController;
+use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\GuestBookingInquiryController;
 use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PassengersController;
@@ -33,7 +34,13 @@ Route::get('/flights', [FlightsController::class, 'index']);
 Route::get('/ticket/{ticket_number}', [TicketsController::class, 'show']);
 Route::get('/tickets/{ticket_number}/report', [TicketsController::class, 'generateTicketReport'])->name('tickets.report');
 
+Route::post('/cities/change/{cityId}', [CitiesController::class, 'update'])->name('cities.update');
+Route::post('/cities/add', [CitiesController::class, 'store'])->name('cities.store');
+Route::delete('/cities/delete/{cityId}', [CitiesController::class, 'delete'])->name('cities.delete');
 Route::get('/arrival_cities/{departure_city}', [CitiesController::class, 'getArrivalCities'])->name('cities.get_arrival_cities');
+Route::get('/cities/all', [CitiesController::class, 'getAllCities'])->name('cities.get_all_cities');
+Route::get('/cities/single/{cityName}/{cityCountry}', [CitiesController::class, 'getCity'])->name('cities.get_all_cities');
+
 
 Route::post('/bookings', [BookingsController::class, 'store'])->name('bookings.store');
 Route::put('/bookings/{bookingReference}', [BookingsController::class, 'update'])->name('bookings.update');
@@ -45,5 +52,9 @@ Route::post('/booking_inquiry/registered_user', [AccountBasedBookingInquiriesCon
 Route::post('/passengers/add/{booking_reference}', [PassengersController::class, 'addPassengers'])->name('passengers.add');
 Route::delete('/passengers/delete/{passengerId}', [PassengersController::class, 'deletePassenger'])->name('passengers.delete');
 Route::put('/passengers/change/{passengerId}', [PassengersController::class, 'updatePassenger'])->name('passengers.update');
+
+Route::post('/employees/add', [EmployeesController::class, 'store'])->name('employees.add');
+Route::delete('/employees/delete/{employeeId}', [EmployeesController::class, 'destroy'])->name('employees.delete');
+Route::put('/employees/change/{employeeId}', [EmployeesController::class, 'update'])->name('employees.update');
 
 Route::get('/openings/match_employees/{openingId}', [OpeningController::class, 'getMatchingEmployees'])->name('openings.match_employees');

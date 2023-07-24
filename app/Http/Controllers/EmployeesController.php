@@ -17,7 +17,7 @@ class EmployeesController extends Controller
     // Create a new employee
     public function store(Request $request)
     {
-        $request->validate([
+        $employeeData = $request->validate([
             'first_name' => 'required',
             'last_name' => 'required',
             'email' => 'required|email|unique:employees,email',
@@ -25,9 +25,17 @@ class EmployeesController extends Controller
             'date_of_birth' => 'required|date',
             'address' => 'required',
             'job_title_id' => 'required|exists:job_titles,id',
+            'qualifications' => 'nullable|array',
+            'qualifications.*' => 'exists:qualifications,id',
+            'skills' => 'nullable|array',
+            'skills.*' => 'exists:skills,id',
         ]);
 
-        $employee = Employee::create($request->all());
+        // Check if the employee already exists based on email
+        $existingEmployee = Employee::where('email', $employeeData['emails'])->first();
+
+
+        $employee = Employee::create($employeeData);
 
         // Attach qualifications and skills if provided in the request
         if ($request->has('qualifications')) {
