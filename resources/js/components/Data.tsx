@@ -11,7 +11,7 @@ const Data: React.FC = () => {
   const [links, setLinks] = useState<Link[]>([
     { id: 1, label: 'Fetch Flights', url: 'http://127.0.0.1:8000/flights' },
     { id: 2, label: 'Fetch Ticket', url: 'http://127.0.0.1:8000/ticket/{ticket_number}' },
-    { id: 3, label: 'Available Destinations', url: 'http://127.0.0.1:8000/available_destinations/{departure_airport}' },
+    { id: 3, label: 'Available Destinations', url: 'http://127.0.0.1:8000/arrival_cities/{departure_city}' },
     { id: 4, label: 'Add Booking', url: 'http://127.0.0.1:8000/bookings' },
     { id: 5, label: 'Change Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}' },
     { id: 6, label: 'Delete Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}'},

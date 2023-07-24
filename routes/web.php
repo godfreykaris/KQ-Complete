@@ -1,16 +1,15 @@
 <?php
 
 use App\Http\Controllers\AccountBasedBookingInquiriesController;
-use App\Http\Controllers\DestinationsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FlightsController;
 use App\Http\Controllers\TicketsController;
 use App\Http\Controllers\BookingsController;
+use App\Http\Controllers\CitiesController;
 use App\Http\Controllers\GuestBookingInquiryController;
 use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PassengersController;
 use App\Http\Controllers\UsersController;
-use App\Models\AccountBasedBookingInquiry;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,7 +33,7 @@ Route::get('/flights', [FlightsController::class, 'index']);
 Route::get('/ticket/{ticket_number}', [TicketsController::class, 'show']);
 Route::get('/tickets/{ticket_number}/report', [TicketsController::class, 'generateTicketReport'])->name('tickets.report');
 
-Route::get('/available_destinations/{departure_destination}', [DestinationsController::class, 'show']);
+Route::get('/arrival_cities/{departure_city}', [CitiesController::class, 'getArrivalCities'])->name('cities.get_arrival_cities');
 
 Route::post('/bookings', [BookingsController::class, 'store'])->name('bookings.store');
 Route::put('/bookings/{bookingReference}', [BookingsController::class, 'update'])->name('bookings.update');

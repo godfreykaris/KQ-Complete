@@ -14,7 +14,7 @@ class GuestBookingInquiryController extends Controller
     {
             try 
             {
-                $validatedData = $request->validate([
+                $inquiryData = $request->validate([
                     'name' => 'required',
                     'email' => 'required|email',
                     'booking_inquiry_type_id' => 'required|exists:booking_inquiry_types,id',
@@ -23,11 +23,11 @@ class GuestBookingInquiryController extends Controller
                 ]);
         
                 $guestBookingInquiry = GuestBookingInquiry::create([
-                            // 'name' => $validatedData['name'],
-                            // 'email' => $validatedData['email'],
-                            // 'booking_inquiry_type_id' => $validatedData['inquiry_type_id'],          
-                            // 'subject' => $validatedData['subject'],
-                            // 'message' => $validatedData['message'],
+                            // 'name' => $inquiryData['name'],
+                            // 'email' => $inquiryData['email'],
+                            // 'booking_inquiry_type_id' => $inquiryData['inquiry_type_id'],          
+                            // 'subject' => $inquiryData['subject'],
+                            // 'message' => $inquiryData['message'],
         
                              /**For testing only */
                             'name' => fake()->name,
@@ -37,15 +37,21 @@ class GuestBookingInquiryController extends Controller
                             'message' => fake()->paragraph,
                         ]
                     );
+
+                    return response()->json(['booking_inquiry' => $guestBookingInquiry, 'status' => 1, 'value' => "Guest booking inquiry sent successfully"]);
             } 
-            catch (\Exception $e) {
+            catch (\Exception $e) 
+            {
                 // Log the error
                 Log::error($e->getMessage());
             
                 // Return the error response
-                return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+
+                // For debugging
+                // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+
+                return response()->json(['error' => 'An error occurred.'], 500);
             }
 
-        return response()->json(['booking_inquiry' => $guestBookingInquiry, 'status' => 1, 'value' => "Guest booking inquiry sent successfully"]);
     }
 }

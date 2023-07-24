@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\City;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-use App\Models\Destination;
 use App\Models\FlightStatus;
 use App\Models\Plane;
 
@@ -30,8 +30,8 @@ class FlightFactory extends Factory
             'airline' => fake()->company(),
             'is_international' => fake()->boolean(30),
             'flight_status_id' => FlightStatus::pluck('id')->random(),
-            'departure_destination_id' => Destination::pluck('id')->random(),
-            'arrival_destination_id' => Destination::pluck('id')->random(),
+            'departure_city_id' => City::pluck('id')->random(),
+            'arrival_city_id' => City::pluck('id')->random(),
             'plane_id' => Plane::pluck('id')->random(),
         ];
     }

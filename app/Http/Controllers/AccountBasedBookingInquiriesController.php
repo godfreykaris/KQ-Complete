@@ -40,8 +40,12 @@ class AccountBasedBookingInquiriesController extends Controller
                             'message' => fake()->paragraph,
                         ]
                     );
+
+                return response()->json(['booking_inquiry' => $accountBasedBookingInquiry, 'status' => 1, 'value' => "User booking inquiry sent successfully"]);
+
             } 
-            catch (\Exception $e) {
+            catch (\Exception $e) 
+            {
                 // Log the error
                 Log::error($e->getMessage());
             
@@ -52,7 +56,5 @@ class AccountBasedBookingInquiriesController extends Controller
 
                 return response()->json(['error' => 'An error occurred.'], 500);
             }
-
-        return response()->json(['booking_inquiry' => $accountBasedBookingInquiry, 'status' => 1, 'value' => "User booking inquiry sent successfully"]);
     }
 }
