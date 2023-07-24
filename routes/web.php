@@ -10,7 +10,10 @@ use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\GuestBookingInquiryController;
 use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PassengersController;
+use App\Http\Controllers\QualificationsController;
+use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\UsersController;
+use App\Models\Qualification;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,8 +41,8 @@ Route::post('/cities/change/{cityId}', [CitiesController::class, 'update'])->nam
 Route::post('/cities/add', [CitiesController::class, 'store'])->name('cities.store');
 Route::delete('/cities/delete/{cityId}', [CitiesController::class, 'delete'])->name('cities.delete');
 Route::get('/arrival_cities/{departure_city}', [CitiesController::class, 'getArrivalCities'])->name('cities.get_arrival_cities');
-Route::get('/cities/all', [CitiesController::class, 'getAllCities'])->name('cities.get_all_cities');
-Route::get('/cities/single/{cityName}/{cityCountry}', [CitiesController::class, 'getCity'])->name('cities.get_all_cities');
+Route::get('/cities', [CitiesController::class, 'index'])->name('cities.all');
+Route::get('/cities/{cityName}/{cityCountry}', [CitiesController::class, 'show'])->name('cities.show');
 
 
 Route::post('/bookings', [BookingsController::class, 'store'])->name('bookings.store');
@@ -58,5 +61,17 @@ Route::get('/employees/{employeeId}', [EmployeesController::class, 'show'])->nam
 Route::post('/employees/add', [EmployeesController::class, 'store'])->name('employees.add');
 Route::delete('/employees/delete/{employeeId}', [EmployeesController::class, 'destroy'])->name('employees.delete');
 Route::put('/employees/change/{employeeId}', [EmployeesController::class, 'update'])->name('employees.update');
+
+Route::post('/qualifications/change/{qualificationId}', [QualificationsController::class, 'update'])->name('qualifications.update');
+Route::post('/qualifications/add', [QualificationsController::class, 'store'])->name('qualifications.store');
+Route::delete('/qualifications/delete/{qualificationId}', [QualificationsController::class, 'delete'])->name('qualifications.delete');
+Route::get('/qualifications', [QualificationsController::class, 'index'])->name('qualifications.all');
+Route::get('/qualifications/{qualificationName}', [QualificationsController::class, 'show'])->name('qualifications.show');
+
+Route::post('/skills/change/{skillId}', [SkillsController::class, 'update'])->name('skills.update');
+Route::post('/skills/add', [SkillsController::class, 'store'])->name('skills.store');
+Route::delete('/skills/delete/{skillId}', [SkillsController::class, 'delete'])->name('skills.delete');
+Route::get('/skills', [SkillsController::class, 'index'])->name('skills.all');
+Route::get('/skills/{skillName}', [SkillsController::class, 'show'])->name('skills.show');
 
 Route::get('/openings/match_employees/{openingId}', [OpeningController::class, 'getMatchingEmployees'])->name('openings.match_employees');

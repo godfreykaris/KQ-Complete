@@ -29,12 +29,12 @@ class Employee extends Model
     // Relationship with Qualifications (Many-to-Many)
     public function qualifications()
     {
-        return $this->belongsToMany(Qualification::class, 'employee_qualifications');
+        return $this->belongsToMany(Qualification::class, 'employee_qualifications')->withTimestamps();
     }
 
     // Relationship with Skills (Many-to-Many)
     public function skills()
     {
-        return $this->belongsToMany(Skill::class, 'employee_skills');
+        return $this->belongsToMany(Skill::class, 'employee_skills')->withTimestamps();
     }
 }

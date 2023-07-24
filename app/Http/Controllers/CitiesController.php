@@ -21,6 +21,57 @@ class CitiesController extends Controller
             return false;
     }
 
+    // Get a city
+    public function show(Request $request, $cityName, $cityCountry)
+    {
+        try
+        {
+            // Make sure the city is valid
+            $city = City::where('name', $cityName)
+                          ->where('country', $cityCountry)
+                          ->first();
+            if(!$city)
+            {
+                return response()->json(['error' => 'The city does not exist'], 500);
+            }
+
+            return response()->json(['city' => $city, 'status' => 1]);
+        }
+        catch (\Exception $e) 
+        {
+            // Log the exception or handle it as needed
+            // For example:
+            Log::error($e->getMessage());
+
+            // For debugging
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+
+             return response()->json(['error' => 'An error occurred.'], 500);
+        }
+    }
+
+    // Get all cities
+    public function index(Request $request)
+    {
+        try
+        {
+            $cities = City::all();
+
+            return response()->json(['cities' => $cities, 'status' => 1]);
+        }
+        catch (\Exception $e) 
+        {
+            // Log the exception or handle it as needed
+            // For example:
+            Log::error($e->getMessage());
+
+            // For debugging
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+
+             return response()->json(['error' => 'An error occurred.'], 500);
+        }
+    }
+
     // Store a new city into the database
     public function store(Request $request)
     {       
@@ -78,7 +129,6 @@ class CitiesController extends Controller
             /*********** For testing only *************/
             $cityData['name'] = fake()->city;
             $cityData['country'] = fake()->country;
-            $cityId = City::pluck('id')->random();
             /******************************************/
 
             // Make sure the city is valid
@@ -142,57 +192,6 @@ class CitiesController extends Controller
              return response()->json(['error' => 'An error occurred.'], 500);
         }
 
-    }
-
-    // Get all cities
-    public function getCity(Request $request, $cityName, $cityCountry)
-    {
-        try
-        {
-            // Make sure the city is valid
-            $city = City::where('name', $cityName)
-                          ->where('country', $cityCountry)
-                          ->first();
-            if(!$city)
-            {
-                return response()->json(['error' => 'The city does not exist'], 500);
-            }
-
-            return response()->json(['city' => $city, 'status' => 1]);
-        }
-        catch (\Exception $e) 
-        {
-            // Log the exception or handle it as needed
-            // For example:
-            Log::error($e->getMessage());
-
-            // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
-
-             return response()->json(['error' => 'An error occurred.'], 500);
-        }
-    }
-
-    // Get a single city
-    public function getAllCities(Request $request)
-    {
-        try
-        {
-            $cities = City::all();
-
-            return response()->json(['cities' => $cities, 'status' => 1]);
-        }
-        catch (\Exception $e) 
-        {
-            // Log the exception or handle it as needed
-            // For example:
-            Log::error($e->getMessage());
-
-            // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
-
-             return response()->json(['error' => 'An error occurred.'], 500);
-        }
     }
 
     // Get arrival cities given a destination city
