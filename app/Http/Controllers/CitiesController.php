@@ -213,7 +213,7 @@ class CitiesController extends Controller
             $arrivalCities = Flight::where('departure_city_id', $departureCityId)->get();
             
         
-            return response()->json($arrivalCities);
+            return response()->json(['arrival_cities' => $arrivalCities, 'status' => 1]);
         } 
         catch (\Exception $e) 
         {

@@ -18,6 +18,7 @@ class EmployeeFactory extends Factory
     public function definition(): array
     {
         return [
+            'employee_id' => 'KQ-EP-' . fake()->unique()->regexify('[A-Z0-9]{15}'),
             'first_name' => fake()->firstName,
             'last_name' => fake()->lastName,
             'email' => fake()->unique()->safeEmail,

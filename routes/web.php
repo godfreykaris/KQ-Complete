@@ -53,6 +53,8 @@ Route::post('/passengers/add/{booking_reference}', [PassengersController::class,
 Route::delete('/passengers/delete/{passengerId}', [PassengersController::class, 'deletePassenger'])->name('passengers.delete');
 Route::put('/passengers/change/{passengerId}', [PassengersController::class, 'updatePassenger'])->name('passengers.update');
 
+Route::get('/employees', [EmployeesController::class, 'index'])->name('employees.all');
+Route::get('/employees/{employeeId}', [EmployeesController::class, 'show'])->name('employees.fetch_one');
 Route::post('/employees/add', [EmployeesController::class, 'store'])->name('employees.add');
 Route::delete('/employees/delete/{employeeId}', [EmployeesController::class, 'destroy'])->name('employees.delete');
 Route::put('/employees/change/{employeeId}', [EmployeesController::class, 'update'])->name('employees.update');

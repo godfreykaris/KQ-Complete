@@ -26,6 +26,11 @@ const Data: React.FC = () => {
     { id: 10, label: 'Add Passengers', url: 'http://127.0.0.1:8000/passengers/add/{booking_reference}'},
     { id: 11, label: 'Delete Passenger', url: 'http://127.0.0.1:8000/passengers/delete/{passengerId}'},
     { id: 12, label: 'Change Passenger', url: 'http://127.0.0.1:8000/passengers/change/{passengerId}'},
+    { id: 20, label: 'Add Employee', url: 'http://127.0.0.1:8000/employees/add'},
+    { id: 21, label: 'Change Employee', url: 'http://127.0.0.1:8000/employees/change/{employeeId}'},
+    { id: 22, label: 'Delete Employee', url: 'http://127.0.0.1:8000/employees/delete/{employeeId}'},
+    { id: 23, label: 'Fetch Employees', url: 'http://127.0.0.1:8000/employees' },
+    { id: 24, label: 'Fetch Employee', url: 'http://127.0.0.1:8000/employees/{employeeId}' },
     { id: 13, label: 'Match Employee', url: 'http://127.0.0.1:8000/openings/match_employees/{openingId}'},
     { id: 14, label: 'Print Ticket Report', url: 'http://127.0.0.1:8000/tickets/{ticket_number}/report'},
     
@@ -362,10 +367,10 @@ const addPassengers = () => {
   const passengersData = [
     {
       name: 'John Doe',
-          date_of_birth: '2022-08-12', // Convert the date format to 'YYYY-MM-DD'
-          passport_number: "jdfhvjvs",
-          identification_number: "jfkvdfb",
-          seat_id: 1,
+      date_of_birth: '2022-08-12', // Convert the date format to 'YYYY-MM-DD'
+      passport_number: "jdfhvjvs",
+      identification_number: "jfkvdfb",
+      seat_id: 1,
       // Add other passenger details
     },
     {
@@ -566,6 +571,122 @@ const deleteCity = () => {
   });
 };
 
+const addEmployee = () => {
+  const employeeData = 
+    {
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john.doe@example.com",
+      "phone": "1234567890",
+      "date_of_birth": "1990-01-01",
+      "address": "123 Main Street",
+      "job_title_id": 1,
+      "qualifications": [1, 2, 3],
+      "skills": [1, 2, 3],
+    };
+
+  const addEmployeeUrl = links.find((link) => link.id === 20)?.url;
+
+  if (addEmployeeUrl) {
+    fetch(addEmployeeUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify(employeeData),
+    })
+      .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
+const changeEmployee = () => {
+  const employeeData = 
+    {
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john.doe@example.com",
+      "phone": "1234567890",
+      "date_of_birth": "1990-01-01",
+      "address": "123 Main Street",
+      "job_title_id": 1,
+      "qualifications": [1, 2, 3],
+      "skills": [1, 2, 3, 6],
+    };
+
+  const changeEmployeeUrl = links.find((link) => link.id === 21)?.url;
+
+  if (changeEmployeeUrl) {
+    fetch(changeEmployeeUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify(employeeData),
+    })
+      .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
+const deleteEmployee = () => {
+  
+  const deleteEmployeeUrl = links.find((link) => link.id === 22)?.url;
+
+  if (deleteEmployeeUrl) {
+    fetch(deleteEmployeeUrl, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      }
+    })
+      .then((response) => {
+        if (response.headers.get('content-type')?.includes('application/json')) {
+          return response.json(); // Extract the response as JSON
+        } else {
+          return response.text(); // Extract the response as text
+        }
+    })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
   return (
     <div style={{ display: 'flex' }}>
       <div style={{ width: '50%', paddingRight: '1rem', borderRight: '1px solid #ccc' }}>
@@ -616,10 +737,22 @@ const deleteCity = () => {
                 </button>
               ) : link.label === 'Change City' ? (
                 <button onClick={changeCity} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
-                  {link.label}
+                  {link.label} 
                 </button>
               ) : link.label === 'Delete City' ? (
                 <button onClick={deleteCity} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Add Employee' ? (
+                <button onClick={addEmployee} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Change Employee' ? (
+                <button onClick={changeEmployee} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Delete Employee' ? (
+                <button onClick={deleteEmployee} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
                 </button>
               ) :(
