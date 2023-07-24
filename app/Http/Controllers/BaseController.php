@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\JobTitle;
+use App\Models\Qualification;
+use App\Models\Skill;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -112,10 +116,25 @@ class BaseController extends Controller
         try 
         {
             $item = $this->model->findOrFail($id);
-            // Detach the skill from all employees before deleting it
-            $item->employees()->detach();    
+            
+            // Check if the model is Skill or Qualification
+            if ($item instanceof Skill || $item instanceof Qualification) {
+                // Detach the skill or qualification from all employees before deleting it
+                $item->employees()->detach();
+            }
 
-            $item->delete();
+            // Check if the model uses SoftDeletes trait
+            if ($item instanceof JobTitle)
+            {
+                // Use soft delete
+                $item->delete();
+            } 
+            else 
+            {
+                // Otherwise, use regular delete
+                $item->forceDelete();
+            }
+
             return response()->json(['message' => 'Item deleted successfully', 'status' => 1]);
         }
         catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) 

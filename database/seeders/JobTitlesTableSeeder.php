@@ -47,8 +47,8 @@ class JobTitlesTableSeeder extends Seeder
             'Baggage Claims Agent',
         ];
 
-        foreach ($jobTitles as $title) {
-            JobTitle::create(['title' => $title]);
+        foreach ($jobTitles as $name) {
+            JobTitle::create(['name' => $name]);
         }
     }
 }

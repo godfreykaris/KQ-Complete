@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('job_titles', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            // Add other job title-related columns as needed
-            $table->timestamps();
+        Schema::table('job_titles', function (Blueprint $table) {
+            $table->softDeletes();
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('job_titles');
+        Schema::table('job_titles', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };

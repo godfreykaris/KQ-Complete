@@ -8,6 +8,7 @@ use App\Http\Controllers\BookingsController;
 use App\Http\Controllers\CitiesController;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\GuestBookingInquiryController;
+use App\Http\Controllers\JobTitlesController;
 use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PassengersController;
 use App\Http\Controllers\QualificationsController;
@@ -73,5 +74,11 @@ Route::post('/skills/add', [SkillsController::class, 'store'])->name('skills.sto
 Route::delete('/skills/delete/{skillId}', [SkillsController::class, 'delete'])->name('skills.delete');
 Route::get('/skills', [SkillsController::class, 'index'])->name('skills.all');
 Route::get('/skills/{skillName}', [SkillsController::class, 'show'])->name('skills.show');
+
+Route::post('/skills/change/{jobTitleId}', [JobTitlesController::class, 'update'])->name('jobTitles.update');
+Route::post('/jobTitles/add', [JobTitlesController::class, 'store'])->name('jobTitles.store');
+Route::delete('/jobTitles/delete/{jobTitleId}', [JobTitlesController::class, 'delete'])->name('jobTitles.delete');
+Route::get('/jobTitles', [JobTitlesController::class, 'index'])->name('jobTitles.all');
+Route::get('/jobTitles/{jobTitleName}', [JobTitlesController::class, 'show'])->name('jobTitles.show');
 
 Route::get('/openings/match_employees/{openingId}', [OpeningController::class, 'getMatchingEmployees'])->name('openings.match_employees');

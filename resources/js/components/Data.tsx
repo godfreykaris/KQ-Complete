@@ -41,6 +41,11 @@ const Data: React.FC = () => {
     { id: 32, label: 'Delete Skill', url: 'http://127.0.0.1:8000/skills/delete/{skillId}' },
     { id: 33, label: 'All Skills', url: 'http://127.0.0.1:8000/skills' },
     { id: 34, label: 'Fetch Skill', url: 'http://127.0.0.1:8000/skills/{skillName}' },
+    { id: 35, label: 'Add JobTitle', url: 'http://127.0.0.1:8000/jobTitles/add' },
+    { id: 36, label: 'Change JobTitle', url: 'http://127.0.0.1:8000/jobTitles/change/{jobTitleId}' },
+    { id: 37, label: 'Delete JobTitle', url: 'http://127.0.0.1:8000/jobTitles/delete/{jobTitleId}' },
+    { id: 38, label: 'All JobTitles', url: 'http://127.0.0.1:8000/jobTitles' },
+    { id: 39, label: 'Fetch JobTitle', url: 'http://127.0.0.1:8000/jobTitles/{jobTitleName}' },
     { id: 13, label: 'Match Employee', url: 'http://127.0.0.1:8000/openings/match_employees/{openingId}'},
     { id: 14, label: 'Print Ticket Report', url: 'http://127.0.0.1:8000/tickets/{ticket_number}/report'},
     
@@ -908,6 +913,108 @@ const deleteSkill = () => {
     behavior: 'smooth',
   });
 };
+
+
+const addJobTitle = () => {
+  const jobTitleData = {
+    name: 'Aircraft Maintenance',
+    
+  };
+
+  const  addJobTitleUrl = links.find((link) => link.id === 35)?.url;
+
+  if (addJobTitleUrl) {
+    fetch(addJobTitleUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify(jobTitleData),
+    })
+      .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
+const changeJobTitle = () => {
+  const jobTitleData = {
+    name: 'Aircraft Maintenance',
+    
+  };
+
+  const  changeJobTitleUrl = links.find((link) => link.id === 36)?.url;
+
+  if (changeJobTitleUrl) {
+    fetch(changeJobTitleUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify(jobTitleData),
+    })
+      .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
+const deleteJobTitle = () => {
+  
+  const deleteJobTitleUrl = links.find((link) => link.id === 37)?.url;
+
+  if (deleteJobTitleUrl) {
+    fetch(deleteJobTitleUrl, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      }
+    })
+      .then((response) => {
+        if (response.headers.get('content-type')?.includes('application/json')) {
+          return response.json(); // Extract the response as JSON
+        } else {
+          return response.text(); // Extract the response as text
+        }
+    })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
   return (
     <div style={{ display: 'flex' }}>
       <div style={{ width: '50%', paddingRight: '1rem', borderRight: '1px solid #ccc' }}>
@@ -998,6 +1105,18 @@ const deleteSkill = () => {
                 </button>
               ) : link.label === 'Delete Skill' ? (
                 <button onClick={deleteSkill} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Add JobTitle' ? (
+                <button onClick={addJobTitle} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Change JobTitle' ? (
+                <button onClick={changeJobTitle} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label} 
+                </button>
+              ) : link.label === 'Delete JobTitle' ? (
+                <button onClick={deleteJobTitle} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
                 </button>
               ) :(
