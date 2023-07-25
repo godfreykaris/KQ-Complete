@@ -9,6 +9,7 @@ use App\Models\Qualification;
 use App\Models\SeatLocation;
 use App\Models\Skill;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -100,7 +101,7 @@ class BaseController extends Controller
             $item->update($data);
             return response()->json(['item' => $item, 'status' => 1]);
         }
-        catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) 
+        catch (ModelNotFoundException $e) 
         {
             return response()->json(['error' => 'The item with id ' . $id . ' does not exist'], 404);
         }
@@ -140,7 +141,7 @@ class BaseController extends Controller
 
             return response()->json(['message' => 'Item deleted successfully', 'status' => 1]);
         }
-        catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) 
+        catch (ModelNotFoundException $e) 
         {
             return response()->json(['error' => 'The item with id ' . $id . ' does not exist'], 404);
         }

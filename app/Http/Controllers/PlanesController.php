@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class PlanesContoller extends Controller
+class PlanesController extends Controller
 {
     public function generatePlaneId()
     {

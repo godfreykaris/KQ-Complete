@@ -9,16 +9,16 @@ use App\Http\Controllers\CitiesController;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\FlightClassesController;
 use App\Http\Controllers\FlightStatusesController;
-use App\Http\Controllers\PlanesContoller;
+use App\Http\Controllers\PlanesController;
 use App\Http\Controllers\GuestBookingInquiryController;
 use App\Http\Controllers\JobTitlesController;
 use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PassengersController;
+use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\QualificationsController;
 use App\Http\Controllers\SeatLocationsController;
 use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\UsersController;
-use App\Models\Qualification;
 
 /*
 |--------------------------------------------------------------------------
@@ -114,3 +114,9 @@ Route::delete('/openings/delete/{openingId}', [OpeningController::class, 'delete
 Route::get('/openings', [OpeningController::class, 'index'])->name('openings.all');
 Route::get('/openings/{openingTitle}', [OpeningController::class, 'show'])->name('openings.show');
 Route::get('/openings/match_employees/{openingId}', [OpeningController::class, 'getMatchingEmployees'])->name('openings.match_employees');
+
+Route::get('/payment/create', [PayPalController::class,'createPayment'])->name('payment.create');
+Route::get('/payment/success', [PayPalController::class, 'handlePaymentResponse'])->name('payment.response');
+Route::get('/payment/cancel', function () {
+    return response()->json(['message' => 'Payment canceled.'], 200);
+});

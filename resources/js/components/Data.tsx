@@ -23,7 +23,7 @@ const Data: React.FC = () => {
     { id: 60, label: 'Add Plane', url: 'http://127.0.0.1:8000/planes/add' },
     { id: 61, label: 'Change Plane', url: 'http://127.0.0.1:8000/planes/change/{planeId}' },
     { id: 62, label: 'Delete Plane', url: 'http://127.0.0.1:8000/planes/delete/{planeId}' },
-    { id: 63, label: 'All Plane', url: 'http://127.0.0.1:8000/planes' },
+    { id: 63, label: 'All Planes', url: 'http://127.0.0.1:8000/planes' },
     { id: 64, label: 'Fetch Plane', url: 'http://127.0.0.1:8000/planes/{planeId}' },
     { id: 2, label: 'Fetch Ticket', url: 'http://127.0.0.1:8000/ticket/{ticket_number}' },
     { id: 3, label: 'Available Destinations', url: 'http://127.0.0.1:8000/arrival_cities/{departure_city}' },
@@ -1447,9 +1447,9 @@ const deleteOpening = () => {
 };
 
 const addPlane = () => {
-  const cityData = {
-    name: 'Washington',
-    model: 'United States of America',   
+  const planeData = {
+    name: 'Boeng 737',
+    model: 'Boeng',   
     capacity: 180,
     
   };
@@ -1463,7 +1463,7 @@ const addPlane = () => {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
       },
-      body: JSON.stringify(cityData),
+      body: JSON.stringify(planeData),
     })
       .then((response) => {
           if (response.headers.get('content-type')?.includes('application/json')) {
@@ -1484,9 +1484,10 @@ const addPlane = () => {
 };
 
 const changePlane = () => {
-  const cityData = {
-    name: 'Washington',
-    country: 'United States of America',   
+  const planeData = {
+    name: 'Boeng 737',
+    model: 'Boeng',   
+    capacity: 180,   
     
   };
 
@@ -1499,7 +1500,7 @@ const changePlane = () => {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
       },
-      body: JSON.stringify(cityData),
+      body: JSON.stringify(planeData),
     })
       .then((response) => {
           if (response.headers.get('content-type')?.includes('application/json')) {
@@ -1699,6 +1700,18 @@ const deletePlane = () => {
                 </button>
               ) : link.label === 'Delete Opening' ? (
                 <button onClick={deleteOpening} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Add Plane' ? (
+                <button onClick={addPlane} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Change Plane' ? (
+                <button onClick={changePlane} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label} 
+                </button>
+              ) : link.label === 'Delete Plane' ? (
+                <button onClick={deletePlane} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
                 </button>
               ) :(
