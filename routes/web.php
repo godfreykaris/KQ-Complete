@@ -7,11 +7,14 @@ use App\Http\Controllers\TicketsController;
 use App\Http\Controllers\BookingsController;
 use App\Http\Controllers\CitiesController;
 use App\Http\Controllers\EmployeesController;
+use App\Http\Controllers\FlightClassesController;
+use App\Http\Controllers\FlightStatusesController;
 use App\Http\Controllers\GuestBookingInquiryController;
 use App\Http\Controllers\JobTitlesController;
 use App\Http\Controllers\OpeningController;
 use App\Http\Controllers\PassengersController;
 use App\Http\Controllers\QualificationsController;
+use App\Http\Controllers\SeatLocationsController;
 use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\UsersController;
 use App\Models\Qualification;
@@ -35,6 +38,18 @@ Route::post('/users/register', [UsersController::class, 'register'])->name('user
 
 Route::get('/flights', [FlightsController::class, 'index']);
 
+Route::post('/flightStatuses/change/{flightStatusId}', [FlightStatusesController::class, 'update'])->name('flightStatuses.update');
+Route::post('/flightStatuses/add', [FlightStatusesController::class, 'store'])->name('flightStatuses.store');
+Route::delete('/flightStatuses/delete/{flightStatusId}', [FlightStatusesController::class, 'delete'])->name('flightStatuses.delete');
+Route::get('/flightStatuses', [FlightStatusesController::class, 'index'])->name('flightStatuses.all');
+Route::get('/flightStatuses/{flightStatusName}', [FlightStatusesController::class, 'show'])->name('flightStatuses.show');
+
+Route::post('/flightClasses/change/{flightClassId}', [FlightClassesController::class, 'update'])->name('flightClasses.update');
+Route::post('/flightClasses/add', [FlightClassesController::class, 'store'])->name('flightClasses.store');
+Route::delete('/flightClasses/delete/{flightClassId}', [FlightClassesController::class, 'delete'])->name('flightClasses.delete');
+Route::get('/flightClasses', [FlightClassesController::class, 'index'])->name('flightClasses.all');
+Route::get('/flightClasses/{flightClassName}', [FlightClassesController::class, 'show'])->name('flightClasses.show');
+
 Route::get('/ticket/{ticket_number}', [TicketsController::class, 'show']);
 Route::get('/tickets/{ticket_number}/report', [TicketsController::class, 'generateTicketReport'])->name('tickets.report');
 
@@ -45,6 +60,11 @@ Route::get('/arrival_cities/{departure_city}', [CitiesController::class, 'getArr
 Route::get('/cities', [CitiesController::class, 'index'])->name('cities.all');
 Route::get('/cities/{cityName}/{cityCountry}', [CitiesController::class, 'show'])->name('cities.show');
 
+Route::post('/seatLocations/change/{seatLocationId}', [SeatLocationsController::class, 'update'])->name('seatLocations.update');
+Route::post('/seatLocations/add', [SeatLocationsController::class, 'store'])->name('seatLocations.store');
+Route::delete('/seatLocations/delete/{seatLocationId}', [SeatLocationsController::class, 'delete'])->name('seatLocations.delete');
+Route::get('/seatLocations', [SeatLocationsController::class, 'index'])->name('seatLocations.all');
+Route::get('/seatLocations/{seatLocationName}', [SeatLocationsController::class, 'show'])->name('seatLocations.show');
 
 Route::post('/bookings', [BookingsController::class, 'store'])->name('bookings.store');
 Route::put('/bookings/{bookingReference}', [BookingsController::class, 'update'])->name('bookings.update');
@@ -75,7 +95,7 @@ Route::delete('/skills/delete/{skillId}', [SkillsController::class, 'delete'])->
 Route::get('/skills', [SkillsController::class, 'index'])->name('skills.all');
 Route::get('/skills/{skillName}', [SkillsController::class, 'show'])->name('skills.show');
 
-Route::post('/skills/change/{jobTitleId}', [JobTitlesController::class, 'update'])->name('jobTitles.update');
+Route::post('/jobTitles/change/{jobTitleId}', [JobTitlesController::class, 'update'])->name('jobTitles.update');
 Route::post('/jobTitles/add', [JobTitlesController::class, 'store'])->name('jobTitles.store');
 Route::delete('/jobTitles/delete/{jobTitleId}', [JobTitlesController::class, 'delete'])->name('jobTitles.delete');
 Route::get('/jobTitles', [JobTitlesController::class, 'index'])->name('jobTitles.all');

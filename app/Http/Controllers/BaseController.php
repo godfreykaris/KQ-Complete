@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FlightClass;
+use App\Models\FlightStatus;
 use App\Models\JobTitle;
 use App\Models\Qualification;
+use App\Models\SeatLocation;
 use App\Models\Skill;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -124,7 +127,7 @@ class BaseController extends Controller
             }
 
             // Check if the model uses SoftDeletes trait
-            if ($item instanceof JobTitle)
+            if ($item instanceof JobTitle || $item instanceof SeatLocation || $item instanceof FlightStatus || $item instanceof FlightClass)
             {
                 // Use soft delete
                 $item->delete();
