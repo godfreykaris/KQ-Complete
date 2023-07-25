@@ -9,6 +9,7 @@ use App\Http\Controllers\CitiesController;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\FlightClassesController;
 use App\Http\Controllers\FlightStatusesController;
+use App\Http\Controllers\PlanesContoller;
 use App\Http\Controllers\GuestBookingInquiryController;
 use App\Http\Controllers\JobTitlesController;
 use App\Http\Controllers\OpeningController;
@@ -49,6 +50,12 @@ Route::post('/flightClasses/add', [FlightClassesController::class, 'store'])->na
 Route::delete('/flightClasses/delete/{flightClassId}', [FlightClassesController::class, 'delete'])->name('flightClasses.delete');
 Route::get('/flightClasses', [FlightClassesController::class, 'index'])->name('flightClasses.all');
 Route::get('/flightClasses/{flightClassName}', [FlightClassesController::class, 'show'])->name('flightClasses.show');
+
+Route::post('/planes/change/{planeId}', [PlanesController::class, 'update'])->name('planes.update');
+Route::post('/planes/add', [PlanesController::class, 'store'])->name('planes.store');
+Route::delete('/planes/delete/{planeId}', [PlanesController::class, 'delete'])->name('planes.delete');
+Route::get('/planes', [PlanesController::class, 'index'])->name('planes.all');
+Route::get('/planes/{planeId}', [PlanesController::class, 'show'])->name('planes.show');
 
 Route::get('/ticket/{ticket_number}', [TicketsController::class, 'show']);
 Route::get('/tickets/{ticket_number}/report', [TicketsController::class, 'generateTicketReport'])->name('tickets.report');

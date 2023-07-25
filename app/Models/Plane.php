@@ -10,6 +10,7 @@ class Plane extends Model
     use HasFactory;
 
     protected $fillable = [
+        'plane_id',
         'name',
         'model',
         'capacity'

@@ -15,18 +15,21 @@ class PlanesTableSeeder extends Seeder
     {
         $planes = [
             [
+                'plane_id' => "PL-FG45738",
                 'name' => 'Boeing 737',
                 'model' => 'Boeing',
                 'capacity' => 180,
             ],
 
             [
+                'plane_id' => "PL-OKJGJJD5",
                 'name' => 'Airbus A320',
                 'model' => 'Airbus',
                 'capacity' => 150,
             ],
 
             [
+                'plane_id' => "PL-NBVHRH45",
                 'name' => 'Bombardier Q400',
                 'model' => 'Bombardier',
                 'capacity' => 80,
