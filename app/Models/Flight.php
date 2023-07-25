@@ -13,7 +13,13 @@ class Flight extends Model
         'flight_number',
         'airline',
         'plane_id',
-        'is_international'
+        'is_international',
+        'duration',
+        'departure_time',
+        'arrival_time',
+        'flight_status_id',
+        'departure_city_id',
+        'arrival_city_id',
         
     ];
 
