@@ -10,7 +10,13 @@ class Seat extends Model
     use HasFactory;
 
     protected $fillable = [
-        'seat_number', 'price', 'is_available', 'plane_id', 'flight_id', 'flight_class_id', 'location_id',
+        'seat_number',
+         'price',
+         'is_available', 
+         'plane_id', 
+         'flight_id', 
+         'flight_class_id', 
+         'location_id',
     ];
 
     public function plane()
