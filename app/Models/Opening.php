@@ -9,6 +9,11 @@ class Opening extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'title',
+        'description',
+    ];
+
     // Define the relationships with qualifications and skills
     public function qualifications()
     {

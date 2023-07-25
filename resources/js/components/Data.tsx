@@ -61,6 +61,11 @@ const Data: React.FC = () => {
     { id: 37, label: 'Delete JobTitle', url: 'http://127.0.0.1:8000/jobTitles/delete/{jobTitleId}' },
     { id: 38, label: 'All JobTitles', url: 'http://127.0.0.1:8000/jobTitles' },
     { id: 39, label: 'Fetch JobTitle', url: 'http://127.0.0.1:8000/jobTitles/{jobTitleName}' },
+    { id: 55, label: 'Add Opening', url: 'http://127.0.0.1:8000/openings/add' },
+    { id: 56, label: 'Change Opening', url: 'http://127.0.0.1:8000/openings/change/{openingId}' },
+    { id: 57, label: 'Delete Opening', url: 'http://127.0.0.1:8000/openings/delete/{openingId}' },
+    { id: 58, label: 'All Openings', url: 'http://127.0.0.1:8000/openings' },
+    { id: 59, label: 'Fetch Opening', url: 'http://127.0.0.1:8000/openings/{openingTitle}' },
     { id: 13, label: 'Match Employee', url: 'http://127.0.0.1:8000/openings/match_employees/{openingId}'},
     { id: 14, label: 'Print Ticket Report', url: 'http://127.0.0.1:8000/tickets/{ticket_number}/report'},
     
@@ -1330,6 +1335,112 @@ const deleteFlightClass = () => {
   });
 };
 
+const addOpening = () => {
+  const openingData = {
+    "title": 'Flight Attendant Opening',
+    "description": 'Flight Attendatnt employee required ASAP',
+    "qualifications": [1, 2, 3],
+    "skills": [1, 2, 3],
+        
+  };
+
+  const  addOpeningUrl = links.find((link) => link.id === 55)?.url;
+
+  if (addOpeningUrl) {
+    fetch(addOpeningUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify(openingData),
+    })
+      .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
+const changeOpening = () => {
+  const openingData = {
+    "title": 'Flight Attendant Opening',
+    "description": 'Flight Attendatnt employee required ASAP',
+    "qualifications": [1, 2, 3],
+    "skills": [1, 2, 3],
+    
+  };
+
+  const  changeOpeningUrl = links.find((link) => link.id === 56)?.url;
+
+  if (changeOpeningUrl) {
+    fetch(changeOpeningUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify(openingData),
+    })
+      .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
+const deleteOpening = () => {
+  
+  const deleteOpeningUrl = links.find((link) => link.id === 57)?.url;
+
+  if (deleteOpeningUrl) {
+    fetch(deleteOpeningUrl, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      }
+    })
+      .then((response) => {
+        if (response.headers.get('content-type')?.includes('application/json')) {
+          return response.json(); // Extract the response as JSON
+        } else {
+          return response.text(); // Extract the response as text
+        }
+    })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
   return (
     <div style={{ display: 'flex' }}>
       <div style={{ width: '50%', paddingRight: '1rem', borderRight: '1px solid #ccc' }}>
@@ -1468,6 +1579,18 @@ const deleteFlightClass = () => {
                 </button>
               ) : link.label === 'Delete FlightClass' ? (
                 <button onClick={deleteFlightClass} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Add Opening' ? (
+                <button onClick={addOpening} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Change Opening' ? (
+                <button onClick={changeOpening} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label} 
+                </button>
+              ) : link.label === 'Delete Opening' ? (
+                <button onClick={deleteOpening} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
                 </button>
               ) :(
