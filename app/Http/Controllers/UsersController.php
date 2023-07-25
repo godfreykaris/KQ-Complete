@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -187,12 +188,122 @@ class UsersController extends Controller
         return response()->json(['payment_methods' => $paymentMethods, 'status' => 1]);
     }
 
+    // Add a new payment method for the user
+    public function addPaymentMethod(Request $request)
+    {
+        try 
+        {
+            // Validate the payment method data
+            $request->validate([
+                'card_number' => 'required|string',
+                'card_holder_name' => 'required|string',
+                'expiration_date' => 'required|string',
+                'security_code' => 'required|string',
+            ]);
+
+            // Get the authenticated user
+            $user = Auth::user();
+
+            // Save the payment method details to the user's record in the database
+            $paymentMethod = new Payment([
+                'card_number' => $request->input('card_number'),
+                'card_holder_name' => $request->input('card_holder_name'),
+                'expiration_date' => $request->input('expiration_date'),
+                'security_code' => $request->input('security_code'),
+            ]);
+
+            User::where('id', $user->id)->payments()->save($paymentMethod);
+
+            return response()->json(['message' => 'Payment method added successfully.', 'status' => 1]);
+        } 
+        catch (\Exception $e) 
+        {
+            Log::error($e->getMessage());
+            return response()->json(['error' => 'An error occurred while adding the payment method.'], 500);
+        }
+    }
+
+    // Delete a payment method for the user
+    public function deletePaymentMethod($paymentId)
+    {
+        try 
+        {
+            // Get the authenticated user
+            $user = Auth::user();
+
+            // Find the payment method by its id and ensure it belongs to the authenticated user
+            $paymentMethod = Payment::where('user_id', $user->id)->findOrFail($paymentId);
+
+            // Delete the payment method
+            $paymentMethod->delete();
+
+            return response()->json(['message' => 'Payment method deleted successfully.', 'status' => 1]);
+        }
+        catch (ModelNotFoundException $e) 
+        {
+            Log::error($e->getMessage());
+            // Handle ModelNotFoundException
+            return response()->json(['error' => 'Payment method not found.'], 404);
+        } 
+        catch (\Exception $e) 
+        {
+            // Handle other exceptions
+            Log::error($e->getMessage());
+            return response()->json(['error' => 'An error occurred while deleting the payment method.'], 500);
+
+            // For debugging
+            // return response()->json(['error' => 'An error occurred while deleting the payment method. ' . $e->getMessage() ], 500);
+        }
+    }
+
+
     // User Wallet or Points (Assuming a 'wallet' attribute is present in the User model)
     public function userWallet()
     {
-        $user = Auth::user();
-        $walletBalance = $user->wallet;
-        return response()->json(['wallet_balance' => $walletBalance, 'status' => 1]);
+        try 
+        {
+            $user = Auth::user();
+            $walletBalance = $user->wallet;
+            $rewardPoints = $user->reward_points;
+            return response()->json(['wallet_balance' => $walletBalance, 'reward_points' => $rewardPoints, 'status' => 1]);
+        }
+        catch (\Exception $e) 
+        {
+            Log::error($e->getMessage());
+            return response()->json(['error' => 'An error occurred.'], 500);
+        }
+    }
+
+    // Reward users with points for booking a flight
+    public function rewardPointsForBookingFlight(Request $request)
+    {
+        try
+        {
+            $userPointsData = $request->validate([
+                'points_earned' => 'required|integer|min:1',               
+            ]);
+
+            // Assume the user's booking is successful, and they earned 100 reward points
+            $user = Auth::user();
+            $pointsEarned = $userPointsData['points_earned'];
+
+            // Update the user's reward_points attribute
+            User::where('id', $user->id)
+                ->increment('reward_points', $pointsEarned);
+
+            // Optionally, you can also update the wallet balance if they earned some wallet credits as part of the reward
+            // $user->increment('wallet', $walletCreditsEarned);
+
+            return response()->json(['message' => 'Points rewarded successfully.', 'status' => 1]);
+        }
+        catch (\Exception $e) 
+        {
+            Log::error($e->getMessage());
+            return response()->json(['error' => 'An error occurred while rewarding points.'], 500);
+
+            // For debugging
+            // return response()->json(['error' => 'An error occurred while rewarding points. ' . $e->getMessage()], 500);
+        }
     }
 
 

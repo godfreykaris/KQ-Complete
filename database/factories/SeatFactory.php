@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Flight;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 use App\Models\Plane;
@@ -24,6 +25,7 @@ class SeatFactory extends Factory
             'is_available' => fake()->boolean(),
             'price' => fake()->randomFloat(2, 100, 500),
             'plane_id' => Plane::pluck('id')->random(),
+            'flight_id' => Flight::pluck('id')->random(),
             'flight_class_id' => FlightClass::pluck('id')->random(),
             'location_id' => SeatLocation::pluck('id')->random(),
         ];

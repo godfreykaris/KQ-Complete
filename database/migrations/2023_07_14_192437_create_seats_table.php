@@ -16,8 +16,9 @@ return new class extends Migration
             $table->string('seat_number');
             $table->float('price');
             $table->boolean('is_available')->default(true);
-            $table->foreignId('plane_id')->constrained('planes')->onDelete('cascade');
-            $table->foreignId('flight_class_id')->constrained('flight_classes')->onDelete('cascade');
+            $table->foreignId('plane_id')->nullable()->constrained('planes')->onDelete('cascade');
+            $table->foreignId('flight_id')->nullable()->constrained('flights')->onDelete('cascade');
+            $table->foreignId('flight_class_id')->nullable()->constrained('flight_classes')->onDelete('cascade');
             $table->foreignId('location_id')->constrained('seat_locations')->onDelete('cascade');
             $table->timestamps();
         });

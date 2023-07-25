@@ -17,6 +17,7 @@ class FlightStatusesTableSeeder extends Seeder
             ['name' => 'On-time'],
             ['name' => 'Delayed'],
             ['name' => 'Cancelled'],
+            ['name' => 'Departed'],
         ];
 
         foreach($flight_statuses as $key => $value)

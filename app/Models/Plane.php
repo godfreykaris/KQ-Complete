@@ -16,4 +16,16 @@ class Plane extends Model
         'capacity'
         
     ];
+
+    // Define the relationship with the Flight model
+    public function flights()
+    {
+        return $this->hasMany(Flight::class);
+    }
+
+    // Define the relationship with the Seat model
+    public function seats()
+    {
+        return $this->hasMany(Seat::class);
+    }
 }

@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'wallet',
+        'reward_points',
     ];
 
     /**
@@ -42,4 +44,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
 }
