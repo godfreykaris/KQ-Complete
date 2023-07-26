@@ -3,11 +3,14 @@ import React, { useState } from 'react';
 
 import apiBaseUrl from '../config'
 
-interface Model 
+interface Entity 
   {
     id: number;
     name: string;
   }
+
+  // Declare the entity types
+  const entityTypes = ['Skill', 'Qualification', 'Flight Class', 'Flight Status', 'Seat Location'];
   
   const BaseFormComponent: React.FC = () => {
     // State variables to store user inputs
@@ -111,14 +114,29 @@ interface Model
                 <h2 className="text-center">Add Data</h2>
                 <form className="form" onSubmit={handleSubmit}>
                     <div className="form-group">
-                      <label htmlFor="selectEntity">Select an Entity</label>
+                    <label htmlFor="selectEntity" className="form-label">
+                      You can select a:
+                    </label>
+
+                    {/* Use an unordered list to display the entity types */}
+                    <ul className="entity-types">
+                      {entityTypes.map((entityType) => (
+                        <li key={entityType} className="entity-item">
+                          {entityType}
+                        </li>
+                      ))}
+                    </ul>
+                    <label htmlFor="selectEntity" className="form-label">
+                      From here:
+                    </label>
+
                       <select
                         id="selectEntity"
                         className="form-control"
                         value={selectedEntity}
                         onChange={handleEntityChange}
                       >
-                        <option value="">Select an Entity</option>
+                        <option value="">Select an Item</option>
                         <option value="skills">Skill</option>
                         <option value="qualifications">Qualification</option>
                         {/* Add more options for other entities as needed */}

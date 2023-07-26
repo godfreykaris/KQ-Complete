@@ -51,4 +51,30 @@
   .btn-primary:hover {
     background-color: #0056b3; /* Darker blue on hover */
   }
+
+
+.form-label {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px; /* Add some spacing below the label */
+  }
+
+/* Styling for the unordered list */
+.entity-types {
+    list-style: none;
+    padding-left: 10;
+    margin: 0;
+    
+  }
+  
+  /* Styling for each entity type in the list */
+  .entity-item {
+    font-size: 16px;
+    color: #555;
+  }
+  
+  
+  /* Add any other custom styles as needed */
+  
   
