@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
         $this->call(QualificationsTableSeeder::class);
         $this->call(SkillsTableSeeder::class);
         Seat::factory(200)->create();
-        Flight::factory(30)->create();
+        Flight::factory(5)->create();
         Ticket::factory(40)->create();
         Booking::factory(40)->create();
         Employee::factory(100)->create();

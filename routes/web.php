@@ -17,6 +17,7 @@ use App\Http\Controllers\PassengersController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\QualificationsController;
 use App\Http\Controllers\SeatLocationsController;
+use App\Http\Controllers\SeatsController;
 use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\UsersController;
 
@@ -38,6 +39,16 @@ Route::get('/', function () {
 Route::post('/users/register', [UsersController::class, 'register'])->name('user_register.store');
 
 Route::get('/flights', [FlightsController::class, 'index']);
+
+Route::post('/flights/change/{flightId}', [FlightsController::class, 'update'])->name('flights.update');
+Route::post('/flights/add', [FlightsController::class, 'store'])->name('flights.store');
+Route::delete('/flights/delete/{flightId}', [FlightsController::class, 'delete'])->name('flights.delete');
+Route::get('/flights', [FlightsController::class, 'index'])->name('flights.all');
+Route::get('/flights/{flightId}', [FlightsController::class, 'show'])->name('flights.show');
+Route::get('/flights/byDepartureCityId/{departureCityId}', [FlightsController::class, 'getFlightsByDepartureCity'])->name('flights.getFlightsByDepartureCity');
+Route::get('/flights/byHours/{hours}', [FlightsController::class, 'getFlightsDepartingWithinHours'])->name('flights.getFlightsDepartingWithinHours');
+Route::get('/flights/byDepartureDate/{departureDate}', [FlightsController::class, 'getFlightsByDepartureDate'])->name('flights.getFlightsByDepartureDate');
+
 
 Route::post('/flightStatuses/change/{flightStatusId}', [FlightStatusesController::class, 'update'])->name('flightStatuses.update');
 Route::post('/flightStatuses/add', [FlightStatusesController::class, 'store'])->name('flightStatuses.store');
@@ -72,6 +83,12 @@ Route::post('/seatLocations/add', [SeatLocationsController::class, 'store'])->na
 Route::delete('/seatLocations/delete/{seatLocationId}', [SeatLocationsController::class, 'delete'])->name('seatLocations.delete');
 Route::get('/seatLocations', [SeatLocationsController::class, 'index'])->name('seatLocations.all');
 Route::get('/seatLocations/{seatLocationName}', [SeatLocationsController::class, 'show'])->name('seatLocations.show');
+
+Route::post('/seats/change/{seatNumber}', [SeatsController::class, 'update'])->name('seats.update');
+Route::post('/seats/add', [SeatsController::class, 'store'])->name('seats.store');
+Route::delete('/seats/delete/{seatId}', [SeatsController::class, 'delete'])->name('seats.delete');
+Route::get('/seats/{planeId}', [SeatsController::class, 'index'])->name('seats.plane_seats');
+Route::get('/seats/{seatNumber}/{planeId}', [SeatsController::class, 'show'])->name('seats.show');
 
 Route::post('/bookings', [BookingsController::class, 'store'])->name('bookings.store');
 Route::put('/bookings/{bookingReference}', [BookingsController::class, 'update'])->name('bookings.update');

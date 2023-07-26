@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FlightClass;
 use App\Models\Plane;
 use App\Models\Seat;
 use App\Models\SeatLocation;
@@ -85,8 +86,9 @@ class SeatsController extends Controller
             /// Validate the form data
             $seatsData = $request->validate([
                 'plane_id' => 'required|integer',
+                'flight_class_id' => 'required|integer',
                 'seats.*.seat_number' => 'required|string|max:10',
-                'seats.*.seat_location' => 'required|string',
+                'seats.*.location_id' => 'required|integer',
                 'seats.*.price' => 'required|numeric',
             ]);
         
@@ -96,23 +98,40 @@ class SeatsController extends Controller
             $plane = Plane::where('id', $planeId)->first();
             if(!$plane)
             {
-                return response()->json(['error' => 'The plane with id ' . $planeId . ' and name ' . $plane->name . ' does not exist'], 500);
+                return response()->json(['error' => 'The plane with id ' . $planeId . ' does not exist'], 500);
             }
-        
+
+            $flightClassId = $seatsData['flight_class_id'];
+            // Make sure the class exists
+            $flight = FlightClass::where('id', $flightClassId)->first();
+            if(!$flight)
+            {
+                return response()->json(['error' => 'The flight with id ' . $flightClassId . ' does not exist'], 500);
+            }
+
+
+            $addedSeatsData = [];
             // Loop through each seat submitted in the form
             foreach ($seatsData['seats'] as $seatData)
             {
-                // Get the seat location ID based on the seat location name
-                $seatLocationId = SeatLocation::where('name', $seatData['seat_location'])->value('id');
-            
+                
+                // Make sure the seat locaion exists
+                $seatLocationId = $seatData['location_id'];
+                $seatLocation = SeatLocation::where('id', $seatLocationId)->first();
+                if(!$seatLocation)
+                {
+                    return response()->json(['error' => 'The Seat Location with id ' . $seatLocationId . ' does not exist'], 500);
+                }
+
                 // Create a new seat instance and set its attributes
                 $seat = new Seat([
                     'seat_number' => $seatData['seat_number'],
                     'price' => $seatData['price'],
                     'is_available' => false,
                     'plane_id' => $planeId,
+                    'flight_class_id' => $flightClassId,
                     'flight_id' => null, // Since we are manually adding seats, there's no specific flight associated yet.
-                    'seat_location_id' => $seatLocationId,
+                    'location_id' => $seatLocationId,
                 ]);
 
                 // Make sure the seat does not exist
@@ -122,16 +141,18 @@ class SeatsController extends Controller
 
                 if($existingSeat)
                 {
-                    return response()->json(['error' => 'The seat whith the seat number ' . $seat->seat_number . ' and plane id ' . $seat->plane_id . ' exists'], 500);
+                    return response()->json(['error' => 'The seat with the seat number ' . $seat->seat_number . ' and plane id ' . $seat->plane_id . ' exists'], 500);
                 }
             
                 // Save the seat to the database
                 $seat->save();
+
+                $addedSeatsData[] = $seat;
             }
 
             DB::commit();
 
-            return response()->json(['seat' => $seat, 'status' => 1]);
+            return response()->json(['seat' => $addedSeatsData, 'status' => 1]);
         } 
         catch (\Exception $e) 
         {
@@ -142,9 +163,9 @@ class SeatsController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+             return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+            // return response()->json(['error' => 'An error occurred.'], 500);
         }
     }
 
@@ -155,12 +176,12 @@ class SeatsController extends Controller
    
         try 
         {
-            // Validate the request data
-             /// Validate the form data
-             $seatData = $request->validate([
+           /// Validate the form data
+           $seatData = $request->validate([
                 'plane_id' => 'required|integer',
+                'flight_class_id' => 'required|integer',
                 'seat_number' => 'required|string|max:10',
-                'seat_location' => 'required|string',
+                'location_id' => 'required|integer',
                 'price' => 'required|numeric',
             ]);
         
@@ -173,6 +194,21 @@ class SeatsController extends Controller
                 return response()->json(['error' => 'The plane with id ' . $planeId . ' and name ' . $plane->name . ' does not exist'], 500);
             }
 
+            $flightClassId = $seatData['flight_class_id'];
+            // Make sure the class exists
+            $flight = FlightClass::where('id', $flightClassId)->first();
+            if(!$flight)
+            {
+                return response()->json(['error' => 'The flight with id ' . $flightClassId . ' does not exist', 'status' => 0], 500);
+            }
+
+             // Make sure the seat locaion exists
+             $seatLocationId = $seatData['location_id'];
+             $seatLocation = SeatLocation::where('id', $seatLocationId)->first();
+             if(!$seatLocation)
+             {
+                 return response()->json(['error' => 'The Seat Location with id ' . $seatLocationId . ' does not exist'], 500);
+             }
             
             // Make sure the seat is valid
             $seat = Seat::where('seat_number', $seatNumber)
@@ -187,7 +223,7 @@ class SeatsController extends Controller
             // Make sure the details given do not conflict with another seat
             if($this->seatExists(($seatData)))
             {
-                return response()->json(['error' => 'The seat whith the seat number ' . $seat->seat_number . ' and plane id ' . $seat->plane_id . ' exists'], 500);
+                return response()->json(['error' => 'The seat with the seat number ' . $seat->seat_number . ' and plane id ' . $seat->plane_id . ' exists'], 500);
             }
 
             // Update the seat

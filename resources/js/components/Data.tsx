@@ -9,7 +9,14 @@ interface Link {
 const Data: React.FC = () => {
   const [data, setData] = useState<any[]>([]);
   const [links, setLinks] = useState<Link[]>([
-    { id: 1, label: 'Fetch Flights', url: 'http://127.0.0.1:8000/flights' },
+    { id: 1, label: 'All Flights', url: 'http://127.0.0.1:8000/flights' },
+    { id: 70, label: 'Add Flight', url: 'http://127.0.0.1:8000/flights/add' },
+    { id: 71, label: 'Change Flight', url: 'http://127.0.0.1:8000/flights/change/{flightId}' },
+    { id: 72, label: 'Delete Flight', url: 'http://127.0.0.1:8000/flights/delete/{flightId}' },
+    { id: 73, label: 'Fetch Flight', url: 'http://127.0.0.1:8000/flights/{flightId}' },
+    { id: 74, label: 'Flight By Departure City', url: 'http://127.0.0.1:8000/flights/byDepartureCityId/{departureCityId}' },
+    { id: 75, label: 'Flight Departing After Hours', url: 'http://127.0.0.1:8000/flights/byHours/{hours}' },
+    { id: 76, label: 'Flight By Departure Date', url: 'http://127.0.0.1:8000/flights/byDepartureDate/{departureDate}' },
     { id: 45, label: 'Add FlightStatus', url: 'http://127.0.0.1:8000/flightStatuses/add' },
     { id: 46, label: 'Change FlightStatus', url: 'http://127.0.0.1:8000/flightStatuses/change/{flightStatusId}' },
     { id: 47, label: 'Delete FlightStatus', url: 'http://127.0.0.1:8000/flightStatuses/delete/{flightStatusId}' },
@@ -37,6 +44,11 @@ const Data: React.FC = () => {
     { id: 42, label: 'Delete SeatLocation', url: 'http://127.0.0.1:8000/seatLocations/delete/{seatLocationId}' },
     { id: 43, label: 'All SeatLocations', url: 'http://127.0.0.1:8000/seatLocations' },
     { id: 44, label: 'Fetch SeatLocation', url: 'http://127.0.0.1:8000/seatLocations/{seatLocationName}' },
+    { id: 65, label: 'Add Seat', url: 'http://127.0.0.1:8000/seats/add' },
+    { id: 66, label: 'Change Seat', url: 'http://127.0.0.1:8000/seats/change/{seatNumber}' },
+    { id: 67, label: 'Delete Seat', url: 'http://127.0.0.1:8000/seats/delete/{seatId}' },
+    { id: 68, label: 'All Seats', url: 'http://127.0.0.1:8000/seats/{planeId}' },
+    { id: 69, label: 'Fetch Seat', url: 'http://127.0.0.1:8000/seats/{seatNumber}/{planeId}' },
     { id: 4, label: 'Add Booking', url: 'http://127.0.0.1:8000/bookings' },
     { id: 5, label: 'Change Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}' },
     { id: 6, label: 'Delete Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}'},
@@ -150,6 +162,119 @@ const Data: React.FC = () => {
       }
     });
   }, [links]);
+
+  const addFlight = () => {
+    const flightData = {
+      airline: 'Example Airlines',
+      plane_id: 1, 
+      is_international: false,
+      departure_time: '2023-07-31 12:00:00', 
+      arrival_time: '2023-07-31 15:00:00', 
+      flight_status_id: 1, 
+      departure_city_id: 1, 
+      arrival_city_id: 2, 
+    };
+  
+    const  addFlightUrl = links.find((link) => link.id === 70)?.url;
+  
+    if (addFlightUrl) {
+      fetch(addFlightUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        },
+        body: JSON.stringify(flightData),
+      })
+        .then((response) => {
+            if (response.headers.get('content-type')?.includes('application/json')) {
+              return response.json(); // Extract the response as JSON
+            } else {
+              return response.text(); // Extract the response as text
+            }
+        })
+        .then((data) => setData(data))
+        .catch((error) => console.error(error));
+    }
+  
+    // Scroll to the top of the page to view the output
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+  
+  const changeFlight = () => {
+    const flightData = {
+      airline: 'Example Airlines',
+      plane_id: 2, 
+      is_international: false,
+      departure_time: '2023-07-31 12:00:00', 
+      arrival_time: '2023-07-31 15:00:00', 
+      flight_status_id: 1, 
+      departure_city_id: 1, 
+      arrival_city_id: 2,    
+      
+    };
+  
+    const  changeFlightUrl = links.find((link) => link.id === 71)?.url;
+  
+    if (changeFlightUrl) {
+      fetch(changeFlightUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        },
+        body: JSON.stringify(flightData),
+      })
+        .then((response) => {
+            if (response.headers.get('content-type')?.includes('application/json')) {
+              return response.json(); // Extract the response as JSON
+            } else {
+              return response.text(); // Extract the response as text
+            }
+        })
+        .then((data) => setData(data))
+        .catch((error) => console.error(error));
+    }
+  
+    // Scroll to the top of the page to view the output
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+  
+  const deleteFlight = () => {
+    
+    const deleteFlightUrl = links.find((link) => link.id === 72)?.url;
+  
+    if (deleteFlightUrl) {
+      fetch(deleteFlightUrl, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+        }
+      })
+        .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
+        .then((data) => setData(data))
+        .catch((error) => console.error(error));
+    }
+  
+    // Scroll to the top of the page to view the output
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
 
   const addBooking = () => {
     const bookingData = {
@@ -1140,6 +1265,123 @@ const deleteSeatLocation = () => {
   });
 };
 
+const addSeat = () => {
+  const seatData = {
+    plane_id: 2, // Replace with the actual plane ID
+    flight_class_id: 1,
+    seats: [
+      {
+        seat_number: 'A1',
+        location_id: 1, // Replace with the actual location ID
+        price: 100.00,
+      },
+      {
+        seat_number: 'B2',
+        location_id: 2, // Replace with the actual location ID
+        price: 120.00,
+      },
+    ],
+    
+  };
+
+  const  addSeatUrl = links.find((link) => link.id === 65)?.url;
+
+  if (addSeatUrl) {
+    fetch(addSeatUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify(seatData),
+    })
+      .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
+const changeSeat = () => {
+  const seatData = {
+    plane_id: 1, // Replace with the actual plane ID
+    flight_class_id: 1,
+    seat_number: 'A6',
+    location_id: 1, // Replace with the actual location ID
+    price: 100.00,    
+  };
+
+
+  const  changeSeatUrl = links.find((link) => link.id === 66)?.url;
+
+  if (changeSeatUrl) {
+    fetch(changeSeatUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify(seatData),
+    })
+      .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
+const deleteSeat = () => {
+  
+  const deleteSeatUrl = links.find((link) => link.id === 67)?.url;
+
+  if (deleteSeatUrl) {
+    fetch(deleteSeatUrl, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      }
+    })
+      .then((response) => {
+        if (response.headers.get('content-type')?.includes('application/json')) {
+          return response.json(); // Extract the response as JSON
+        } else {
+          return response.text(); // Extract the response as text
+        }
+    })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
 const addFlightStatus = () => {
   const flightStatusData = {
     name: 'On-time',
@@ -1712,6 +1954,30 @@ const deletePlane = () => {
                 </button>
               ) : link.label === 'Delete Plane' ? (
                 <button onClick={deletePlane} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Add Seat' ? (
+                <button onClick={addSeat} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Change Seat' ? (
+                <button onClick={changeSeat} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label} 
+                </button>
+              ) : link.label === 'Delete Seat' ? (
+                <button onClick={deleteSeat} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Add Flight' ? (
+                <button onClick={addFlight} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Change Flight' ? (
+                <button onClick={changeFlight} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label} 
+                </button>
+              ) : link.label === 'Delete Flight' ? (
+                <button onClick={deleteFlight} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
                 </button>
               ) :(
