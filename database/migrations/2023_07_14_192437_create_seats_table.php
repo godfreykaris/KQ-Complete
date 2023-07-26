@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('flight_id')->nullable()->constrained('flights')->onDelete('cascade');
             $table->foreignId('flight_class_id')->nullable()->constrained('flight_classes')->onDelete('cascade');
             $table->foreignId('location_id')->constrained('seat_locations')->onDelete('cascade');
+            $table->unique(['seat_number', 'plane_id']);
             $table->timestamps();
         });
     }

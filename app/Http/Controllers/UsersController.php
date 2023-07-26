@@ -307,37 +307,73 @@ class UsersController extends Controller
     }
 
 
-    // // Update Current User Profile
-    // public function updateCurrentUserProfile(Request $request)
-    // {
-    //     $user = Auth::user();
+    // Update Current User Profile
+    public function updateCurrentUserProfile(Request $request)
+    {
+        try
+        {
+            $user = Auth::user();
 
-    //     $userData = $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'email' => 'required|email|unique:users,email,' . $user->id,
-    //         'password' => 'nullable|string|min:8|confirmed',
-    //     ]);
+            $userData = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email,' . $user->id,
+                'password' => 'nullable|string|min:8|confirmed',
+            ]);
 
-    //     $user->name = $userData['name'];
-    //     $user->email = $userData['email'];
+            $user->name = $userData['name'];
+            $user->email = $userData['email'];
 
-    //     if ($request->has('password')) {
-    //         $user->password = Hash::make($userData['password']);
-    //     }
+            if ($request->has('password')) 
+            {
+                $user->password = Hash::make($userData['password']);
+            }
 
-    //     $user->save();
+            $mUser = User::findOrFail($user->id);
+            $mUser->save();
 
-    //     return response()->json(['user' => $user, 'status' => 1, 'message' => 'User profile updated successfully']);
-    // }
+            return response()->json(['user' => $user, 'status' => 1, 'message' => 'User profile updated successfully']);
+        }
+        catch (ModelNotFoundException $e) 
+        {
+            return response()->json(['error' => 'Flight not found'], 404);
+        }
+        catch (\Exception $e) 
+        {
+            Log::error($e->getMessage());
+            return response()->json(['error' => 'An error occurred while rewarding points.'], 500);
 
-    // // User Booking History
-    // public function userBookingHistory()
-    // {
-    //     $user = Auth::user();
-    //     $bookings = $user->bookings; // Assuming you have a 'bookings' relationship set up in the User model
-    //     return response()->json(['bookings' => $bookings, 'status' => 1]);
-    // }
+            // For debugging
+            // return response()->json(['error' => 'An error occurred while rewarding points. ' . $e->getMessage()], 500);
+        }
+        
+    }
 
-    
+    // User Booking History
+    public function userBookingHistory()
+    {
+        try
+        {
+            $user = Auth::user();
+        
+            $mUser = User::findOrFail($user->id);
+            $bookings = $mUser->bookings; // Assuming you have a 'bookings' relationship set up in the User model
+
+            return response()->json(['bookings' => $bookings, 'status' => 1]);
+        }
+        catch (ModelNotFoundException $e) 
+        {
+            return response()->json(['error' => 'User not found', 'status' => 0], 404);
+        }
+        catch (\Exception $e) 
+        {
+            Log::error($e->getMessage());
+            return response()->json(['error' => 'An error occurred.', 'status' => 0], 500);
+
+            // For debugging
+            // return response()->json(['error' => 'An error occurred while rewarding points. ' . $e->getMessage()], 500);
+        }
+        
+    }
+
 
 }

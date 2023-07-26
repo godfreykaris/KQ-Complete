@@ -10,6 +10,8 @@ use App\Models\Flight;
 use App\Models\Seat;
 use App\Models\Passenger;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -171,13 +173,14 @@ class BookingsController extends Controller
                 $booking = Booking::create([
                     // 'flight_id' => $bookingData['flight_id'],
                     // 'email' => $bookingData['passenger_email'],
+                    // 'booking_date' => Carbon::now(), // Use the current date and time as the booking date
                     'booking_reference' => $this->generateBookingReference(),
-                    'booking_date' => fake()->dateTime(),
+                    'user_id' => Auth::check() ? Auth::id() : null,
 
                     /**For testing only */
+                    'booking_date' => fake()->dateTime(),
                     'flight_id' => Flight::pluck('id')->random(),
                     'email' => fake()->safeEmail,
-                    
                 ]);
                             
                 // Create and save the new passengers
