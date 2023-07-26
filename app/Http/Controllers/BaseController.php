@@ -30,18 +30,18 @@ class BaseController extends Controller
 
             if(!$item)
             {
-                return response()->json(['error' => 'The item with name ' . $name . ' does not exist'], 404);
+                return response()->json(['error' => 'The item with name ' . $name . ' does not exist', 'status' => 0], 404);
             }
 
-            return response()->json(['item' => $item, 'status' => 1]);
+            return response()->json(['item' => $item,  'status' => 1]);
         }         
         catch (\Exception $e) 
         {
             Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred'], 500);
+            return response()->json(['error' => 'An error occurred', 'status' => 0]);
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
         }
     }
 
@@ -55,10 +55,10 @@ class BaseController extends Controller
         catch (\Exception $e) 
         {
             Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred'], 500);
+            return response()->json(['error' => 'An error occurred']);
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
         }
     }
 
@@ -70,19 +70,26 @@ class BaseController extends Controller
                 'name' => 'required|string',
             ]);
 
-            // For testing only
-            $data['name'] = fake()->sentence(6);
+            // Make sure it is not a duplicate
+            $existingItem = $this->model->where('name', $data['name'])->first();
+
+            if($existingItem)
+            {
+                return response()->json(['error' => 'The item with name ' . $data['name'] . ' exists', 'status' => 0]);
+            }
+            
 
             $item = $this->model->create($data);
-            return response()->json(['item' => $item, 'status' => 1]);
+
+            return response()->json(['success' => 'Item added successfully', 'status' => 1]);
         }
         catch (\Exception $e) 
         {
             Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred'], 500);
+            return response()->json(['error' => 'An error occurred']);
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
         }
     }
 
@@ -94,24 +101,22 @@ class BaseController extends Controller
                 'name' => 'required|string',
             ]);
 
-            // For testing only
-            $data['name'] = fake()->sentence(7);
-
             $item = $this->model->findOrFail($id);
             $item->update($data);
-            return response()->json(['item' => $item, 'status' => 1]);
+
+            return response()->json(['success' => 'Item updated successfully', 'status' => 1]);
         }
         catch (ModelNotFoundException $e) 
         {
-            return response()->json(['error' => 'The item with id ' . $id . ' does not exist'], 404);
+            return response()->json(['error' => 'The item with id ' . $id . ' does not exist', 'status' => 0], 404);
         }
         catch (\Exception $e) 
         {
             Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred'], 500);
+            return response()->json(['error' => 'An error occurred', 'status' => 0]);
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
         }
     }
 
@@ -139,19 +144,19 @@ class BaseController extends Controller
                 $item->forceDelete();
             }
 
-            return response()->json(['message' => 'Item deleted successfully', 'status' => 1]);
+            return response()->json(['success' => 'Item deleted successfully', 'status' => 1]);
         }
         catch (ModelNotFoundException $e) 
         {
-            return response()->json(['error' => 'The item with id ' . $id . ' does not exist'], 404);
+            return response()->json(['error' => 'The item with id ' . $id . ' does not exist', 'status' => 0]);
         }
         catch (\Exception $e) 
         {
             Log::error($e->getMessage());
-            // return response()->json(['error' => 'An error occurred'], 500);
+             return response()->json(['error' => 'An error occurred' , 'status' => 0]);
 
             // For debugging
-            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage(), 'status' => 0]);
         }
     }
 }

@@ -1,0 +1,54 @@
+/* Custom styles for the form container */
+.container {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Custom styles for the form header */
+  h2 {
+    margin-bottom: 20px;
+    color: #007bff; /* Blue color for the form header */
+  }
+  
+  /* Custom styles for the form labels */
+  label {
+    font-weight: bold;
+    color: #343a40; /* Dark grey color for form labels */
+  }
+  
+  /* Custom styles for the input field */
+  .form-control {
+    border: 1px solid #ced4da;
+    color: #495057; /* Dark grey color for text input */
+  }
+  
+  /* Custom styles for the submit button */
+  .btn-primary {
+    background-color: #007bff;
+    border: none;
+  }
+  
+  /* Custom styles for the response message */
+  .response-message {
+    font-weight: bold;
+    margin-top: 10px;
+    font-size: 16px;
+  }
+  
+  /* Success styles */
+  .text-success {
+    color: #28a745; /* Green color for success message */
+  }
+  
+  /* Error styles */
+  .text-danger {
+    color: #dc3545; /* Red color for error message */
+  }
+  
+  /* Hover styles for the submit button */
+  .btn-primary:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
+  
