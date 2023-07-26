@@ -17,13 +17,12 @@ return new class extends Migration
             $table->dateTime('departure_time');
             $table->dateTime('arrival_time');
             $table->time('duration')->virtualAs('TIMEDIFF(arrival_time, departure_time)');
-            $table->string('airline');
             $table->boolean('is_international')->default(true);
             $table->foreignId('flight_status_id')->constrained('flight_statuses')->onDelete('cascade');
             $table->foreignId('departure_city_id')->constrained('cities')->onDelete('cascade');
             $table->foreignId('arrival_city_id')->constrained('cities')->onDelete('cascade');
             $table->foreignId('plane_id')->constrained('planes')->onDelete('cascade');
-
+            $table->foreignId('airline_id')->nullable()->constrained('airlines')->onDelete('cascade');
             $table->timestamps();
         });
     }

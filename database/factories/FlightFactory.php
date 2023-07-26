@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Airline;
 use App\Models\City;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -27,12 +28,13 @@ class FlightFactory extends Factory
             'flight_number' => fake()->unique()->regexify('[A-Z]{2}\d{3}'),
             'departure_time' => $departureTime,
             'arrival_time' => $arrivalTime,
-            'airline' => fake()->company(),
             'is_international' => fake()->boolean(30),
             'flight_status_id' => FlightStatus::pluck('id')->random(),
             'departure_city_id' => City::pluck('id')->random(),
             'arrival_city_id' => City::pluck('id')->random(),
             'plane_id' => Plane::pluck('id')->random(),
+            'airline_id' => Airline::pluck('id')->random(),
+
         ];
     }
 }
