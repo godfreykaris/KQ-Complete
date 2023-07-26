@@ -139,6 +139,9 @@ interface Entity
                         <option value="">Select an Item</option>
                         <option value="skills">Skill</option>
                         <option value="qualifications">Qualification</option>
+                        <option value="flightClasses">Flight Class</option>
+                        <option value="flightStatuses">Flight Status</option>
+                        <option value="seatLocations">Seat Location</option>
                         {/* Add more options for other entities as needed */}
                       </select>
                     </div>
