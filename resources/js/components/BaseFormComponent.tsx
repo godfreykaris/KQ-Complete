@@ -157,6 +157,7 @@ interface Entity
                             value={name}
                             onChange={handleNameChange}
                             placeholder="Enter name"
+                            required
                           />
                         </div>
                         <div className="text-center mt-3">
