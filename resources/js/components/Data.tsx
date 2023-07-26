@@ -44,6 +44,11 @@ const Data: React.FC = () => {
     { id: 17, label: 'Delete City', url: 'http://127.0.0.1:8000/cities/delete/{cityId}' },
     { id: 18, label: 'All Cities', url: 'http://127.0.0.1:8000/cities' },
     { id: 19, label: 'Fetch City', url: 'http://127.0.0.1:8000/cities/{cityName}/{cityCountry}' },
+    { id: 81, label: 'Add Airline', url: 'http://127.0.0.1:8000/airlines/add' },
+    { id: 82, label: 'Change Airline', url: 'http://127.0.0.1:8000/airlines/change/{airlineId}' },
+    { id: 83, label: 'Delete Airline', url: 'http://127.0.0.1:8000/airlines/delete/{airlineId}' },
+    { id: 84, label: 'All Airlines', url: 'http://127.0.0.1:8000/airlines' },
+    { id: 85, label: 'Fetch Airline', url: 'http://127.0.0.1:8000/airlines/{airlineCode}' },
     { id: 40, label: 'Add SeatLocation', url: 'http://127.0.0.1:8000/seatLocations/add' },
     { id: 41, label: 'Change SeatLocation', url: 'http://127.0.0.1:8000/seatLocations/change/{seatLocationId}' },
     { id: 42, label: 'Delete SeatLocation', url: 'http://127.0.0.1:8000/seatLocations/delete/{seatLocationId}' },
@@ -728,6 +733,108 @@ const deleteCity = () => {
 
   if (deleteCityUrl) {
     fetch(deleteCityUrl, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      }
+    })
+      .then((response) => {
+        if (response.headers.get('content-type')?.includes('application/json')) {
+          return response.json(); // Extract the response as JSON
+        } else {
+          return response.text(); // Extract the response as text
+        }
+    })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
+const addAirline = () => {
+  const airlineData = {
+    name: 'Qatar Airways',
+    code: 'QTA',   
+    
+  };
+
+  const  addAirlineUrl = links.find((link) => link.id === 81)?.url;
+
+  if (addAirlineUrl) {
+    fetch(addAirlineUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify(airlineData),
+    })
+      .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
+const changeAirline = () => {
+  const airlineData = {
+    name: 'Qatar Airways',
+    code: 'QTA',     
+    
+  };
+
+  const  changeAirlineUrl = links.find((link) => link.id === 82)?.url;
+
+  if (changeAirlineUrl) {
+    fetch(changeAirlineUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify(airlineData),
+    })
+      .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
+const deleteAirline = () => {
+  
+  const deleteAirlineUrl = links.find((link) => link.id === 83)?.url;
+
+  if (deleteAirlineUrl) {
+    fetch(deleteAirlineUrl, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -2058,6 +2165,18 @@ const deleteUser = () => {
                 </button>
               ) : link.label === 'Delete User' ? (
                 <button onClick={deleteUser} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Add Airline' ? (
+                <button onClick={addAirline} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Change Airline' ? (
+                <button onClick={changeAirline} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label} 
+                </button>
+              ) : link.label === 'Delete Airline' ? (
+                <button onClick={deleteAirline} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
                 </button>
               ) :(

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountBasedBookingInquiriesController;
+use App\Http\Controllers\AirlineController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FlightsController;
 use App\Http\Controllers\TicketsController;
@@ -91,6 +92,12 @@ Route::delete('/cities/delete/{cityId}', [CitiesController::class, 'delete'])->n
 Route::get('/arrival_cities/{departure_city}', [CitiesController::class, 'getArrivalCities'])->name('cities.get_arrival_cities');
 Route::get('/cities', [CitiesController::class, 'index'])->name('cities.all');
 Route::get('/cities/{cityName}/{cityCountry}', [CitiesController::class, 'show'])->name('cities.show');
+
+Route::put('/airlines/change/{airlineId}', [AirlineController::class, 'update'])->name('airlines.update');
+Route::post('/airlines/add', [AirlineController::class, 'store'])->name('airlines.store');
+Route::delete('/airlines/delete/{airlineId}', [AirlineController::class, 'delete'])->name('airlines.delete');
+Route::get('/airlines', [AirlineController::class, 'index'])->name('airlines.all');
+Route::get('/airlines/{airlineCode}', [AirlineController::class, 'show'])->name('airlines.show');
 
 Route::put('/seatLocations/change/{seatLocationId}', [SeatLocationsController::class, 'update'])->name('seatLocations.update');
 Route::post('/seatLocations/add', [SeatLocationsController::class, 'store'])->name('seatLocations.store');
