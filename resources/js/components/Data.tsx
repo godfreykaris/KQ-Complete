@@ -169,7 +169,7 @@ const Data: React.FC = () => {
 
   const addFlight = () => {
     const flightData = {
-      airline: 'Example Airlines',
+      airline_id: 1,
       plane_id: 1, 
       is_international: false,
       departure_time: '2023-07-31 12:00:00', 
@@ -210,7 +210,7 @@ const Data: React.FC = () => {
   
   const changeFlight = () => {
     const flightData = {
-      airline: 'Example Airlines',
+      airline_id: 1,
       plane_id: 2, 
       is_international: false,
       departure_time: '2023-07-31 12:00:00', 

@@ -81,7 +81,7 @@ class FlightsController extends Controller
     public function store(Request $request)
     {
         $flightData = $request->validate([
-            'airline' => 'required|string|max:255',
+            'airline_id' => 'required|exists:airlines,id',
             'plane_id' => 'required|exists:planes,id',
             'is_international' => 'required|boolean',
             'departure_time' => 'required|date',
@@ -123,7 +123,7 @@ class FlightsController extends Controller
     public function update(Request $request, $flightId)
     {
         $flightData = $request->validate([
-            'airline' => 'required|string|max:255',
+            'airline_id' => 'required|exists:airlines,id',
             'plane_id' => 'required|exists:planes,id',
             'is_international' => 'required|boolean',
             'departure_time' => 'required|date',

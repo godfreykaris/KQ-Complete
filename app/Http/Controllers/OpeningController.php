@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Opening;
+use Barryvdh\DomPDF\PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+
+use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
+
 
 class OpeningController extends Controller
 {
@@ -56,7 +60,7 @@ class OpeningController extends Controller
         }
     }
 
-    public function getMatchingOpenings($openingId)
+    public function getMatchingEmployees($openingId)
     {
         try
         {
@@ -70,10 +74,15 @@ class OpeningController extends Controller
             }
 
             // Retrieve all openings who meet the qualifications and skills required for the opening
-            $matchingOpenings = $opening->getMatchingOpenings();
+            $matchingEmployees = $opening->getMatchingEmployees();
 
-            // Return the matching openings as JSON response
-            return response()->json(['matched_openings' => $matchingOpenings, 'status' => 1]);
+            $data = json_decode($matchingEmployees, true);
+
+            // Load the blade template view that is used to organize and style the matches data
+            $pdf = FacadePdf::loadView('matched_employees.pdf_template', ['matched_employees' => $data]);
+
+            return $pdf->stream('employee-matches.pdf'); // Stream the PDF to the browser
+           
         }
         catch (\Exception $e) 
         {
@@ -82,9 +91,9 @@ class OpeningController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+             return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+            // return response()->json(['error' => 'An error occurred.'], 500);
         }
         
     }

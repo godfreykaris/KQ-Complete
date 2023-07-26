@@ -13,30 +13,32 @@ class AirlinesTableSeeder extends Seeder
      */
     public function run(): void
     {
-        // Insert sample data into the airlines table
-        Airline::create([
-            'name' => 'Emirates',
-            'code' => 'EMR',
-        ]);
+        $airlines = [
+            [
+                'name' => 'Emirates',
+                'code' => 'EMR',
+            ],
+            [
+                'name' => 'British Airways',
+                'code' => 'BAW',
+            ],
+            [
+                'name' => 'Lufthansa',
+                'code' => 'LH',
+            ],
+            [
+                'name' => 'Singapore Airlines',
+                'code' => 'SIA',
+            ],
+            [
+                'name' => 'Qatar Airways',
+                'code' => 'QTR',
+            ],
+            // Add more airlines as needed
+        ];
 
-        Airline::create([
-            'name' => 'British Airways',
-            'code' => 'BAW',
-        ]);
-
-        Airline::create([
-            'name' => 'Lufthansa',
-            'code' => 'LH',
-        ]);
-
-        Airline::create([
-            'name' => 'Singapore Airlines',
-            'code' => 'SIA',
-        ]);
-
-        Airline::create([
-            'name' => 'Qatar Airways',
-            'code' => 'QTR',
-        ]);
+        foreach ($airlines as $airline) {
+            Airline::create($airline);
+        }
     }
 }

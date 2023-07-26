@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\City;
 use App\Models\Destination;
 use App\Models\Flight;
 use App\Models\FlightStatus;
@@ -87,12 +88,12 @@ class TicketsController extends Controller
                 'boardingPass' => $ticket->boarding_pass,
                 'flightStatus' => FlightStatus::find($ticket->flight_status_id)->name,
                 'flight' => Flight::find($ticket->flight_id)->flight_number,
-                'destination' => Destination::find(Flight::find($ticket->flight_id)->arrival_destination_id)->name,
+                'destination' => City::find(Flight::find($ticket->flight_id)->arrival_city_id)->name,
                 'flightType' => Flight::find($ticket->flight_id)->is_international == 1 ? 'International' : 'Domestic',
                 "passengers" => $passengers,
             ];
 
-            // Load the blade template view that is used to organize and stylethe ticket data
+            // Load the blade template view that is used to organize and style the ticket data
             $pdf = FacadePdf::loadView('ticket.pdf_template', $ticketData);
 
             return $pdf->stream('ticket.pdf'); // Stream the PDF to the browser

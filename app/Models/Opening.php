@@ -38,6 +38,9 @@ class Opening extends Model
             $query->whereIn('skills.id', $this->skills()->pluck('skills.id'));
         });
 
+        // Eager load the jobTitle relationship
+        $matchingEmployees = $matchingEmployees->with('jobTitle');
+
         // Retrieve the final list of matching employees
         return $matchingEmployees->get();
     }
