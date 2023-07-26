@@ -90,10 +90,10 @@ class UsersController extends Controller
         catch (\Exception $e) 
         {
             Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred.'], 500);
+            //return response()->json(['error' => 'An error occurred.'], 500);
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+             return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
         }
     }
 
@@ -126,7 +126,7 @@ class UsersController extends Controller
     {
         try
         {
-            $users = User::paginate(10); // Adjust the pagination limit as needed
+            $users = User::all();
             return response()->json(['users' => $users, 'status' => 1]);
         }
         catch (\Exception $e) 

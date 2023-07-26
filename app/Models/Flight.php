@@ -44,7 +44,7 @@ class Flight extends Model
         $seats = $plane->seats->map(function ($seat) {
             return [
                 'seat_number' => $seat->seat_number,
-                'is_available' => $seat->is_available,
+                'is_available' => false,
                 'price' => $seat->price,
                 'plane_id' => null, // Set plane_id to null for seats associated with a flight
                 'flight_id' => $this->id,

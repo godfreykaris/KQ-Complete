@@ -36,11 +36,25 @@ Route::get('/', function () {
     return view('app');
 });
 
+// Routes for UsersController
 Route::post('/users/register', [UsersController::class, 'register'])->name('user_register.store');
+Route::get('/users', [UsersController::class, 'listUsers'])->name('users.all');
+Route::get('/users/{userId}', [UsersController::class, 'getUser'])->name('users.show');
+Route::delete('/users/delete/{userId}', [UsersController::class, 'deleteUser'])->name('users.delete');
+Route::put('/users/change/{userId}', [UsersController::class, 'updateUser'])->name('users.update');
+Route::get('/users/search', [UsersController::class, 'searchUsers'])->name('users.search');
+Route::get('/users/profile', [UsersController::class, 'viewUserProfile'])->name('users.profile');
+Route::get('/users/payment_methods', [UsersController::class, 'userPaymentMethods'])->name('users.payment_methods');
+Route::post('/users/payment_methods/add', [UsersController::class, 'addPaymentMethod'])->name('users.payment_methods.add');
+Route::delete('/users/payment_methods/delete/{paymentId}', [UsersController::class, 'deletePaymentMethod'])->name('users.payment_methods.delete');
+Route::get('/users/wallet', [UsersController::class, 'userWallet'])->name('users.wallet');
+Route::post('/users/reward_points', [UsersController::class, 'rewardPointsForBookingFlight'])->name('users.reward_points');
+Route::put('/users/profile/update', [UsersController::class, 'updateCurrentUserProfile'])->name('users.profile.update');
+Route::get('/users/booking_history', [UsersController::class, 'userBookingHistory'])->name('users.booking_history');
 
 Route::get('/flights', [FlightsController::class, 'index']);
 
-Route::post('/flights/change/{flightId}', [FlightsController::class, 'update'])->name('flights.update');
+Route::put('/flights/change/{flightId}', [FlightsController::class, 'update'])->name('flights.update');
 Route::post('/flights/add', [FlightsController::class, 'store'])->name('flights.store');
 Route::delete('/flights/delete/{flightId}', [FlightsController::class, 'delete'])->name('flights.delete');
 Route::get('/flights', [FlightsController::class, 'index'])->name('flights.all');
@@ -50,19 +64,19 @@ Route::get('/flights/byHours/{hours}', [FlightsController::class, 'getFlightsDep
 Route::get('/flights/byDepartureDate/{departureDate}', [FlightsController::class, 'getFlightsByDepartureDate'])->name('flights.getFlightsByDepartureDate');
 
 
-Route::post('/flightStatuses/change/{flightStatusId}', [FlightStatusesController::class, 'update'])->name('flightStatuses.update');
+Route::put('/flightStatuses/change/{flightStatusId}', [FlightStatusesController::class, 'update'])->name('flightStatuses.update');
 Route::post('/flightStatuses/add', [FlightStatusesController::class, 'store'])->name('flightStatuses.store');
 Route::delete('/flightStatuses/delete/{flightStatusId}', [FlightStatusesController::class, 'delete'])->name('flightStatuses.delete');
 Route::get('/flightStatuses', [FlightStatusesController::class, 'index'])->name('flightStatuses.all');
 Route::get('/flightStatuses/{flightStatusName}', [FlightStatusesController::class, 'show'])->name('flightStatuses.show');
 
-Route::post('/flightClasses/change/{flightClassId}', [FlightClassesController::class, 'update'])->name('flightClasses.update');
+Route::put('/flightClasses/change/{flightClassId}', [FlightClassesController::class, 'update'])->name('flightClasses.update');
 Route::post('/flightClasses/add', [FlightClassesController::class, 'store'])->name('flightClasses.store');
 Route::delete('/flightClasses/delete/{flightClassId}', [FlightClassesController::class, 'delete'])->name('flightClasses.delete');
 Route::get('/flightClasses', [FlightClassesController::class, 'index'])->name('flightClasses.all');
 Route::get('/flightClasses/{flightClassName}', [FlightClassesController::class, 'show'])->name('flightClasses.show');
 
-Route::post('/planes/change/{planeId}', [PlanesController::class, 'update'])->name('planes.update');
+Route::put('/planes/change/{planeId}', [PlanesController::class, 'update'])->name('planes.update');
 Route::post('/planes/add', [PlanesController::class, 'store'])->name('planes.store');
 Route::delete('/planes/delete/{planeId}', [PlanesController::class, 'delete'])->name('planes.delete');
 Route::get('/planes', [PlanesController::class, 'index'])->name('planes.all');
@@ -71,20 +85,20 @@ Route::get('/planes/{planeId}', [PlanesController::class, 'show'])->name('planes
 Route::get('/ticket/{ticket_number}', [TicketsController::class, 'show']);
 Route::get('/tickets/{ticket_number}/report', [TicketsController::class, 'generateTicketReport'])->name('tickets.report');
 
-Route::post('/cities/change/{cityId}', [CitiesController::class, 'update'])->name('cities.update');
+Route::put('/cities/change/{cityId}', [CitiesController::class, 'update'])->name('cities.update');
 Route::post('/cities/add', [CitiesController::class, 'store'])->name('cities.store');
 Route::delete('/cities/delete/{cityId}', [CitiesController::class, 'delete'])->name('cities.delete');
 Route::get('/arrival_cities/{departure_city}', [CitiesController::class, 'getArrivalCities'])->name('cities.get_arrival_cities');
 Route::get('/cities', [CitiesController::class, 'index'])->name('cities.all');
 Route::get('/cities/{cityName}/{cityCountry}', [CitiesController::class, 'show'])->name('cities.show');
 
-Route::post('/seatLocations/change/{seatLocationId}', [SeatLocationsController::class, 'update'])->name('seatLocations.update');
+Route::put('/seatLocations/change/{seatLocationId}', [SeatLocationsController::class, 'update'])->name('seatLocations.update');
 Route::post('/seatLocations/add', [SeatLocationsController::class, 'store'])->name('seatLocations.store');
 Route::delete('/seatLocations/delete/{seatLocationId}', [SeatLocationsController::class, 'delete'])->name('seatLocations.delete');
 Route::get('/seatLocations', [SeatLocationsController::class, 'index'])->name('seatLocations.all');
 Route::get('/seatLocations/{seatLocationName}', [SeatLocationsController::class, 'show'])->name('seatLocations.show');
 
-Route::post('/seats/change/{seatNumber}', [SeatsController::class, 'update'])->name('seats.update');
+Route::put('/seats/change/{seatNumber}', [SeatsController::class, 'update'])->name('seats.update');
 Route::post('/seats/add', [SeatsController::class, 'store'])->name('seats.store');
 Route::delete('/seats/delete/{seatId}', [SeatsController::class, 'delete'])->name('seats.delete');
 Route::get('/seats/{planeId}', [SeatsController::class, 'index'])->name('seats.plane_seats');

@@ -9,6 +9,11 @@ interface Link {
 const Data: React.FC = () => {
   const [data, setData] = useState<any[]>([]);
   const [links, setLinks] = useState<Link[]>([
+    { id: 8, label: 'Register A User', url: 'http://127.0.0.1:8000/users/register'},
+    { id: 77, label: 'Change User', url: 'http://127.0.0.1:8000/users/change/{userId}' },
+    { id: 78, label: 'Delete User', url: 'http://127.0.0.1:8000/users/delete/{userId}' },
+    { id: 79, label: 'All Users', url: 'http://127.0.0.1:8000/users' },
+    { id: 80, label: 'Fetch User', url: 'http://127.0.0.1:8000/users/{userId}' },
     { id: 1, label: 'All Flights', url: 'http://127.0.0.1:8000/flights' },
     { id: 70, label: 'Add Flight', url: 'http://127.0.0.1:8000/flights/add' },
     { id: 71, label: 'Change Flight', url: 'http://127.0.0.1:8000/flights/change/{flightId}' },
@@ -53,7 +58,6 @@ const Data: React.FC = () => {
     { id: 5, label: 'Change Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}' },
     { id: 6, label: 'Delete Booking', url: 'http://127.0.0.1:8000/bookings/{booking_reference}'},
     { id: 7, label: 'Guest Booking Inquiry', url: 'http://127.0.0.1:8000/booking_inquiry/guest'},
-    { id: 8, label: 'Register A User', url: 'http://127.0.0.1:8000/users/register'},
     { id: 9, label: 'Registerd User Booking Inquiry', url: 'http://127.0.0.1:8000/booking_inquiry/registered_user'},
     { id: 10, label: 'Add Passengers', url: 'http://127.0.0.1:8000/passengers/add/{booking_reference}'},
     { id: 11, label: 'Delete Passenger', url: 'http://127.0.0.1:8000/passengers/delete/{passengerId}'},
@@ -221,7 +225,7 @@ const Data: React.FC = () => {
   
     if (changeFlightUrl) {
       fetch(changeFlightUrl, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
@@ -693,7 +697,7 @@ const changeCity = () => {
 
   if (changeCityUrl) {
     fetch(changeCityUrl, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
@@ -909,7 +913,7 @@ const changeQualification = () => {
 
   if (changeQualificationUrl) {
     fetch(changeQualificationUrl, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
@@ -1009,7 +1013,7 @@ const changeSkill = () => {
 
   if (changeSkillUrl) {
     fetch(changeSkillUrl, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
@@ -1110,7 +1114,7 @@ const changeJobTitle = () => {
 
   if (changeJobTitleUrl) {
     fetch(changeJobTitleUrl, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
@@ -1210,7 +1214,7 @@ const changeSeatLocation = () => {
 
   if (changeSeatLocationUrl) {
     fetch(changeSeatLocationUrl, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
@@ -1327,7 +1331,7 @@ const changeSeat = () => {
 
   if (changeSeatUrl) {
     fetch(changeSeatUrl, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
@@ -1427,7 +1431,7 @@ const changeFlightStatus = () => {
 
   if (changeFlightStatusUrl) {
     fetch(changeFlightStatusUrl, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
@@ -1527,7 +1531,7 @@ const changeFlightClass = () => {
 
   if (changeFlightClassUrl) {
     fetch(changeFlightClassUrl, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
@@ -1633,7 +1637,7 @@ const changeOpening = () => {
 
   if (changeOpeningUrl) {
     fetch(changeOpeningUrl, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
@@ -1737,7 +1741,7 @@ const changePlane = () => {
 
   if (changePlaneUrl) {
     fetch(changePlaneUrl, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
@@ -1791,6 +1795,74 @@ const deletePlane = () => {
     behavior: 'smooth',
   });
 };
+
+const changeUser = () => {
+  const userData = {
+    name: 'John Doe',
+    email: 'johndoe@example.com',
+    password: 'jdskfbvdijkdbhadh',  
+    
+  };
+
+  const  changeUserUrl = links.find((link) => link.id === 77)?.url;
+
+  if (changeUserUrl) {
+    fetch(changeUserUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      },
+      body: JSON.stringify(userData),
+    })
+      .then((response) => {
+          if (response.headers.get('content-type')?.includes('application/json')) {
+            return response.json(); // Extract the response as JSON
+          } else {
+            return response.text(); // Extract the response as text
+          }
+      })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
+const deleteUser = () => {
+  
+  const deleteUserUrl = links.find((link) => link.id === 78)?.url;
+
+  if (deleteUserUrl) {
+    fetch(deleteUserUrl, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+      }
+    })
+      .then((response) => {
+        if (response.headers.get('content-type')?.includes('application/json')) {
+          return response.json(); // Extract the response as JSON
+        } else {
+          return response.text(); // Extract the response as text
+        }
+    })
+      .then((data) => setData(data))
+      .catch((error) => console.error(error));
+  }
+
+  // Scroll to the top of the page to view the output
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+
 
   return (
     <div style={{ display: 'flex' }}>
@@ -1978,6 +2050,14 @@ const deletePlane = () => {
                 </button>
               ) : link.label === 'Delete Flight' ? (
                 <button onClick={deleteFlight} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label}
+                </button>
+              ) : link.label === 'Change User' ? (
+                <button onClick={changeUser} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
+                  {link.label} 
+                </button>
+              ) : link.label === 'Delete User' ? (
+                <button onClick={deleteUser} style={{ backgroundColor: 'rgb(0, 128, 128)', marginBottom: '0.1rem' }}>
                   {link.label}
                 </button>
               ) :(
