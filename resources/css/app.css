@@ -1,5 +1,13 @@
+
+/* styles.css (or styles.scss) */
+
+.menu-item-text {
+  color: #d40d0d; /* Replace with the desired text color */
+}
+
+
 /* Custom styles for the form container */
-.container {
+.form-container {
     background-color: #f8f9fa;
     padding: 20px;
     border-radius: 8px;

@@ -102,6 +102,13 @@ class BaseController extends Controller
             ]);
 
             $item = $this->model->findOrFail($id);
+
+            // If the details are the same
+            if($item->name === $data['name'])
+            {
+                return response()->json(['success' => 'Item already up to date.', 'status' => 1]);
+            }
+
             $item->update($data);
 
             return response()->json(['success' => 'Item updated successfully', 'status' => 1]);

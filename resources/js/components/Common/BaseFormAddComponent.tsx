@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 
-import apiBaseUrl from '../config'
+import apiBaseUrl from '../../config'
 
 interface Entity 
   {
@@ -10,9 +10,9 @@ interface Entity
   }
 
   // Declare the entity types
-  const entityTypes = ['Skill', 'Qualification', 'Flight Class', 'Flight Status', 'Seat Location'];
+  const entityTypes = ['Skill', 'Qualification' , 'Job Title', 'Flight Class', 'Flight Status', 'Seat Location'];
   
-  const BaseFormComponent: React.FC = () => {
+  const BaseFormAddComponent: React.FC = () => {
     // State variables to store user inputs
     const [selectedEntity, setSelectedEntity] = useState<string>('');
     const [name, setName] = useState<string>('');
@@ -107,7 +107,7 @@ interface Entity
 
     // JSX code for the form component
     return (
-        <div className="form-container">
+        <div className="form-container col-md-6">
           <div className="container mt-4">
             <div className="row justify-content-center">
               <div className="col-md-6">
@@ -139,6 +139,7 @@ interface Entity
                         <option value="">Select an Item</option>
                         <option value="skills">Skill</option>
                         <option value="qualifications">Qualification</option>
+                        <option value="jobTitles">Job Title</option>
                         <option value="flightClasses">Flight Class</option>
                         <option value="flightStatuses">Flight Status</option>
                         <option value="seatLocations">Seat Location</option>
@@ -169,7 +170,7 @@ interface Entity
                     )}
 
                   {/* Display response message with appropriate styles */}
-                  <p className={`response-message ${getResponseClass()}`}>{responseMessage}</p>
+                  <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
                 </form>
               </div>
             </div>
@@ -179,4 +180,4 @@ interface Entity
     );
 };
 
-export default BaseFormComponent;
+export default BaseFormAddComponent;

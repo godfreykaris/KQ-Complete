@@ -33,9 +33,7 @@ use App\Http\Controllers\UsersController;
 |
 */
 
-Route::get('/', function () {
-    return view('app');
-});
+
 
 // Routes for UsersController
 Route::post('/users/register', [UsersController::class, 'register'])->name('user_register.store');
@@ -134,19 +132,19 @@ Route::delete('/qualifications/delete/{qualificationId}', [QualificationsControl
 Route::get('/qualifications', [QualificationsController::class, 'index'])->name('qualifications.all');
 Route::get('/qualifications/{qualificationName}', [QualificationsController::class, 'show'])->name('qualifications.show');
 
-Route::post('/skills/change/{skillId}', [SkillsController::class, 'update'])->name('skills.update');
+Route::put('/skills/change/{skillId}', [SkillsController::class, 'update'])->name('skills.update');
 Route::post('/skills/add', [SkillsController::class, 'store'])->name('skills.store');
 Route::delete('/skills/delete/{skillId}', [SkillsController::class, 'delete'])->name('skills.delete');
 Route::get('/skills', [SkillsController::class, 'index'])->name('skills.all');
 Route::get('/skills/{skillName}', [SkillsController::class, 'show'])->name('skills.show');
 
-Route::post('/jobTitles/change/{jobTitleId}', [JobTitlesController::class, 'update'])->name('jobTitles.update');
+Route::put('/jobTitles/change/{jobTitleId}', [JobTitlesController::class, 'update'])->name('jobTitles.update');
 Route::post('/jobTitles/add', [JobTitlesController::class, 'store'])->name('jobTitles.store');
 Route::delete('/jobTitles/delete/{jobTitleId}', [JobTitlesController::class, 'delete'])->name('jobTitles.delete');
 Route::get('/jobTitles', [JobTitlesController::class, 'index'])->name('jobTitles.all');
 Route::get('/jobTitles/{jobTitleName}', [JobTitlesController::class, 'show'])->name('jobTitles.show');
 
-Route::post('/openings/change/{openingId}', [OpeningController::class, 'update'])->name('openings.update');
+Route::put('/openings/change/{openingId}', [OpeningController::class, 'update'])->name('openings.update');
 Route::post('/openings/add', [OpeningController::class, 'store'])->name('openings.store');
 Route::delete('/openings/delete/{openingId}', [OpeningController::class, 'delete'])->name('openings.delete');
 Route::get('/openings', [OpeningController::class, 'index'])->name('openings.all');
@@ -158,3 +156,13 @@ Route::get('/payment/success', [PayPalController::class, 'handlePaymentResponse'
 Route::get('/payment/cancel', function () {
     return response()->json(['message' => 'Payment canceled.'], 200);
 });
+
+// Define a specific route for your React app (root route)
+Route::get('/', function () {
+    return view('app');
+});
+
+// Catch-all route for other paths that should be handled by React Router
+Route::get('/{any}', function () {
+    return view('app'); 
+})->where('any', '.*');
