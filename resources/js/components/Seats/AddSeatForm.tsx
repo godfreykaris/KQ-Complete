@@ -152,6 +152,11 @@ const AddSeatForm = () => {
     }
   };
 
+  const getLocationName = (locationId: number) => {
+    const location = seatLocations[locationId - 1];
+    return location ? location.name : '';
+  };
+
   const handlePlaneChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setSelectedPlaneId(parseInt(e.target.value));
   };
@@ -219,6 +224,13 @@ const AddSeatForm = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (seatsAdded.length <= 0) 
+    {
+      // If the seat with the same seat_number already exists, do not add it again
+      alert('There are no seats to add!');
+      return;
+    }
 
     try 
     {
@@ -355,7 +367,7 @@ const AddSeatForm = () => {
             onChange={handleChange}
             className="form-control"
             placeholder="Seat Number"
-            required
+            maxLength={5}
           />
         </div>
 
@@ -366,7 +378,6 @@ const AddSeatForm = () => {
             value={formData.location_id }
             onChange={handleChange}
             className="form-select"
-            required
           >
             <option value="">Select a location</option>
             {seatLocations && seatLocations.length > 0 && seatLocations.map((seatLocation) => (
@@ -389,18 +400,20 @@ const AddSeatForm = () => {
             onChange={handleChange}
             className="form-control"
             placeholder="Seat Price"
-            required
           />
         </div>
 
         <div className="text-center mt-3">
           <button type="button" className="btn btn-primary" onClick={handleAddSeat}>
-            Add Seat
+            {isEditing ? 'Save Changes' : 'Add Seat'}
           </button>
           <button type="submit" className="btn btn-primary ms-3">
-            Create Seats
+            Submit Seats
           </button>
         </div>
+
+        {isEditing && <div className="text-center text-info"><h3>Editing</h3></div>}
+
       </form>
 
       {/* Table to display the seats added */}
@@ -412,7 +425,7 @@ const AddSeatForm = () => {
               <tr>
                 <th>Seat Number</th>
                 <th>Seat Price</th>                
-                <th>Location ID</th>
+                <th>Seat Location</th>
                 <th>Edit</th> {/* Cell for Edit button */}
                 <th>Delete</th> {/* Cell for Delete button */}
               </tr>
@@ -422,7 +435,7 @@ const AddSeatForm = () => {
                 <tr key={index}>
                   <td>{seatData.seat_number}</td>
                   <td>{seatData.price}</td>                  
-                  <td>{seatData.location_id}</td>
+                  <td>{getLocationName(seatData.location_id)}</td> {/* Use getLocationName function */}
                   <td>
                       <button
                         type="button"

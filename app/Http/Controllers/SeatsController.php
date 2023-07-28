@@ -180,7 +180,7 @@ class SeatsController extends Controller
            $seatData = $request->validate([
                 'plane_id' => 'required|integer',
                 'flight_class_id' => 'required|integer',
-                'seat_number' => 'required|string|max:10',
+                'seat_number' => 'required|string|max:5',
                 'location_id' => 'required|integer',
                 'price' => 'required|numeric',
             ]);
