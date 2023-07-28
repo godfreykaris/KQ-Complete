@@ -5,11 +5,12 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'; 
 
-import BaseFormAddComponent from './components/Common/BaseFormAddComponent';
-import BaseFormEditComponent from './components/Common/BaseFormEditComponent';
-import EditFormComponent from './components/Common/EditFormComponent';
-import BaseFormDeleteComponent from './components/Common/BaseFormDeleteComponent';
-import DeleteFormComponent from './components/Common/DeleteFormComponent';
+import BaseFormAddComponent from './components/OtherData/BaseFormAddComponent';
+import BaseFormEditComponent from './components/OtherData/BaseFormEditComponent';
+import EditFormComponent from './components/OtherData/EditFormComponent';
+import BaseFormDeleteComponent from './components/OtherData/BaseFormDeleteComponent';
+import DeleteFormComponent from './components/OtherData/DeleteFormComponent';
+import ViewFormComponent from './components/OtherData/ViewFormComponent';
 
 const App = () => {
   
@@ -27,7 +28,7 @@ const App = () => {
                   <Nav.Link href="#" className="menu-item-text" active>
                     Home
                   </Nav.Link>
-                  <NavDropdown title="Common Data" id="basic-nav-dropdown" className="menu-item-text">                    
+                  <NavDropdown title="Other Data" id="basic-nav-dropdown" className="menu-item-text">                    
                     <NavDropdown.Item as={Link} to="/" className="menu-item-text">
                       Add Data
                     </NavDropdown.Item>
@@ -36,6 +37,9 @@ const App = () => {
                     </NavDropdown.Item>
                     <NavDropdown.Item as={Link} to="/delete" className="menu-item-text">
                       Delete Data
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/view" className="menu-item-text">
+                      View Data
                     </NavDropdown.Item>
                     {/* Add other menu items as needed */}
                   </NavDropdown>
@@ -52,6 +56,8 @@ const App = () => {
                 <Route path="/edit/:selectedEntity/:id/:name" element={<EditFormComponent />} />
                 <Route path="/delete" element={<BaseFormDeleteComponent />} />
                 <Route path="/delete/:selectedEntity/:id/:name" element={<DeleteFormComponent />} />
+                <Route path="/view" element={<ViewFormComponent />} />
+
                 {/* Add other routes for other menu items as needed */}
               </Routes>
           </div>

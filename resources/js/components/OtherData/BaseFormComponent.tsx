@@ -8,7 +8,7 @@ interface Entity {
 }
 
 interface Props {
-  formType: 'Edit' | 'Delete';
+  formType: 'Edit' | 'Delete' | 'View';
 }
 
 const entityTypes = ['Skill', 'Qualification', 'Job Title', 'Flight Class', 'Flight Status', 'Seat Location'];
@@ -102,7 +102,10 @@ const BaseFormComponent: React.FC<Props> = ({ formType }) => {
                       <tr>
                         <th>ID</th>
                         <th>Name</th>
-                        <th>{`${formType}`}</th>
+                        {formType !== 'View' && (
+                            <th>{`${formType}`}</th>
+                          )} 
+                        
                       </tr>
                     </thead>
                     <tbody>
@@ -110,15 +113,17 @@ const BaseFormComponent: React.FC<Props> = ({ formType }) => {
                         <tr key={item.id}>
                           <td>{item.id}</td>
                           <td>{item.name}</td>
-                          <td>
-                            {/* Link to the EditFormComponent or DeleteFormComponent */}
-                            <Link
-                              to={`/${formType.toLowerCase()}/${selectedEntity}/${item.id}/${item.name}`}
-                              className="btn btn-primary"
-                            >
-                              {`${formType}`}
-                            </Link>
-                          </td>
+                          {formType !== 'View' && (
+                            //{/* Link to the EditFormComponent or DeleteFormComponent */}
+                            <td>
+                              <Link
+                                to={`/${formType.toLowerCase()}/${selectedEntity}/${item.id}/${item.name}`}
+                                className="btn btn-primary"
+                              >
+                                {`${formType}`}
+                              </Link>
+                            </td>
+                          )}                            
                         </tr>
                       ))}
                     </tbody>
