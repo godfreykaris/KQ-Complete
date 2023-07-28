@@ -32,7 +32,7 @@ class CitiesController extends Controller
                           ->first();
             if(!$city)
             {
-                return response()->json(['error' => 'The city does not exist'], 500);
+                return response()->json(['error' => 'The city does not exist']);
             }
 
             return response()->json(['city' => $city, 'status' => 1]);
@@ -44,9 +44,9 @@ class CitiesController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.']);
         }
     }
 
@@ -66,9 +66,9 @@ class CitiesController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
     }
 
@@ -83,15 +83,10 @@ class CitiesController extends Controller
                 'country' => 'required|string',                              
             ]);
 
-            /*********** For testing only *************/
-            $cityData['name'] = fake()->city;
-            $cityData['country'] = fake()->country;
-            /******************************************/
-
             // Make sure the city is not a duplicate
             if($this->cityExists(($cityData)))
             {
-                return response()->json(['error' => 'The city exists'], 500);
+                return response()->json(['error' => 'The city exists', 'status' => 0]);
             }                       
 
             // Creae the city
@@ -100,7 +95,7 @@ class CitiesController extends Controller
                 'country' => $cityData['country'],
             ]);
 
-            return response()->json(['city' => $city, 'status' => 1]);
+            return response()->json(['success' => 'City added successfully', 'status' => 1]);
         } 
         catch (\Exception $e) 
         {
@@ -109,9 +104,9 @@ class CitiesController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
     }
 
@@ -126,28 +121,23 @@ class CitiesController extends Controller
                 'country' => 'required|string',                              
             ]);
 
-            /*********** For testing only *************/
-            $cityData['name'] = fake()->city;
-            $cityData['country'] = fake()->country;
-            /******************************************/
-
             // Make sure the city is valid
             $city = City::where('id', $cityId)->first();
             if(!$city)
             {
-                return response()->json(['error' => 'The city does not exist'], 500);
+                return response()->json(['error' => 'The city does not exist.', 'status' => 0], 404);
             }
 
             // Make sure the details given do not conflict with another city
             if($this->cityExists(($cityData)))
             {
-                return response()->json(['error' => 'The city exists'], 500);
+                return response()->json(['success' => 'City already upto date.', 'status' => 1]);
             }
 
             // Update the city
             $city->update($cityData);
 
-            return response()->json(['city' => $city, 'status' => 1]);
+            return response()->json(['success' => 'City updated successfully.', 'status' => 1]);
         } 
         catch (\Exception $e) 
         {
@@ -156,9 +146,9 @@ class CitiesController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
     }
 
@@ -172,13 +162,13 @@ class CitiesController extends Controller
             $city = City::where('id', $cityId)->first();
             if(!$city)
             {
-                return response()->json(['error' => 'The city does not exist'], 500);
+                return response()->json(['error' => 'The city does not exist', 'status' => 0]);
             }
 
             // Delete the city
             $city->delete();
 
-            return response()->json(['message' => 'City deleted successfully', 'status' => 1]);
+            return response()->json(['success' => 'City deleted successfully', 'status' => 1]);
         }
         catch (\Exception $e) 
         {
@@ -187,9 +177,9 @@ class CitiesController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
 
     }
@@ -205,7 +195,7 @@ class CitiesController extends Controller
             // Make sure the departure city exists in the database
             if (!$departureCityDetails) 
             {
-                return response()->json(['error' => 'Departure city does not exist!'], 500);
+                return response()->json(['error' => 'Departure city does not exist!', 'status' => 0]);
             } 
             
             $departureCityId = $departureCityDetails->id;
@@ -221,9 +211,9 @@ class CitiesController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
     }
 }

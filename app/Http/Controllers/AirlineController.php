@@ -27,7 +27,7 @@ class AirlineController extends Controller
             $airline = Airline::where('code', $airlineCode)->first();
             if(!$airline)
             {
-                return response()->json(['error' => 'The airline does not exist'], 500);
+                return response()->json(['error' => 'The airline does not exist', 'status' => 0], 404);
             }
 
             return response()->json(['airline' => $airline, 'status' => 1]);
@@ -39,9 +39,9 @@ class AirlineController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
     }
 
@@ -61,9 +61,9 @@ class AirlineController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
     }
 
@@ -75,18 +75,14 @@ class AirlineController extends Controller
             // Validate the request data
             $airlineData = $request->validate([
                 'name' => 'required|string',
-                'code' => 'required|string', // For testing only
-                //'code' => 'required|string|unique:airlines,code',                              
+                'code' => 'required|string',                              
             ]);
 
-            /*********** For testing only *************/
-            $airlineData['code'] = fake()->sentence(1);
-            /******************************************/
-
+           
             // Make sure the airline is not a duplicate
             if($this->airlineExists(($airlineData)))
             {
-                return response()->json(['error' => 'The airline exists'], 500);
+                return response()->json(['error' => 'The airline exists', 'status' => 0]);
             }                       
 
             // Creae the airline
@@ -95,7 +91,7 @@ class AirlineController extends Controller
                 'code' => $airlineData['code'],
             ]);
 
-            return response()->json(['airline' => $airline, 'status' => 1]);
+            return response()->json(['success' => 'Airline added successfully', 'status' => 1]);
         } 
         catch (\Exception $e) 
         {
@@ -104,9 +100,9 @@ class AirlineController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
     }
 
@@ -118,31 +114,27 @@ class AirlineController extends Controller
             // Validate the request data
             $airlineData = $request->validate([
                 'name' => 'required|string',
-                'code' => 'required|string', // For testing only
-                //'code' => 'required|string|unique:airlines,code',                              
+                'code' => 'required|string',                              
             ]);
 
-            /*********** For testing only *************/
-            $airlineData['code'] = fake()->sentence(1);
-            /******************************************/
-
+            
             // Make sure the airline is valid
             $airline = Airline::where('id', $airlineId)->first();
             if(!$airline)
             {
-                return response()->json(['error' => 'The airline does not exist'], 500);
+                return response()->json(['error' => 'The airline does not exist', 'status' => 0], 404);
             }
 
             // Make sure the details given do not conflict with another airline
             if($this->airlineExists(($airlineData)))
             {
-                return response()->json(['error' => 'The airline exists'], 500);
+                return response()->json(['success' => 'Airline already upto date.', 'status' => 1]);
             }
 
             // Update the airline
             $airline->update($airlineData);
 
-            return response()->json(['airline' => $airline, 'status' => 1]);
+            return response()->json(['success' => 'Airline updated successfully.', 'status' => 1]);
         } 
         catch (\Exception $e) 
         {
@@ -151,9 +143,9 @@ class AirlineController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+             return response()->json(['error' => 'An error occurred. ' . $e->getMessage(), 'status' => 0]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+            // return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
     }
 
@@ -167,13 +159,13 @@ class AirlineController extends Controller
             $airline = Airline::where('id', $airlineId)->first();
             if(!$airline)
             {
-                return response()->json(['error' => 'The airline does not exist'], 500);
+                return response()->json(['error' => 'The airline does not exist', 'status' => 0]);
             }
 
             // Delete the airline
             $airline->delete();
 
-            return response()->json(['message' => 'Airline deleted successfully', 'status' => 1]);
+            return response()->json(['success' => 'Airline deleted successfully', 'status' => 1]);
         }
         catch (\Exception $e) 
         {
@@ -182,9 +174,9 @@ class AirlineController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-             return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
 
-            // return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
 
     }

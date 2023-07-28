@@ -5,6 +5,8 @@ import apiBaseUrl from '../../config';
 interface Entity {
   id: number;
   name: string;
+  country: string;
+  code: string;
 }
 interface EntityType {
   entityType: string;
@@ -58,6 +60,28 @@ const BaseFormComponent: React.FC<Props> = ({ dataCategory, formType, entityType
         item.name.toLowerCase().includes(filterValue.toLowerCase())
       )
     : [];
+
+    const generateLink = (selectedEntity: string, item: Entity) => 
+    {
+      let link = '';
+
+      if (item.country) 
+      {
+        link = `/${dataCategory.toLowerCase()}/city/${formType.toLowerCase()}/${selectedEntity}/${item.id}/${item.name}/${item.country}`;
+      }
+      else if (item.code) 
+      {
+        link = `/${dataCategory.toLowerCase()}/airline/${formType.toLowerCase()}/${selectedEntity}/${item.id}/${item.name}/${item.code}`;
+      }
+      else
+      {
+        link = `/${dataCategory.toLowerCase()}/${formType.toLowerCase()}/${selectedEntity}/${item.id}/${item.name}`;
+      }
+    
+      return link;
+
+    };
+
 
   return (
     <div className="form-container">
@@ -114,6 +138,12 @@ const BaseFormComponent: React.FC<Props> = ({ dataCategory, formType, entityType
                       <tr>
                         <th>ID</th>
                         <th>Name</th>
+                        {selectedEntity === 'cities' && (
+                            <th>Country</th>
+                          )} 
+                        {selectedEntity === 'airlines' && (
+                            <th>Code</th>
+                          )} 
                         {formType !== 'View' && (
                             <th>{`${formType}`}</th>
                           )} 
@@ -121,15 +151,21 @@ const BaseFormComponent: React.FC<Props> = ({ dataCategory, formType, entityType
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredData.map((item) => (
+                      {filteredData.map((item) => (                                    
                         <tr key={item.id}>
                           <td>{item.id}</td>
                           <td>{item.name}</td>
+                          {selectedEntity === 'cities' && (
+                            <td>{item.country}</td>
+                          )}
+                          {selectedEntity === 'airlines' && (
+                            <td>{item.code}</td>
+                          )} 
                           {formType !== 'View' && (
                             //{/* Link to the EditFormComponent or DeleteFormComponent */}
                             <td>
                               <Link
-                                to={`/${dataCategory.toLowerCase()}/${formType.toLowerCase()}/${selectedEntity}/${item.id}/${item.name}`}
+                                to={generateLink(selectedEntity, item)}
                                 className="btn btn-primary"
                               >
                                 {`${formType}`}

@@ -28,7 +28,7 @@
   
   /* Custom styles for the input field */
   .form-control {
-    border: 1px solid #ced4da;
+    border: 1px solid rgb(73, 75, 77);
     color: #495057; /* Dark grey color for text input */
   }
   

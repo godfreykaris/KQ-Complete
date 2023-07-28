@@ -8,27 +8,66 @@ interface Entity {
 }
 
 const DeleteFormComponent: React.FC = () => {
-  const { selectedEntity, id, name } = useParams<{ selectedEntity: string; id: string; name: string }>();
+  const { selectedEntity, id, name, country, code } = useParams<{ selectedEntity: string; id: string; name: string; country: string; code: string; }>();
 
   const [itemName, setItemName] = useState<string>( name || '');
   const [itemId, setItemId] = useState<string>( id || '');
+
+  const [itemCountry, setItemCountry] = useState<string | null >( country || null);
+  const [itemCode, setItemCode] = useState<string | null>( code || null);
 
   const [responseMessage, setResponseMessage] = useState<string>('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
   useEffect(() => {
-    if (name) {
-      fetchData(name);
+    if (itemName)
+    {
+      fetchData(itemName);
     }
-  }, [name]);
+  }, [itemName]);
 
+  
   const fetchData = async (itemName: string) => {
     try {
-      const response = await fetch(`${apiBaseUrl}/${selectedEntity}/${itemName}`);
+
+      let url = `${apiBaseUrl}/${selectedEntity}`;
+
+      if (itemCountry) 
+      {
+        url += `/${itemName}/${itemCountry}`;
+      }
+      else if (itemCode) 
+      {
+        url += `/${itemCode}`;
+      }
+      else
+      {
+        url += `/${itemName}`;
+      }
+
+      const response = await fetch(url);
+
       const data = await response.json();
-      setItemName(data.item.name);
-      setItemId(data.item.id);
-    } catch (error) {
+      
+      if (itemCountry) 
+      {
+        setItemName(data.city.name);
+        setItemId(data.city.id);
+      }
+      else if (itemCode) 
+      {
+        setItemName(data.airline.name);
+        setItemId(data.airline.id);
+      }
+      else
+      {
+        setItemName(data.item.name);
+        setItemId(data.item.id);
+      }
+            
+    } 
+    catch (error) 
+    {
       console.error('Error fetching data:', error);
     }
   };
