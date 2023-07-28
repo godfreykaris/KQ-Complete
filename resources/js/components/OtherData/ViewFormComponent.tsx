@@ -1,8 +1,18 @@
 import React from 'react';
-import BaseFormComponent from './BaseFormComponent';
+import BaseFormComponent from '../Common/BaseFormComponent';
 
 const ViewFormComponent: React.FC = () => {
-  return <BaseFormComponent formType="View" />;
+
+  const entityTypes = [
+    { entityType: 'Skill', value: 'skills' },
+    { entityType: 'Qualification', value: 'qualifications' },
+    { entityType: 'Job Title', value: 'jobTitles' },
+    { entityType: 'Flight Class', value: 'flightClasses' },
+    { entityType: 'Flight Status', value: 'flightStatuses' },
+    { entityType: 'Seat Location', value: 'seatLocations' },
+  ];
+
+  return <BaseFormComponent  dataCategory="other"  formType="View" entityTypes={entityTypes}/>;
 };
 
 export default ViewFormComponent;

@@ -6,14 +6,18 @@ interface Entity {
   id: number;
   name: string;
 }
-
-interface Props {
-  formType: 'Edit' | 'Delete' | 'View';
+interface EntityType {
+  entityType: string;
+  value: string;
 }
 
-const entityTypes = ['Skill', 'Qualification', 'Job Title', 'Flight Class', 'Flight Status', 'Seat Location'];
+interface Props {
+  dataCategory: string;
+  formType: 'Edit' | 'Delete' | 'View';
+  entityTypes: EntityType[];
+}
 
-const BaseFormComponent: React.FC<Props> = ({ formType }) => {
+const BaseFormComponent: React.FC<Props> = ({ dataCategory, formType, entityTypes }) => {
   const [selectedEntity, setSelectedEntity] = useState<string>('');
   const [selectedEntityData, setSelectedEntityData] = useState<Entity[] | null>(null);
   const [filterValue, setFilterValue] = useState<string>('');
@@ -25,11 +29,20 @@ const BaseFormComponent: React.FC<Props> = ({ formType }) => {
   }, [selectedEntity]);
 
   const fetchData = async (entityType: string) => {
-    try {
+    try 
+    {
       const response = await fetch(`${apiBaseUrl}/${entityType}`);
       const data = await response.json();
-      setSelectedEntityData(data.items);
-    } catch (error) {
+
+      if(entityType === "cities")
+        setSelectedEntityData(data.cities);
+      else if(entityType === "airlines")
+        setSelectedEntityData(data.airlines);
+      else 
+        setSelectedEntityData(data.items);
+    }
+    catch (error) 
+    {
       console.error('Error fetching data:', error);
     }
   };
@@ -59,8 +72,8 @@ const BaseFormComponent: React.FC<Props> = ({ formType }) => {
 
               <ul className="entity-types">
                 {entityTypes.map((entityType) => (
-                  <li key={entityType} className="entity-item">
-                    {entityType}
+                  <li key={entityType.value} className="entity-item">
+                    {entityType.entityType}
                   </li>
                 ))}
               </ul>
@@ -76,12 +89,11 @@ const BaseFormComponent: React.FC<Props> = ({ formType }) => {
                 onChange={handleEntityChange}
               >
                 <option value="">Select an Item</option>
-                <option value="skills">Skill</option>
-                <option value="qualifications">Qualification</option>
-                <option value="jobTitles">Job Title</option>
-                <option value="flightClasses">Flight Class</option>
-                <option value="flightStatuses">Flight Status</option>
-                <option value="seatLocations">Seat Location</option>
+                {entityTypes.map((entityType) => (
+                  <option key={entityType.value} value={entityType.value}>
+                    {entityType.entityType}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -117,7 +129,7 @@ const BaseFormComponent: React.FC<Props> = ({ formType }) => {
                             //{/* Link to the EditFormComponent or DeleteFormComponent */}
                             <td>
                               <Link
-                                to={`/${formType.toLowerCase()}/${selectedEntity}/${item.id}/${item.name}`}
+                                to={`/${dataCategory.toLowerCase()}/${formType.toLowerCase()}/${selectedEntity}/${item.id}/${item.name}`}
                                 className="btn btn-primary"
                               >
                                 {`${formType}`}
