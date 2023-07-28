@@ -32,7 +32,7 @@ const AddPlaneForm = () => {
         return;
       }
 
-      const response = await fetch(`${apiBaseUrl}/planes`, {
+      const response = await fetch(`${apiBaseUrl}/planes/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

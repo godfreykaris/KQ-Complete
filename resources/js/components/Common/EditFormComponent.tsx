@@ -15,6 +15,12 @@ const EditFormComponent: React.FC = () => {
   const [responseMessage, setResponseMessage] = useState<string>('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
+  useEffect(() => {
+    if (itemName) {
+      fetchData(itemName);
+    }
+  }, [itemName]);
+
   const fetchData = async (itemName: string) => {
     try {
 

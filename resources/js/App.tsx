@@ -14,6 +14,8 @@ import BaseFormDeleteComponent from './components/OtherData/BaseFormDeleteCompon
 import ViewFormComponent from './components/OtherData/ViewFormComponent';
 
 import AddPlaneForm from './components/Plane/AddPlaneForm';
+import BaseEditPlaneForm from './components/Plane/BaseEditPlaneForm';
+import EditPlaneForm from './components/Plane/EditPlaneForm';
 
 import AirlineFormAddComponent from './components/Cities&Airlines/AirlineFormAddComponent';
 import CityFormAddComponent from './components/Cities&Airlines/CityFormAddComponent';
@@ -101,8 +103,8 @@ const App = () => {
                 <Route path="/other/view" element={<ViewFormComponent />} />
 
                 <Route path="/planes/add" element={<AddPlaneForm />} />
-                <Route path="/planes/edit" element={<BaseFormEditComponent />} />
-                <Route path="/planes/edit/:selectedEntity/:id/:name" element={<EditFormComponent />} />
+                <Route path="/planes/edit" element={<BaseEditPlaneForm />} />
+                <Route path="/planes/edit/:id/:planeId/:model/:name" element={<EditPlaneForm />} />
                 <Route path="/planes/delete" element={<BaseFormDeleteComponent />} />
                 <Route path="/planes/delete/:selectedEntity/:id/:name" element={<DeleteFormComponent />} />
                 <Route path="/planes/view" element={<ViewFormComponent />} />

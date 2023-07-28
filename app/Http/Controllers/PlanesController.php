@@ -45,7 +45,7 @@ class PlanesController extends Controller
             $plane = Plane::where('plane_id', $planeId)->first();
             if(!$plane)
             {
-                return response()->json(['error' => 'The plane does not exist'], 500);
+                return response()->json(['error' => 'The plane does not exist', 'status' => 0]);
             }
 
             return response()->json(['plane' => $plane, 'status' => 1]);
@@ -57,9 +57,9 @@ class PlanesController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
     }
 
@@ -79,9 +79,9 @@ class PlanesController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
     }
 
@@ -97,15 +97,10 @@ class PlanesController extends Controller
                 'capacity' => 'required|numeric'                              
             ]);
 
-            /*********** For testing only *************/
-            $planeData['name'] = fake()->sentence(1);
-            $planeData['model'] = fake()->sentence(1);
-            /******************************************/
-
             // Make sure the plane is not a duplicate
             if($this->planeExists(($planeData)))
             {
-                return response()->json(['error' => 'The plane exists'], 500);
+                return response()->json(['error' => 'The plane exists', 'status' => 0]);
             }                       
 
             // Creae the plane
@@ -116,7 +111,7 @@ class PlanesController extends Controller
                 'capacity' => $planeData['capacity'],
             ]);
 
-            return response()->json(['plane' => $plane, 'status' => 1]);
+            return response()->json(['success' => 'Plane added successfully.', 'status' => 1]);
         } 
         catch (\Exception $e) 
         {
@@ -125,9 +120,9 @@ class PlanesController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.']);
         }
     }
 
@@ -143,22 +138,18 @@ class PlanesController extends Controller
                 'capacity' => 'required|numeric'                              
             ]);
 
-            /*********** For testing only *************/
-            $planeData['name'] = fake()->sentence(1);
-            $planeData['model'] = fake()->sentence(1);
-            /******************************************/
-
+            
             // Make sure the plane is valid
             $plane = Plane::where('plane_id', $planeId)->first();
             if(!$plane)
             {
-                return response()->json(['error' => 'The plane does not exist'], 500);
+                return response()->json(['error' => 'The plane does not exist', 'status' => 0]);
             }
 
             // Make sure the details given do not conflict with another plane
             if($this->planeExists(($planeData)))
             {
-                return response()->json(['error' => 'The plane exists'], 500);
+                return response()->json(['success' => 'The plane is upto date.', 'status' => 1]);
             }
 
             // Update the plane
@@ -173,9 +164,9 @@ class PlanesController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
     }
 
@@ -189,13 +180,13 @@ class PlanesController extends Controller
             $plane = Plane::where('plane_id', $planeId)->first();
             if(!$plane)
             {
-                return response()->json(['error' => 'The plane does not exist'], 500);
+                return response()->json(['error' => 'The plane does not exist', 'status' => 0]);
             }
 
             // Delete the plane
             $plane->delete();
 
-            return response()->json(['message' => 'Plane deleted successfully', 'status' => 1]);
+            return response()->json(['success' => 'Plane deleted successfully', 'status' => 1]);
         }
         catch (\Exception $e) 
         {
@@ -204,9 +195,9 @@ class PlanesController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
 
     }
