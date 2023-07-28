@@ -50,7 +50,7 @@ const BasePlaneForm: React.FC<Props> = ({ formType}) => {
       <div className="container mt-4">
         <div className="row justify-content-center">
           <div className="col-md-6">
-            <h2 className="text-center">{`${formType} Data`}</h2>
+            <h2 className="text-center">{`${formType} Planes`}</h2>
             
             {planesData ? (
               <div>
@@ -81,9 +81,9 @@ const BasePlaneForm: React.FC<Props> = ({ formType}) => {
                     <tbody>
                       {filteredData.map((item) => (                                    
                         <tr key={item.id}>
-                          <td>{item.id}</td>
-                          <td>{item.name}</td>
+                          <td>{item.id}</td>                          
                           <td>{item.plane_id}</td>
+                          <td>{item.name}</td>
                           <td>{item.model}</td>
                           <td>{item.capacity}</td>
                           {formType !== 'View' && (

@@ -155,7 +155,7 @@ class PlanesController extends Controller
             // Update the plane
             $plane->update($planeData);
 
-            return response()->json(['plane' => $plane, 'status' => 1]);
+            return response()->json(['success' => 'Plane updated successfully.', 'status' => 1]);
         } 
         catch (\Exception $e) 
         {
