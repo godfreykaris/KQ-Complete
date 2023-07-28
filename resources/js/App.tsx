@@ -8,6 +8,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import BaseFormAddComponent from './components/Common/BaseFormAddComponent';
 import BaseFormEditComponent from './components/Common/BaseFormEditComponent';
 import EditFormComponent from './components/Common/EditFormComponent';
+import BaseFormDeleteComponent from './components/Common/BaseFormDeleteComponent';
+import DeleteFormComponent from './components/Common/DeleteFormComponent';
 
 const App = () => {
   
@@ -32,6 +34,9 @@ const App = () => {
                     <NavDropdown.Item as={Link} to="/edit" className="menu-item-text">
                       Edit Data
                     </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/delete" className="menu-item-text">
+                      Delete Data
+                    </NavDropdown.Item>
                     {/* Add other menu items as needed */}
                   </NavDropdown>
                 </Nav>
@@ -45,6 +50,8 @@ const App = () => {
                 <Route path="/" element={<BaseFormAddComponent />} />
                 <Route path="/edit" element={<BaseFormEditComponent />} />
                 <Route path="/edit/:selectedEntity/:id/:name" element={<EditFormComponent />} />
+                <Route path="/delete" element={<BaseFormDeleteComponent />} />
+                <Route path="/delete/:selectedEntity/:id/:name" element={<DeleteFormComponent />} />
                 {/* Add other routes for other menu items as needed */}
               </Routes>
           </div>

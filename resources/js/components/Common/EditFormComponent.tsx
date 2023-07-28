@@ -5,7 +5,6 @@ import apiBaseUrl from '../../config';
 
 const EditFormComponent: React.FC = () => {
   const { selectedEntity, name, id } = useParams<{ selectedEntity: string; name: string; id:string }>();
-  const navigate = useNavigate();
 
   const [itemId, setItemId] = useState<string>(id || '');
   const [itemName, setItemName] = useState<string>(name || '');

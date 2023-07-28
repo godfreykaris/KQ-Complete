@@ -126,7 +126,7 @@ Route::post('/employees/add', [EmployeesController::class, 'store'])->name('empl
 Route::delete('/employees/delete/{employeeId}', [EmployeesController::class, 'destroy'])->name('employees.delete');
 Route::put('/employees/change/{employeeId}', [EmployeesController::class, 'update'])->name('employees.update');
 
-Route::post('/qualifications/change/{qualificationId}', [QualificationsController::class, 'update'])->name('qualifications.update');
+Route::put('/qualifications/change/{qualificationId}', [QualificationsController::class, 'update'])->name('qualifications.update');
 Route::post('/qualifications/add', [QualificationsController::class, 'store'])->name('qualifications.store');
 Route::delete('/qualifications/delete/{qualificationId}', [QualificationsController::class, 'delete'])->name('qualifications.delete');
 Route::get('/qualifications', [QualificationsController::class, 'index'])->name('qualifications.all');
