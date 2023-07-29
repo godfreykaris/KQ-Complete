@@ -147,7 +147,7 @@ const ViewFlights: React.FC = () => {
 
                                   <td>
                                     <Link
-                                      to={`/plane_flights/edit/${item.id}`} // Replace "edit-flight" with the actual URL for the EditFlightComponent
+                                      to={`/manage_flights/edit/${item.id}`} // Replace "edit-flight" with the actual URL for the EditFlightComponent
                                       className="btn btn-primary"
                                     >
                                       Edit

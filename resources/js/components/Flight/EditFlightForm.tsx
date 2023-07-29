@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import apiBaseUrl from '../../config';
 
 import LoadingComponent from '../LoadingComponent';
+import { useParams } from 'react-router-dom';
 
 type Plane = {
     id: number;
@@ -23,13 +24,16 @@ type Airline = {
   name: string;
 };
 
-const AddFlightForm = () => {
+const EditFlightForm = () => {
   
+  const { flight_id} = useParams<{flight_id: string; }>();
+
   const [isLoading, setIsLoading] = useState(true);
+
+  const [prevFlightId, setPrevFlightId] = useState<string>(flight_id || '');
 
   const [airlines, setAirlines] = useState<Airline[]>([]);
   const [planes, setPlanes] = useState<Plane[]>([]);
-  const [seatLocations, setSeatLocations] = useState<SeatLocation[]>([]);
   const [cities, setCities] = useState<City[]>([]);
 
   const [formData, setFormData] = useState({
@@ -46,6 +50,7 @@ const AddFlightForm = () => {
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
   useEffect(() => {
+    fetchFlight();
     fetchData();
   }, []);
 
@@ -89,6 +94,24 @@ const AddFlightForm = () => {
     }
   };
 
+  const fetchFlight = async () => {
+    setIsLoading(true);
+
+    try 
+    {
+      const response = await fetch(`${apiBaseUrl}/flights/${prevFlightId}`);
+      const data = await response.json();
+      setFormData(data.flight);
+      setIsLoading(false);
+
+    }
+    catch (error) 
+    {
+      console.error('Error fetching data:', error);
+      setIsLoading(false);
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
@@ -123,8 +146,8 @@ const AddFlightForm = () => {
         return;
       }
 
-      const response = await fetch(`${apiBaseUrl}/flights/add`, {
-        method: 'POST',
+      const response = await fetch(`${apiBaseUrl}/flights/change/${prevFlightId}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': csrfToken,
@@ -183,8 +206,8 @@ const AddFlightForm = () => {
 
   return (
     <div className="col-sm-12 col-md-4">
-      <h2 className="text-center">Add New Flight</h2>
-      {isLoading ? (
+      <h2 className="text-center">Edit Flight</h2>
+      {((isLoading) || (!formData.airline_id) || (!formData.plane_id)) ? (
         /**Show loading */
         <LoadingComponent />
       ) : (
@@ -304,7 +327,7 @@ const AddFlightForm = () => {
               </div>
               <div className="text-center mt-3">
                 <button type="submit" className="btn btn-primary">
-                  Add Flight
+                  Save Changes
                 </button>
               </div>
             </form>
@@ -314,4 +337,4 @@ const AddFlightForm = () => {
   );
 };
 
-export default AddFlightForm;
+export default EditFlightForm;

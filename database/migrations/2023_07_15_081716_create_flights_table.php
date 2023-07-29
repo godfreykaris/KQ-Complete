@@ -22,7 +22,7 @@ return new class extends Migration
             $table->foreignId('departure_city_id')->constrained('cities')->onDelete('cascade');
             $table->foreignId('arrival_city_id')->constrained('cities')->onDelete('cascade');
             $table->foreignId('plane_id')->constrained('planes')->onDelete('cascade');
-            $table->foreignId('airline_id')->nullable()->constrained('airlines')->onDelete('cascade');
+            $table->foreignId('airline_id')->constrained('airlines')->onDelete('cascade');
             $table->timestamps();
         });
     }

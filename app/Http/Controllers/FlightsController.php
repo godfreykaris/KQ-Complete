@@ -115,10 +115,10 @@ class FlightsController extends Controller
             DB::rollback();
 
             Log::error($e->getMessage());
-            // return response()->json(['error' => 'An error occurred.', 'status' => 0]);
+            //return response()->json(['error' => 'An error occurred.', 'status' => 0]);
 
             // For debugging
-            // return response()->json(['error' => 'Error: ' . $e->getMessage(), 'status' => 0]);
+             return response()->json(['error' => 'Error: ' . $e->getMessage(), 'status' => 0]);
         }
     }
 
@@ -169,7 +169,7 @@ class FlightsController extends Controller
 
             DB::commit();
 
-            return response()->json(['flight' => $flight, 'status' => 1]);
+            return response()->json(['success' => 'Flight Updated Successfully.', 'status' => 1]);
         }         
         catch (ModelNotFoundException $e) 
         {
@@ -181,10 +181,10 @@ class FlightsController extends Controller
             DB::rollback();
 
             Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred.', 'status' => 0]);
+            //return response()->json(['error' => 'An error occurred.', 'status' => 0]);
 
             // For debugging
-            // return response()->json(['error' => 'Error: ' . $e->getMessage(), 'status' => 0]);
+             return response()->json(['error' => 'Error: ' . $e->getMessage(), 'status' => 0]);
         }
     }
 

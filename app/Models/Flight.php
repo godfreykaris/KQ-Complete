@@ -11,7 +11,7 @@ class Flight extends Model
 
     protected $fillable = [
         'flight_number',
-        'airline',
+        'airline_id',
         'plane_id',
         'is_international',
         'duration',

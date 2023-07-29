@@ -15,6 +15,7 @@ import ViewFormComponent from './components/OtherData/ViewFormComponent';
 
 import AddFlightForm from './components/Flight/AddFlightForm';
 import ViewFlights from './components/Flight/ViewFlights';
+import EditFlightForm from './components/Flight/EditFlightForm';
 
 import AddPlaneForm from './components/Plane/AddPlaneForm';
 import BaseEditPlaneForm from './components/Plane/BaseEditPlaneForm';
@@ -52,15 +53,9 @@ const App = () => {
                   <NavDropdown title="Flights" id="basic-nav-dropdown" className="menu-item-text">                    
                     <NavDropdown.Item as={Link} to="/manage_flights/add" className="menu-item-text">
                       Add Flight
-                    </NavDropdown.Item>
-                    <NavDropdown.Item as={Link} to="/manage_flights/edit" className="menu-item-text">
-                      Edit Flight
-                    </NavDropdown.Item>                    
-                    <NavDropdown.Item as={Link} to="/manage_flights/delete" className="menu-item-text">
-                      Delete Flight
-                    </NavDropdown.Item>                    
+                    </NavDropdown.Item>                                       
                     <NavDropdown.Item as={Link} to="/manage_flights/view" className="menu-item-text">
-                      View Flights
+                      View|Edit|Delete Flights
                     </NavDropdown.Item>
                     {/* Add other menu items as needed */}
                   </NavDropdown>
@@ -138,7 +133,7 @@ const App = () => {
                 <Route path="/other/view" element={<ViewFormComponent />} />
 
                 <Route path="/manage_flights/add" element={<AddFlightForm />} />
-                <Route path="/manage_flights/edit/:plane_id/:flight_class_id/:location_id/:price/:seat_number" element={<EditSeatForm />} />
+                <Route path="/manage_flights/edit/:flight_id" element={<EditFlightForm />} />
                 <Route path="/manage_flights/delete/:selectedEntity/:flight_id" element={<DeleteFormComponent />} />
                 <Route path="/manage_flights/view" element={<ViewFlights />} />
 
