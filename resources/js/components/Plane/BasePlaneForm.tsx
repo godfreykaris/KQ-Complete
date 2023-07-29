@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import apiBaseUrl from '../../config';
+import { Button, Spinner } from 'react-bootstrap';
+import LoadingComponent from '../LoadingComponent';
 
 interface Entity {
     id: number;
@@ -104,7 +106,9 @@ const BasePlaneForm: React.FC<Props> = ({ formType}) => {
                 </div>
               </div>
             ): (
-                <div className="text-center mt-3">Loading...</div>
+                /**Show loading */
+                <LoadingComponent />
+
               )}
           </div>
         </div>

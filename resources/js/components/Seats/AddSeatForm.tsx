@@ -1,56 +1,44 @@
-import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
+import React, { useState, ChangeEvent, FormEvent, useEffect, useMemo, useCallback } from 'react';
 import apiBaseUrl from '../../config';
+import LoadingComponent from '../LoadingComponent';
 
-
-// Define the types for your data
 type Plane = {
     id: number;
     name: string;
-    // other properties...
-  };
+ };
 
 type FlightClass = {
   id: number;
   name: string;
-  // other properties...
 };
 
 type SeatLocation = {
   id: number;
   name: string;
-  // other properties...
 };
 
 type Seat = {
-    id: number;
-    seat_number: string;
-    price: number;
-    is_available: boolean;
-    plane_id: number;
-    flight_class_id: number;
-    location_id: number;
-    // Add any other properties if needed
-  };
-
-  type SeatFormData = {
-    seat_number: string;
-    price: number;
-    is_available: boolean;
-    location_id: number;
-  };
+  seat_number: string;
+  price: number;
+  is_available: boolean;
+  location_id: number;
+};
   
 
 const AddSeatForm = () => {
   
-    const [formData, setFormData] = useState({
-      seat_number: '',
-      price: 0,
-      is_available: false,      
-      location_id: 0,
-    });
+  const [formData, setFormData] = useState({
+    seat_number: '',
+    price: 0,
+    is_available: false,      
+    location_id: 0,
+  });
 
+  const { seat_number, price, is_available, location_id } = formData; // Destructuring formData here
 
-  const [seatsAdded, setSeatsAdded] = useState<SeatFormData[]>([]); // State to store the seats added by the user
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [seatsAdded, setSeatsAdded] = useState<Seat[]>([]); // State to store the seats added by the user
 
   const [isEditing, setIsEditing] = useState(false);
   const [editingSeatIndex, setEditingSeatIndex] = useState<number | null>(null);
@@ -72,59 +60,68 @@ const AddSeatForm = () => {
   }, []);
 
   const fetchPlanes = async () => {
+    setIsLoading(true);
     try 
     {
       const response = await fetch(`${apiBaseUrl}/planes`);
       const data = await response.json();
       setPlanes(data.planes);
+      setIsLoading(false);
     } 
-    catch (error) 
+    catch (error: any) 
     {
+      setIsLoading(false); 
       setResponseStatus(0); // Error
-      setResponseMessage('Error fetching planes: An error occurred');
+      setResponseMessage(`Error fetching planes:${error.message}`);
       console.error('Error fetching planes:', error);
     }
   };
 
   const fetchFlightClasses = async () => {
+    setIsLoading(true); 
     try
     {
       const response = await fetch(`${apiBaseUrl}/flightClasses`); 
       const data = await response.json();
       setFlightClasses(data.items);
+      setIsLoading(false); 
     } 
-    catch (error) 
+    catch (error: any) 
     {
+      setIsLoading(false); 
       setResponseStatus(0); // Error
-      setResponseMessage('Error fetching flight classes: An error occurred');
+      setResponseMessage(`Error fetching flight classes:${error.message}`);
       console.error('Error fetching flight classes:', error);
     }
   };
 
   const fetchSeatLocations = async () => {
+    setIsLoading(true); 
+
     try 
     {
       const response = await fetch(`${apiBaseUrl}/seatLocations`); 
       const data = await response.json();
       setSeatLocations(data.items);
+      setIsLoading(false); 
     } 
-    catch (error) 
+    catch (error: any) 
     {
+      setIsLoading(false); 
       setResponseStatus(0); // Error
-      setResponseMessage('Error fetching seat locations: An error occurred');
+      setResponseMessage(`Error fetching seat locations:${error.message}`);
       console.error('Error fetching seat locations:', error);
     }
   };
 
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-  
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }, []);
 
   const handleEditSeat = (index: number) => {
     const seatToEdit = seatsAdded[index];
@@ -134,157 +131,176 @@ const AddSeatForm = () => {
   };
 
   const handleDeleteSeat = (index: number) => {
-    // When the user clicks on "Delete" for a seat, remove the seat from seatsAdded state
-    setSeatsAdded((prevSeatsAdded) => {
-      const updatedSeats = [...prevSeatsAdded];
-      updatedSeats.splice(index, 1);
-      return updatedSeats;
-    });
-    // If the seat being deleted was also in the editing mode, reset the form fields and editing index
-    if (editingSeatIndex === index) {
-      setFormData({
-        seat_number: '',
-        price: 0,
-        is_available: false,
-        location_id: 0,
+      // When the user clicks on "Delete" for a seat, remove the seat from seatsAdded state
+      setSeatsAdded((prevSeatsAdded) => {
+        const updatedSeats = [...prevSeatsAdded];
+        updatedSeats.splice(index, 1);
+        return updatedSeats;
       });
-      setEditingSeatIndex(null);
-    }
+      // If the seat being deleted was also in the editing mode, reset the form fields and editing index
+      if (editingSeatIndex === index) 
+      {
+        setFormData({
+          seat_number: '',
+          price: 0,
+          is_available: false,
+          location_id: 0,
+        });
+        setEditingSeatIndex(null);
+      }
   };
+
+  const seatLocationMap = useMemo(() => {
+     const locationMap: { [key: number]: string } = {};
+     seatLocations.forEach((location) => {
+       locationMap[location.id] = location.name;
+     });
+     return locationMap;
+   }, [seatLocations]);
+  
 
   const getLocationName = (locationId: number) => {
-    const location = seatLocations[locationId - 1];
-    return location ? location.name : '';
+    return seatLocationMap[locationId] || '';
   };
 
-  const handlePlaneChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  const handlePlaneChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
     setSelectedPlaneId(parseInt(e.target.value));
-  };
-
-  const handleFlightClassChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  }, []);
+  
+  const handleFlightClassChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
     setSelectedFlightClassId(parseInt(e.target.value));
-  };
-
+  }, []);
+  
   const handleAddSeat = () => {
 
     // Validate form data
-    if (
-      formData.seat_number.trim() === '' ||
-      formData.price === 0 ||
-      formData.price < 0 ||
-      formData.price === 0 ||
-      formData.location_id === 0
-    ) {
-      // If any of the required fields are empty or 0, do not add the seat
-      alert('Please fill all fields!');
-      return;
+    if (seat_number.trim() === '' || price < 1 || location_id === 0)
+    {
+        // If any of the required fields are empty or 0, do not add the seat
+        alert('Please fill all fields!');
+        return;
     }
 
-    const seatToAddOrUpdate = {
-      is_available: false,
-      seat_number: formData.seat_number,
-      price: formData.price,
-      location_id: formData.location_id,
+    const seatToAddOrUpdate =
+    {
+        is_available,
+        seat_number,
+        price,
+        location_id,
     };
 
-    if (isEditing && editingSeatIndex !== null) {
-      // If editing an existing seat, update the table
-      const updatedSeats = [...seatsAdded];
-      updatedSeats[editingSeatIndex] = seatToAddOrUpdate;
-      setSeatsAdded(updatedSeats);
-      setIsEditing(false);
-      setEditingSeatIndex(null);
-    } 
+    if (isEditing && editingSeatIndex !== null) 
+    {
+        // If editing an existing seat, update the table
+        const updatedSeats = [...seatsAdded];
+
+        updatedSeats[editingSeatIndex] = seatToAddOrUpdate;
+
+        setSeatsAdded(updatedSeats);
+        setIsEditing(false);
+        setEditingSeatIndex(null);
+    }   
     else 
     {
-     // Check if the seat with the same seat_number already exists in the seatsAdded array
-    const seatAlreadyExists = seatsAdded.some(
-      (seatData) => seatData.seat_number === formData.seat_number
-    );
-
-    if (seatAlreadyExists) {
-      // If the seat with the same seat_number already exists, do not add it again
-      alert('Seat already in table!');
-      return;
-    }
-      // When the user clicks on "Add Seat", add the current seat data to the seatsAdded state
-    setSeatsAdded((prevSeatsAdded) => [...prevSeatsAdded, formData]);
-
-    setFormData({
-        seat_number: '',
-        price: 0,
-        is_available: false,
-        location_id: 0,
-      });
-    }
-
-    
+        // Check if the seat with the same seat_number already exists in the seatsAdded array
+        const seatAlreadyExists = seatsAdded.some((seatData) => seatData.seat_number === seat_number);
+        
+        if (seatAlreadyExists) 
+        {
+            // If the seat with the same seat_number already exists, do not add it again
+            alert('Seat already in table!');
+            return;
+        }
+        
+        // When the user clicks on "Add Seat", add the current seat data to the seatsAdded state
+        setSeatsAdded((prevSeatsAdded) => [...prevSeatsAdded, formData]);
+      
+        setFormData(
+            {
+              seat_number: '',
+              price: 0,
+              is_available: false,
+              location_id: 0,
+            }
+          );
+    }   
     
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (seatsAdded.length <= 0) 
+    if (seatsAdded.length < 1) 
     {
-      // If the seat with the same seat_number already exists, do not add it again
-      alert('There are no seats to add!');
-      return;
+        // If the seat with the same seat_number already exists, do not add it again
+        alert('There are no seats to add!');
+        return;
     }
 
     try 
     {
-      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        setIsLoading(true); // Start loading data
 
-      if (!csrfToken) 
-      {
-        console.error('CSRF token not found.');
-        return;
-      }
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-      // Create an array of seat objects to be submitted
-      const seatsData = {
-        plane_id: selectedPlaneId,
-        flight_class_id: selectedFlightClassId,
-        seats: seatsAdded.map((seatData) => ({
-          seat_number: seatData.seat_number,
-          price: seatData.price,
-          location_id: seatData.location_id,
-        })),
-      };
+        if (!csrfToken) 
+        {
+            console.error('CSRF token not found.');
+            return;
+        }
 
-      const response = await fetch(`${apiBaseUrl}/seats/add`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': csrfToken,
-        },
-        body: JSON.stringify(seatsData),
-      });
+        // Create an array of seat objects to be submitted
+        const seatsData = 
+        {
+            plane_id: selectedPlaneId,
+            flight_class_id: selectedFlightClassId,
+            seats: seatsAdded.map((seatData) => (
+              {
+                seat_number: seatData.seat_number,
+                price: seatData.price,
+                location_id: seatData.location_id,
+              }
+            )),
+        };
 
-      const data = await response.json();
+        const response = await fetch(`${apiBaseUrl}/seats/add`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+          },
+          body: JSON.stringify(seatsData),
+        });
 
-      if (response.ok) 
-      {
-         if (data.status) 
-         {
-           setResponseStatus(1); // Success
-           setResponseMessage(`Success: ${data.success}`);
-         } 
-         else 
-         {
-           setResponseStatus(0); // Error
-           setResponseMessage(`Error: ${data.error}`);
-         }
-      }
-      else 
-      {
-        setResponseStatus(0); // Error
-        setResponseMessage(`Error: ${data.error}`);
-      }
+        const data = await response.json();
+
+        if (response.ok) 
+        {
+           setIsLoading(false); // Start loading data
+           if (data.status) 
+           {             
+             setResponseStatus(1); // Success
+             setResponseMessage(`Success: ${data.success}`);
+
+             // Reset the seats added array after a successful submission
+             setSeatsAdded([]);
+           } 
+           else 
+           {
+             setResponseStatus(0); // Error
+             setResponseMessage(`Error: ${data.error}`);
+           }
+        }
+        else 
+        {
+          setIsLoading(false); // Start loading data
+          setResponseStatus(0); // Error
+          setResponseMessage(`Error: ${data.error}`);
+        }
     } 
     catch (error) 
     {
+        setIsLoading(false); // Start loading data
         setResponseStatus(0); // Error
         setResponseMessage('Error submitting data: An error occurred');
         console.error('Error submitting data:', error);
@@ -292,23 +308,32 @@ const AddSeatForm = () => {
   };
 
   const getResponseClass = () => {
-    if (responseStatus === 1) 
-    {
-      return 'text-success'; // Green color for success
-    } 
-    else if (responseStatus === 0) 
-    {
-      return 'text-danger'; // Red color for error
-    } 
-    else 
-    {
-      return ''; // No specific styles (default)
-    }
+      
+      if (responseStatus === 1) 
+      {
+        return 'text-success'; // Green color for success
+      } 
+      else if (responseStatus === 0) 
+      {
+        return 'text-danger'; // Red color for error
+      } 
+      else 
+      {
+        return ''; // No specific styles (default)
+      }
   };
 
   return (
     <div className="form-container col-md-4">
       <h2 className="text-center">Add Seats</h2> 
+      
+      <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+
+      {isLoading ? (
+        /**Show loading */
+        <LoadingComponent />
+      ) : (
+      <div>
       <form onSubmit={handleSubmit}>
         
         <div className="mb-3">
@@ -344,38 +369,37 @@ const AddSeatForm = () => {
                 {flightClass.name}
               </option>
             ))}
-          </select>
-
-          
+          </select>          
         </div>
 
         <hr
-        style={{
-          height: '5px', // Adjust the thickness (height) as needed
-          backgroundColor: 'black', // Change the color as needed
-          border: 'none', // Remove the default border
-          margin: '20px 0', // Add some margin for spacing
-        }}
-      />
+          style=
+            {{
+                height: '5px', // Adjust the thickness (height) as needed
+                backgroundColor: 'black', // Change the color as needed
+                border: 'none', // Remove the default border
+                margin: '20px 0', // Add some margin for spacing
+            }}
+        />
 
         <div className="form-group">
-          <label htmlFor="seat_number" className="form-label">Seat Number</label>
-          <input
-            type="text"
-            name="seat_number"
-            value={formData.seat_number}
-            onChange={handleChange}
-            className="form-control"
-            placeholder="Seat Number"
-            maxLength={5}
-          />
+            <label htmlFor="seat_number" className="form-label">Seat Number</label>
+            <input
+              type="text"
+              name="seat_number"
+              value={seat_number}
+              onChange={handleChange}
+              className="form-control"
+              placeholder="Seat Number"
+              maxLength={5}
+            />
         </div>
 
         <div className="mb-3">
           <label htmlFor="location_id" className="form-label">Seat location</label>
           <select
             name="location_id"
-            value={formData.location_id }
+            value={location_id }
             onChange={handleChange}
             className="form-select"
           >
@@ -388,15 +412,14 @@ const AddSeatForm = () => {
           </select>
         </div>
 
-      {/* Seat Price Input Field */}
-      <div className="mb-3">
+        <div className="mb-3">
           <label htmlFor="price" className="form-label">
             Seat Price (USD $)
           </label>
           <input
             type="number"
             name="price"
-            value={formData.price}
+            value={price}
             onChange={handleChange}
             className="form-control"
             placeholder="Seat Price"
@@ -416,7 +439,7 @@ const AddSeatForm = () => {
 
       </form>
 
-      {/* Table to display the seats added */}
+      {/* Table to display multiple seats added before submision*/}
       {seatsAdded.length > 0 && (
         <div className="mt-4">
           <h3 className="form-label">Seats Added:</h3>
@@ -444,23 +467,26 @@ const AddSeatForm = () => {
                       >
                         Edit
                       </button>
-                    </td>
-                    <td>
-                      <button
-                        type="button"
-                        className="btn btn-danger btn-sm"
-                        onClick={() => handleDeleteSeat(index)}
-                      >
-                        Delete
-                      </button>
-                    </td>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDeleteSeat(index)}
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       )}
-      <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+
+      </div>
+    )}
+
     </div>
   );
 };
