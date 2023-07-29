@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\City;
 use App\Models\Flight;
+use App\Models\FlightStatus;
 use App\Models\Seat;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -35,7 +36,7 @@ class FlightsController extends Controller
     {
         try 
         {
-            $flights = Flight::all();
+           $flights = Flight::with('plane', 'flightStatus', 'departureCity', 'arrivalCity')->get();
         
             return response()->json(['flights' => $flights, 'status' => 1]);
         } 
@@ -46,9 +47,9 @@ class FlightsController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            //return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            //return response()->json(['error' => 'An error occurred. ' . $e->getMessage(), 'status' => 0]);
             
-            return response()->json(['error' => 'An error occurred.'], 500);
+            return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
     }
 
@@ -57,12 +58,14 @@ class FlightsController extends Controller
     {
         try 
         {
-            $flight = Flight::findOrFail($flightId);
-            return response()->json(['flight' => $flight]);
+            $flight = Flight::with(['plane', 'flightStatus', 'departureCity', 'arrivalCity'])
+                     ->findOrFail($flightId);
+
+            return response()->json(['flight' => $flight, 'status' => 1]);
         }
         catch (ModelNotFoundException $e) 
         {
-            return response()->json(['error' => 'Flight not found'], 404);
+            return response()->json(['error' => 'Flight not found', 'status' => 0], 404);
         } 
         catch (\Exception $e) 
         {
@@ -71,9 +74,9 @@ class FlightsController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            //return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            //return response()->json(['error' => 'An error occurred. ' . $e->getMessage(), 'status' => 0]);
             
-            return response()->json(['error' => 'An error occurred.'], 500);
+            return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
     }
 
@@ -86,7 +89,6 @@ class FlightsController extends Controller
             'is_international' => 'required|boolean',
             'departure_time' => 'required|date',
             'arrival_time' => 'required|date|after:departure_time',
-            'flight_status_id' => 'required|exists:flight_statuses,id',
             'departure_city_id' => 'required|exists:cities,id',
             'arrival_city_id' => 'required|exists:cities,id',
         ]);
@@ -99,22 +101,24 @@ class FlightsController extends Controller
             $flightNumber = $this->generateFlightNumber();
             $flightData['flight_number'] = $flightNumber;
 
+            $flightData['flight_status_id'] = FlightStatus::where('name', 'On-time')->first()->id;
+
             // Create the flight
             $flight = Flight::create($flightData);
 
             DB::commit();
 
-            return response()->json(['flight' => $flight, 'status' => 1]);
+            return response()->json(['success' => 'Flight added successfully.', 'status' => 1]);
         }
         catch (\Exception $e) 
         {
             DB::rollback();
 
             Log::error($e->getMessage());
-            //return response()->json(['error' => 'An error occurred.'], 500);
+            // return response()->json(['error' => 'An error occurred.', 'status' => 0]);
 
             // For debugging
-             return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'Error: ' . $e->getMessage(), 'status' => 0]);
         }
     }
 
@@ -170,17 +174,17 @@ class FlightsController extends Controller
         catch (ModelNotFoundException $e) 
         {
             Log::error($e->getMessage());
-            return response()->json(['error' => 'Flight not found'], 404);
+            return response()->json(['error' => 'Flight not found', 'status' => 0], 404);
         }
         catch (\Exception $e) 
         {
             DB::rollback();
 
             Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred.'], 500);
+            return response()->json(['error' => 'An error occurred.', 'status' => 0]);
 
             // For debugging
-            // return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'Error: ' . $e->getMessage(), 'status' => 0]);
         }
     }
 
@@ -199,23 +203,23 @@ class FlightsController extends Controller
 
             DB::commit();
 
-            return response()->json(['message' => 'Flight deleted successfully', 'status' => 1]);
+            return response()->json(['success' => 'Flight deleted successfully', 'status' => 1]);
         }
         catch (ModelNotFoundException $e) 
         {
             Log::error($e->getMessage());
 
-            return response()->json(['error' => 'Flight not found'], 404);
+            return response()->json(['error' => 'Flight not found', 'status' => 0], 404);
         }
         catch (\Exception $e) 
         {
             DB::rollback();
 
             Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred.'], 500);
+            return response()->json(['error' => 'An error occurred.', 'status' => 0]);
 
             // For debugging
-            // return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'Error: ' . $e->getMessage(), 'status' => 0]);
         }
     }
 
@@ -235,15 +239,15 @@ class FlightsController extends Controller
         {
             Log::error($e->getMessage());
 
-            return response()->json(['error' => 'Departure city not found'], 404);
+            return response()->json(['error' => 'Departure city not found', 'status' => 0], 404);
         }
         catch (\Exception $e) 
         {
             Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred.'], 500);
+            return response()->json(['error' => 'An error occurred.', 'status' => 0]);
 
             // For debugging
-            // return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'Error: ' . $e->getMessage(), 'status' => 0]);
         }
     }
 
@@ -257,7 +261,7 @@ class FlightsController extends Controller
 
             if ($hours <= 0 || $hours > 1000) 
             {
-                return response()->json(['error' => 'Invalid number of hours. Acceptable range 0 to 1000 hours.'], 400);
+                return response()->json(['error' => 'Invalid number of hours. Acceptable range 0 to 1000 hours.', 'status' => 0], 400);
             }
 
             // Calculate the departure time after the given hours from the current time
@@ -271,11 +275,11 @@ class FlightsController extends Controller
         catch (\Exception $e) 
         {
             Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred.'], 500);
+            return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
 
         // For debugging
-        // return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
+        // return response()->json(['error' => 'Error: ' . $e->getMessage(), 'status' => 0]);
     }
 
     // Get flights departing on a particular departure date
@@ -297,10 +301,10 @@ class FlightsController extends Controller
         catch (\Exception $e) 
         {
             Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred.'], 500);
+            return response()->json(['error' => 'An error occurred.', 'status' => 0]);
 
             // For debugging
-            // return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'Error: ' . $e->getMessage(), 'status' => 0]);
         }
 
     }

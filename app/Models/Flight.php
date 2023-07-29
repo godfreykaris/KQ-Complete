@@ -62,4 +62,22 @@ class Flight extends Model
     {
         return $this->belongsTo(Plane::class);
     }
+
+    // Define the relationship with the FlightStatus model
+    public function flightStatus()
+    {
+        return $this->belongsTo(FlightStatus::class, 'flight_status_id');
+    }
+
+    // Define the relationship with the City model for departure city
+    public function departureCity()
+    {
+        return $this->belongsTo(City::class, 'departure_city_id');
+    }
+
+    // Define the relationship with the City model for arrival city
+    public function arrivalCity()
+    {
+        return $this->belongsTo(City::class, 'arrival_city_id');
+    }
 }

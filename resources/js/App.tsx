@@ -13,6 +13,9 @@ import BaseFormEditComponent from './components/OtherData/BaseFormEditComponent'
 import BaseFormDeleteComponent from './components/OtherData/BaseFormDeleteComponent';
 import ViewFormComponent from './components/OtherData/ViewFormComponent';
 
+import AddFlightForm from './components/Flight/AddFlightForm';
+import ViewFlights from './components/Flight/ViewFlights';
+
 import AddPlaneForm from './components/Plane/AddPlaneForm';
 import BaseEditPlaneForm from './components/Plane/BaseEditPlaneForm';
 import EditPlaneForm from './components/Plane/EditPlaneForm';
@@ -46,6 +49,21 @@ const App = () => {
                   <Nav.Link href="#" className="menu-item-text" active>
                     Home
                   </Nav.Link>
+                  <NavDropdown title="Flights" id="basic-nav-dropdown" className="menu-item-text">                    
+                    <NavDropdown.Item as={Link} to="/manage_flights/add" className="menu-item-text">
+                      Add Flight
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/manage_flights/edit" className="menu-item-text">
+                      Edit Flight
+                    </NavDropdown.Item>                    
+                    <NavDropdown.Item as={Link} to="/manage_flights/delete" className="menu-item-text">
+                      Delete Flight
+                    </NavDropdown.Item>                    
+                    <NavDropdown.Item as={Link} to="/manage_flights/view" className="menu-item-text">
+                      View Flights
+                    </NavDropdown.Item>
+                    {/* Add other menu items as needed */}
+                  </NavDropdown>
                   <NavDropdown title="Planes" id="basic-nav-dropdown" className="menu-item-text">                    
                     <NavDropdown.Item as={Link} to="/planes/add" className="menu-item-text">
                       Add Plane
@@ -118,6 +136,11 @@ const App = () => {
                 <Route path="/other/delete" element={<BaseFormDeleteComponent />} />
                 <Route path="/other/delete/:selectedEntity/:id/:name" element={<DeleteFormComponent />} />
                 <Route path="/other/view" element={<ViewFormComponent />} />
+
+                <Route path="/manage_flights/add" element={<AddFlightForm />} />
+                <Route path="/manage_flights/edit/:plane_id/:flight_class_id/:location_id/:price/:seat_number" element={<EditSeatForm />} />
+                <Route path="/manage_flights/delete/:selectedEntity/:flight_id" element={<DeleteFormComponent />} />
+                <Route path="/manage_flights/view" element={<ViewFlights />} />
 
                 <Route path="/planes/add" element={<AddPlaneForm />} />
                 <Route path="/planes/edit" element={<BaseEditPlaneForm />} />

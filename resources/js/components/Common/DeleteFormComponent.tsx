@@ -10,12 +10,15 @@ interface Entity {
 }
 
 const DeleteFormComponent: React.FC = () => {
-  const { selectedEntity, id, name, country, code, seat_number, plane, plane_id } = useParams<{ selectedEntity: string; id: string; name: string; country: string; code: string; seat_number: string; plane: string; plane_id: string; }>();
+  const { selectedEntity, id, name, country, code, seat_number, plane, plane_id, flight_id } = useParams<{ selectedEntity: string; id: string; name: string; country: string; code: string; seat_number: string; plane: string; plane_id: string; flight_id: string; }>();
 
   const [isLoading, setIsLoading] = useState(true);
 
   const [itemName, setItemName] = useState<string>( name || '');
   const [itemId, setItemId] = useState<string>( id || '');
+
+  const [flightNumber, setFlightNumber] = useState<string>('');
+  const [planeId, setPlaneId] = useState<string>( '');
 
   const [itemCountry, setItemCountry] = useState<string | null >( country || null);
   const [itemCode, setItemCode] = useState<string | null>( code || null);
@@ -47,6 +50,10 @@ const DeleteFormComponent: React.FC = () => {
       {
         url += `/${seat_number}/${plane_id}`;
       }
+      else if (flight_id) 
+      {
+        url += `/${flight_id}`;
+      }      
       else
       {
         url += `/${itemName}`;
@@ -71,7 +78,12 @@ const DeleteFormComponent: React.FC = () => {
         setItemName(data.seat.name);
         setItemId(data.seat.id);
       }
-      else
+      else if(flight_id) 
+      {
+        setItemId(data.flight.id);
+        setFlightNumber(data.flight.flight_number);
+        setPlaneId(data.flight.plane.plane_id);
+      }
       {
         setItemName(data.item.name);
         setItemId(data.item.id);
@@ -145,21 +157,27 @@ const DeleteFormComponent: React.FC = () => {
 
   return (
     <div className="text-center col-sm-12 col-md-9 col-lg-6">
-      <h2>Delete { seat_number ? 'Seat' : 'Item'}</h2>
-
-      { isLoading ? (
+      <h2>Delete {seat_number ? 'Seats' : flight_id ? 'Flight' : 'Item'}</h2>
+      {isLoading ? (
         /**Show loading */
         <LoadingComponent />
-      ):
-      (
+      ) : (
         <>
-          <p>Are you sure you want to delete the following { seat_number ? 'seat' : 'item'}?</p>
+          <p>Are you sure you want to delete the following {seat_number ? 'seat' : itemName ? 'item' : 'flight'}?</p>
 
           {seat_number ? (
-            <p><b>Seat Number</b>: {seat_number} <br/> <b>Plane</b>: {plane}</p>
-          ):
-          (
-            <p>{itemName}</p>
+            <p>
+              <b>Seat Number</b>: {seat_number}
+            </p>
+          ) : flight_id ? (
+            <p>
+              <b>Flight Number</b>: {flightNumber} <br/>
+              <b>Plane Id</b>: {planeId}
+            </p>
+          ) : (
+            <p>
+              <b>Item Name</b>: {itemName}
+            </p>
           )}
 
           <div className="text-center mt-3">
