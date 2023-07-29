@@ -20,9 +20,9 @@ import BaseDeletePlaneForm from './components/Plane/BaseDeletePlaneForm';
 import DeletePlaneForm from './components/Plane/DeletePlaneForm';
 import ViewPlanes from './components/Plane/ViewPlanes';
 
-import AddSeatForm from './components/Seats/AddSeatForm';
-import ViewSeats from './components/Seats/ViewSeats';
-import EditSeatForm from './components/Seats/EditSeatForm';
+import AddSeatForm from './components/Seat/AddSeatForm';
+import ViewSeats from './components/Seat/ViewSeats';
+import EditSeatForm from './components/Seat/EditSeatForm';
 
 import AirlineFormAddComponent from './components/Cities&Airlines/AirlineFormAddComponent';
 import CityFormAddComponent from './components/Cities&Airlines/CityFormAddComponent';
