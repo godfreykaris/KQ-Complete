@@ -258,18 +258,17 @@ class SeatsController extends Controller
             $seat = Seat::where('id', $seatId)->first();
             if(!$seat)
             {
-                return response()->json(['error' => 'The seat does not exist', 'status' => 0 ]);
+                return response()->json(['error' => 'The seat does not exist.', 'status' => 0 ]);
             }
 
             // Delete the seat
             $seat->delete();
 
-            return response()->json(['success' => 'Seat deleted successfully', 'status' => 1]);
+            return response()->json(['success' => 'Seat deleted successfully.', 'status' => 1]);
         }
         catch (\Exception $e) 
         {
             // Log the exception or handle it as needed
-            // For example:
             Log::error($e->getMessage());
 
             // For debugging

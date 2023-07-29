@@ -2,13 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import apiBaseUrl from '../../config';
 
+import LoadingComponent from '../LoadingComponent';
+
 interface Entity {
   id: number;
   name: string;
 }
 
 const DeleteFormComponent: React.FC = () => {
-  const { selectedEntity, id, name, country, code } = useParams<{ selectedEntity: string; id: string; name: string; country: string; code: string; }>();
+  const { selectedEntity, id, name, country, code, seat_number, plane, plane_id } = useParams<{ selectedEntity: string; id: string; name: string; country: string; code: string; seat_number: string; plane: string; plane_id: string; }>();
+
+  const [isLoading, setIsLoading] = useState(true);
 
   const [itemName, setItemName] = useState<string>( name || '');
   const [itemId, setItemId] = useState<string>( id || '');
@@ -20,14 +24,13 @@ const DeleteFormComponent: React.FC = () => {
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
   useEffect(() => {
-    if (itemName)
-    {
-      fetchData(itemName);
-    }
-  }, [itemName]);
+    fetchData();
+  }, []);
 
   
-  const fetchData = async (itemName: string) => {
+  const fetchData = async () => {
+    setIsLoading(true);
+
     try {
 
       let url = `${apiBaseUrl}/${selectedEntity}`;
@@ -39,6 +42,10 @@ const DeleteFormComponent: React.FC = () => {
       else if (itemCode) 
       {
         url += `/${itemCode}`;
+      }
+      else if (seat_number) 
+      {
+        url += `/${seat_number}/${plane_id}`;
       }
       else
       {
@@ -59,15 +66,24 @@ const DeleteFormComponent: React.FC = () => {
         setItemName(data.airline.name);
         setItemId(data.airline.id);
       }
+      else if (seat_number) 
+      {
+        setItemName(data.seat.name);
+        setItemId(data.seat.id);
+      }
       else
       {
         setItemName(data.item.name);
         setItemId(data.item.id);
       }
+
+      setIsLoading(false);
+
             
     } 
     catch (error) 
     {
+      setIsLoading(false);
       console.error('Error fetching data:', error);
     }
   };
@@ -103,35 +119,59 @@ const DeleteFormComponent: React.FC = () => {
         setResponseStatus(0); // Error
         setResponseMessage(`Error: ${data.error}`);
       }
-    } catch (error) {
+    } 
+    catch (error: any) 
+    {
       setResponseStatus(0); // Error
-      setResponseMessage('Error deleting data: An error occurred');
+      setResponseMessage(`Error deleting data. An error occurred.`);
       console.error('Error deleting data:', error);
     }
   };
 
   const getResponseClass = () => {
-    if (responseStatus === 1) {
+    if (responseStatus === 1) 
+    {
       return 'text-success'; // Green color for success
-    } else if (responseStatus === 0) {
+    } 
+    else if (responseStatus === 0) 
+    {
       return 'text-danger'; // Red color for error
-    } else {
+    } 
+    else 
+    {
       return ''; // No specific styles (default)
     }
   };
 
   return (
-    <div className="col-md-6">
-      <h2>Delete Item</h2>
+    <div className="text-center col-md-6">
+      <h2>Delete { seat_number ? 'Seat' : 'Item'}</h2>
 
-      <p>Are you sure you want to delete the following item?</p>
-      <p>{itemName}</p>
-      <div className="text-center mt-3">
-        <button type="button" className="btn btn-danger" onClick={handleDelete}>
-          Delete
-        </button>
-      </div>
-      <p className={`response-message ${getResponseClass()} text-center mt-3`}>{responseMessage}</p>
+      { isLoading ? (
+        /**Show loading */
+        <LoadingComponent />
+      ):
+      (
+        <>
+          <p>Are you sure you want to delete the following { seat_number ? 'seat' : 'item'}?</p>
+
+          {seat_number ? (
+            <p><b>Seat Number</b>: {seat_number} <br/> <b>Plane</b>: {plane}</p>
+          ):
+          (
+            <p>{itemName}</p>
+          )}
+
+          <div className="text-center mt-3">
+            <button type="button" className="btn btn-danger" onClick={handleDelete}>
+              Delete
+            </button>
+          </div>
+          <p className={`response-message ${getResponseClass()} text-center mt-3`}>{responseMessage}</p>
+        </>
+      )}
+
+      
     </div>
   );
 };

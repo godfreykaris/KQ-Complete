@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import apiBaseUrl from '../../config';
+import LoadingComponent from '../LoadingComponent';
 
 interface Entity {
   id: number;
@@ -20,6 +21,9 @@ interface Props {
 }
 
 const BaseFormComponent: React.FC<Props> = ({ dataCategory, formType, entityTypes }) => {
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const [selectedEntity, setSelectedEntity] = useState<string>('');
   const [selectedEntityData, setSelectedEntityData] = useState<Entity[] | null>(null);
   const [filterValue, setFilterValue] = useState<string>('');
@@ -31,6 +35,9 @@ const BaseFormComponent: React.FC<Props> = ({ dataCategory, formType, entityType
   }, [selectedEntity]);
 
   const fetchData = async (entityType: string) => {
+    
+    setIsLoading(true);
+
     try 
     {
       const response = await fetch(`${apiBaseUrl}/${entityType}`);
@@ -42,10 +49,15 @@ const BaseFormComponent: React.FC<Props> = ({ dataCategory, formType, entityType
         setSelectedEntityData(data.airlines);
       else 
         setSelectedEntityData(data.items);
+      
+      setIsLoading(false);
+
     }
-    catch (error) 
+    catch (error: any) 
     {
       console.error('Error fetching data:', error);
+      setIsLoading(false);
+
     }
   };
 
@@ -121,7 +133,9 @@ const BaseFormComponent: React.FC<Props> = ({ dataCategory, formType, entityType
               </select>
             </div>
 
-            {selectedEntity && selectedEntityData && (
+            {isLoading ? (
+              <LoadingComponent />
+            ) : (selectedEntity && selectedEntityData && (
               <div>
                 <input
                   type="text"
@@ -178,7 +192,7 @@ const BaseFormComponent: React.FC<Props> = ({ dataCategory, formType, entityType
                   </table>
                 </div>
               </div>
-            )}
+            ))}
           </div>
         </div>
       </div>

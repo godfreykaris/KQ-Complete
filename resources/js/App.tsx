@@ -21,6 +21,7 @@ import DeletePlaneForm from './components/Plane/DeletePlaneForm';
 import ViewPlanes from './components/Plane/ViewPlanes';
 
 import AddSeatForm from './components/Seats/AddSeatForm';
+import ViewSeats from './components/Seats/ViewSeats';
 
 import AirlineFormAddComponent from './components/Cities&Airlines/AirlineFormAddComponent';
 import CityFormAddComponent from './components/Cities&Airlines/CityFormAddComponent';
@@ -63,14 +64,9 @@ const App = () => {
                     <NavDropdown.Item as={Link} to="/plane_seats/add" className="menu-item-text">
                       Add Seat
                     </NavDropdown.Item>
-                    <NavDropdown.Item as={Link} to="/plane_seats/edit" className="menu-item-text">
-                      Edit Seat
-                    </NavDropdown.Item>                    
-                    <NavDropdown.Item as={Link} to="/plane_seats/delete" className="menu-item-text">
-                      Delete Seat
-                    </NavDropdown.Item>                    
+                                      
                     <NavDropdown.Item as={Link} to="/plane_seats/view" className="menu-item-text">
-                      View Seats
+                      View|Edit|Delete Seats
                     </NavDropdown.Item>
                     {/* Add other menu items as needed */}
                   </NavDropdown>
@@ -130,11 +126,9 @@ const App = () => {
                 <Route path="/planes/view" element={<ViewPlanes />} />
 
                 <Route path="/plane_seats/add" element={<AddSeatForm />} />
-                <Route path="/plane_seats/edit" element={<BaseEditPlaneForm />} />
                 <Route path="/plane_seats/edit/:id/:planeId/:model/:name" element={<EditPlaneForm />} />
-                <Route path="/plane_seats/delete" element={<BaseDeletePlaneForm />} />
-                <Route path="/plane_seats/delete/:id/:planeId/:model/:name" element={<DeletePlaneForm />} />
-                <Route path="/plane_seats/view" element={<ViewPlanes />} />
+                <Route path="/plane_seats/delete/:selectedEntity/:plane/:seat_number/:plane_id" element={<DeleteFormComponent />} />
+                <Route path="/plane_seats/view" element={<ViewSeats />} />
 
                 <Route path="/cities_airlines/add/city" element={<CityFormAddComponent />} />
                 <Route path="/cities_airlines/add/airline" element={<AirlineFormAddComponent />} />

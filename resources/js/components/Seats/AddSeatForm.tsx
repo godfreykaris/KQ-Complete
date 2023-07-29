@@ -327,13 +327,14 @@ const AddSeatForm = () => {
     <div className="form-container col-md-4">
       <h2 className="text-center">Add Seats</h2> 
       
-      <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
-
       {isLoading ? (
         /**Show loading */
         <LoadingComponent />
       ) : (
       <div>
+      
+      <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+
       <form onSubmit={handleSubmit}>
         
         <div className="mb-3">
@@ -429,11 +430,14 @@ const AddSeatForm = () => {
         <div className="text-center mt-3">
           <button type="button" className="btn btn-primary" onClick={handleAddSeat}>
             {isEditing ? 'Save Changes' : 'Add Seat'}
-          </button>
+          </button>          
+        </div>
+        <div className="text-center mt-3">
           <button type="submit" className="btn btn-primary ms-3">
             Submit Seats
           </button>
         </div>
+
 
         {isEditing && <div className="text-center text-info"><h3>Editing</h3></div>}
 
