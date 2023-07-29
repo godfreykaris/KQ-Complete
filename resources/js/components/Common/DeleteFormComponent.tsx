@@ -144,7 +144,7 @@ const DeleteFormComponent: React.FC = () => {
   };
 
   return (
-    <div className="text-center col-md-6">
+    <div className="text-center col-sm-12 col-md-9 col-lg-6">
       <h2>Delete { seat_number ? 'Seat' : 'Item'}</h2>
 
       { isLoading ? (

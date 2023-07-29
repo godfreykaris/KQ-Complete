@@ -146,7 +146,7 @@ const EditFormComponent: React.FC = () => {
   };
 
   return (
-    <div className="col-md-6">
+    <div className="col-sm-12 col-md-9 col-lg-6">
       <h2>Edit Item</h2>
       <form onSubmit={handleSaveChanges}>
         

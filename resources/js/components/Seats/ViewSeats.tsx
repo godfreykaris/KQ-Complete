@@ -16,6 +16,7 @@ type Seat = {
     price: number;
     is_available: boolean;
     location_id: number;
+    flight_class_id:number;
 };
 
 const ViewSeats: React.FC = () => {
@@ -122,7 +123,7 @@ const ViewSeats: React.FC = () => {
     <div className="form-container">
       <div className="container mt-4">
         <div className="row justify-content-center">
-          <div className="col-md-6">
+          <div className="col-sm-12 col-md-9 col-lg-6">
             <h2 className="text-center">View Seats</h2>
             {isLoading || (selectedPlane && !seats) ? (
                 /**Show loading */
@@ -184,7 +185,7 @@ const ViewSeats: React.FC = () => {
                                   <td>{item.price}</td>  
                                   <td>
                                     <Link
-                                      to={`/edit-seat/${item.plane_id}`} // Replace "edit-seat" with the actual URL for the EditSeatComponent
+                                      to={`/plane_seats/edit/${item.plane_id}/${item.flight_class_id}/${item.location_id}/${item.price}/${item.seat_number}`} // Replace "edit-seat" with the actual URL for the EditSeatComponent
                                       className="btn btn-primary"
                                     >
                                       Edit

@@ -135,7 +135,7 @@ import apiBaseUrl from '../../config'
         <div className="form-container">
           <div className="container mt-4">
             <div className="row justify-content-center">
-              <div className="col-md-6">
+              <div className="col-sm-12 col-md-9 col-lg-6">
                 <h2 className="text-center">Add Data</h2>
                 <form className="form" onSubmit={handleSubmit}>
                     <div className="form-group">

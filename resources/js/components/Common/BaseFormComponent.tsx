@@ -99,7 +99,7 @@ const BaseFormComponent: React.FC<Props> = ({ dataCategory, formType, entityType
     <div className="form-container">
       <div className="container mt-4">
         <div className="row justify-content-center">
-          <div className="col-md-6">
+          <div className="col-sm-12 col-md-9 col-lg-6">
             <h2 className="text-center">{`${formType} Data`}</h2>
             <div className="form-group">
               <label htmlFor="selectEntity" className="form-label">

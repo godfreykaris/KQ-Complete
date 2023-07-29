@@ -103,7 +103,7 @@ Route::delete('/seatLocations/delete/{seatLocationId}', [SeatLocationsController
 Route::get('/seatLocations', [SeatLocationsController::class, 'index'])->name('seatLocations.all');
 Route::get('/seatLocations/{seatLocationName}', [SeatLocationsController::class, 'show'])->name('seatLocations.show');
 
-Route::put('/seats/change/{seatNumber}', [SeatsController::class, 'update'])->name('seats.update');
+Route::put('/seats/change/{planeId}/{seatNumber}', [SeatsController::class, 'update'])->name('seats.update');
 Route::post('/seats/add', [SeatsController::class, 'store'])->name('seats.store');
 Route::delete('/seats/delete/{seatId}', [SeatsController::class, 'delete'])->name('seats.delete');
 Route::get('/seats/{planeId}', [SeatsController::class, 'index'])->name('seats.plane_seats');

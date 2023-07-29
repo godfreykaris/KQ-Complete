@@ -16,6 +16,9 @@ class SeatsController extends Controller
     {
         $existingSeat = Seat::where('seat_number', $seatData['seat_number'])
                         ->where('plane_id', $seatData['plane_id'])
+                        ->where('price', $seatData['price'])
+                        ->where('flight_class_id', $seatData['flight_class_id'])
+                        ->where('location_id', $seatData['location_id'])
                         ->first();
 
         if($existingSeat)
@@ -170,7 +173,7 @@ class SeatsController extends Controller
     }
 
     // Update a seat 
-    public function update(Request $request, $seatNumber)
+    public function update(Request $request, $planeId, $seatNumber)
     {    
         DB::beginTransaction();
    
@@ -185,8 +188,6 @@ class SeatsController extends Controller
                 'price' => 'required|numeric',
             ]);
         
-            $planeId = $seatData['plane_id'];
-
             // Make sure the plane exists
             $plane = Plane::where('id', $planeId)->first();
             if(!$plane)

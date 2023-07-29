@@ -96,7 +96,7 @@ const DeletePlaneForm: React.FC = () => {
   };
 
   return (
-    <div className="col-md-6">
+    <div className="col-sm-12 col-md-9 col-lg-6">
       <h2>Delete Plane</h2>
 
       <p>Are you sure you want to delete the following plane?</p>

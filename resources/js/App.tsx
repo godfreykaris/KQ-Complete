@@ -22,6 +22,7 @@ import ViewPlanes from './components/Plane/ViewPlanes';
 
 import AddSeatForm from './components/Seats/AddSeatForm';
 import ViewSeats from './components/Seats/ViewSeats';
+import EditSeatForm from './components/Seats/EditSeatForm';
 
 import AirlineFormAddComponent from './components/Cities&Airlines/AirlineFormAddComponent';
 import CityFormAddComponent from './components/Cities&Airlines/CityFormAddComponent';
@@ -126,7 +127,7 @@ const App = () => {
                 <Route path="/planes/view" element={<ViewPlanes />} />
 
                 <Route path="/plane_seats/add" element={<AddSeatForm />} />
-                <Route path="/plane_seats/edit/:id/:planeId/:model/:name" element={<EditPlaneForm />} />
+                <Route path="/plane_seats/edit/:plane_id/:flight_class_id/:location_id/:price/:seat_number" element={<EditSeatForm />} />
                 <Route path="/plane_seats/delete/:selectedEntity/:plane/:seat_number/:plane_id" element={<DeleteFormComponent />} />
                 <Route path="/plane_seats/view" element={<ViewSeats />} />
 
