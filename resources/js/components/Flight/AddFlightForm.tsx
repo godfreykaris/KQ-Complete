@@ -23,6 +23,11 @@ type Airline = {
   name: string;
 };
 
+type FlightStatus = {
+  id: number;
+  name: string;
+};
+
 const AddFlightForm = () => {
   
   const [isLoading, setIsLoading] = useState(true);
@@ -31,6 +36,8 @@ const AddFlightForm = () => {
   const [planes, setPlanes] = useState<Plane[]>([]);
   const [seatLocations, setSeatLocations] = useState<SeatLocation[]>([]);
   const [cities, setCities] = useState<City[]>([]);
+  const [flight_statuses, setFlightStatuses] = useState<FlightStatus[]>([]);
+
 
   const [formData, setFormData] = useState({
     airline_id: '',
@@ -38,6 +45,7 @@ const AddFlightForm = () => {
     is_international: false,
     departure_time: '',
     arrival_time: '',
+    flight_status_id: '',
     departure_city_id: '',
     arrival_city_id: '',
   });
@@ -58,25 +66,31 @@ const AddFlightForm = () => {
         airlinesResponse,
         planesResponse,
         citiesResponse,
+        flightStatusesResponse,
       ] = await Promise.all([
         fetch(`${apiBaseUrl}/airlines`),
         fetch(`${apiBaseUrl}/planes`),
         fetch(`${apiBaseUrl}/cities`),
+        fetch(`${apiBaseUrl}/flightStatuses`),
       ]);
 
       const [
         airlinesData,
         planesData,
         citiesData,
+        flightStatusesData,
       ] = await Promise.all([
         airlinesResponse.json(),
         planesResponse.json(),
         citiesResponse.json(),
+        flightStatusesResponse.json(),
       ]);
 
       setAirlines(airlinesData.airlines);
       setPlanes(planesData.planes);
       setCities(citiesData.cities);
+      setFlightStatuses(flightStatusesData.items);
+
       setIsLoading(false);
 
     } 
@@ -161,7 +175,7 @@ const AddFlightForm = () => {
     {
       setIsLoading(false);
       setResponseStatus(0); // Error
-      setResponseMessage('Error submitting data: An error occurred');
+      setResponseMessage('Error submitting data: Make sure the dates are set correctly just in case.');
       console.error('Error submitting data:', error);
     }
   };
@@ -230,17 +244,25 @@ const AddFlightForm = () => {
                   ))}
                 </select>
               </div>
-              <div className="form-group m-2">
-                <label htmlFor="isInternational">Is International</label>
-                <input
-                  type="checkbox"
-                  id="isInternational"
-                  name="is_international"
-                  className="m-2"
-                  checked={formData.is_international}
-                  onChange={handleCheckboxChange}
-                />
+              <div className="form-group">
+                <label htmlFor="flight_status_id">Flight Status</label>
+                <select
+                  id="flight_status_id"
+                  className="form-control"
+                  name="flight_status_id"
+                  value={formData.flight_status_id}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select a flight status</option>
+                  {flight_statuses.map((flight_status) => (
+                    <option key={flight_status.id} value={flight_status.id}>
+                      {flight_status.name}
+                    </option>
+                  ))}
+                </select>
               </div>
+              
               <div className="form-group">
                 <label htmlFor="departureTime">Departure Time</label>
                 <input
@@ -302,6 +324,18 @@ const AddFlightForm = () => {
                   ))}
                 </select>
               </div>
+              <div className="form-group m-3">
+                <label htmlFor="isInternational">Is International</label>
+                <input
+                  type="checkbox"
+                  id="isInternational"
+                  name="is_international"
+                  className="m-2"
+                  checked={formData.is_international}
+                  onChange={handleCheckboxChange}
+                />
+              </div>
+
               <div className="text-center mt-3">
                 <button type="submit" className="btn btn-primary">
                   Add Flight

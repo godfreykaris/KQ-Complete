@@ -24,6 +24,11 @@ type Airline = {
   name: string;
 };
 
+type FlightStatus = {
+  id: number;
+  name: string;
+};
+
 const EditFlightForm = () => {
   
   const { flight_id} = useParams<{flight_id: string; }>();
@@ -35,6 +40,10 @@ const EditFlightForm = () => {
   const [airlines, setAirlines] = useState<Airline[]>([]);
   const [planes, setPlanes] = useState<Plane[]>([]);
   const [cities, setCities] = useState<City[]>([]);
+  const [flight_statuses, setFlightStatuses] = useState<FlightStatus[]>([]);
+
+  const [isDropdownsDataLoading, setDropdownsDataLoading] = useState(true);
+
 
   const [formData, setFormData] = useState({
     airline_id: '',
@@ -42,6 +51,7 @@ const EditFlightForm = () => {
     is_international: false,
     departure_time: '',
     arrival_time: '',
+    flight_status_id: '',
     departure_city_id: '',
     arrival_city_id: '',
   });
@@ -59,39 +69,48 @@ const EditFlightForm = () => {
 
     try 
     {
-      const [
-        airlinesResponse,
-        planesResponse,
-        citiesResponse,
-      ] = await Promise.all([
+      Promise.all([
         fetch(`${apiBaseUrl}/airlines`),
         fetch(`${apiBaseUrl}/planes`),
         fetch(`${apiBaseUrl}/cities`),
-      ]);
-
-      const [
-        airlinesData,
-        planesData,
-        citiesData,
-      ] = await Promise.all([
-        airlinesResponse.json(),
-        planesResponse.json(),
-        citiesResponse.json(),
-      ]);
-
-      setAirlines(airlinesData.airlines);
-      setPlanes(planesData.planes);
-      setCities(citiesData.cities);
-      setIsLoading(false);
+        fetch(`${apiBaseUrl}/flightStatuses`),
+      ])
+        .then((responses) =>
+          Promise.all(responses.map((response) => response.json()))
+        )
+        .then(
+          ([
+            airlinesData,
+            planesData,
+            citiesData,
+            flightStatusesData,
+          ]) => {
+            // Do something with the fetched data
+            setAirlines(airlinesData.airlines);
+            setPlanes(planesData.planes);
+            setCities(citiesData.cities);
+            setFlightStatuses(flightStatusesData.items);
+          }
+        )
+        .catch((error) => {
+          // Handle any errors that occurred during fetching
+          console.error('Error fetching data:', error);
+        })
+        .finally(() => {
+          setDropdownsDataLoading(false);
+          setIsLoading(false);
+        });
+      
 
     } 
     catch (error: any) 
-    {
+    {      
       setIsLoading(false);
       setResponseStatus(0); // Error
-      setResponseMessage(`Error fetching data: ${error.message}`);
+      setResponseMessage('Error submitting data: An error occured.');
       console.error('Error fetching data:', error);
     }
+   
   };
 
   const fetchFlight = async () => {
@@ -102,13 +121,16 @@ const EditFlightForm = () => {
       const response = await fetch(`${apiBaseUrl}/flights/${prevFlightId}`);
       const data = await response.json();
       setFormData(data.flight);
-      setIsLoading(false);
+
+      if(!isDropdownsDataLoading)
+          setIsLoading(false);
 
     }
-    catch (error) 
+    catch (error: any) 
     {
+      setResponseStatus(0); // Error
+      setResponseMessage('Error submitting data: An error occurred.');
       console.error('Error fetching data:', error);
-      setIsLoading(false);
     }
   };
 
@@ -184,7 +206,7 @@ const EditFlightForm = () => {
     {
       setIsLoading(false);
       setResponseStatus(0); // Error
-      setResponseMessage('Error submitting data: An error occurred');
+      setResponseMessage('Error submitting data: Make sure the dates are set correctly just in case');
       console.error('Error submitting data:', error);
     }
   };
@@ -207,7 +229,7 @@ const EditFlightForm = () => {
   return (
     <div className="col-sm-12 col-md-4">
       <h2 className="text-center">Edit Flight</h2>
-      {((isLoading) || (!formData.airline_id) || (!formData.plane_id)) ? (
+      {isLoading ? (
         /**Show loading */
         <LoadingComponent />
       ) : (
@@ -233,8 +255,7 @@ const EditFlightForm = () => {
                   ))}
                 </select>
               </div>
-              {/* Add other form fields for plane, is_international, departure_time, arrival_time, flight_status_id, departure_city_id, and arrival_city_id */}
-              {/* Example: */}
+             
               <div className="form-group">
                 <label htmlFor="plane_id">Plane</label>
                 <select
@@ -253,17 +274,25 @@ const EditFlightForm = () => {
                   ))}
                 </select>
               </div>
-              <div className="form-group m-2">
-                <label htmlFor="isInternational">Is International</label>
-                <input
-                  type="checkbox"
-                  id="isInternational"
-                  name="is_international"
-                  className="m-2"
-                  checked={formData.is_international}
-                  onChange={handleCheckboxChange}
-                />
+              <div className="form-group">
+                <label htmlFor="flight_status_id">Flight Status</label>
+                <select
+                  id="flight_status_id"
+                  className="form-control"
+                  name="flight_status_id"
+                  value={formData.flight_status_id}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select a flight status</option>
+                  {flight_statuses.map((flight_status) => (
+                    <option key={flight_status.id} value={flight_status.id}>
+                      {flight_status.name}
+                    </option>
+                  ))}
+                </select>
               </div>
+              
               <div className="form-group">
                 <label htmlFor="departureTime">Departure Time</label>
                 <input
@@ -324,6 +353,17 @@ const EditFlightForm = () => {
                     </option>
                   ))}
                 </select>
+              </div>
+              <div className="form-group m-3">
+                <label htmlFor="isInternational">Is International</label>
+                <input
+                  type="checkbox"
+                  id="isInternational"
+                  name="is_international"
+                  className="m-2"
+                  checked={formData.is_international}
+                  onChange={handleCheckboxChange}
+                />
               </div>
               <div className="text-center mt-3">
                 <button type="submit" className="btn btn-primary">

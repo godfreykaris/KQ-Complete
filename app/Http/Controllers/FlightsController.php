@@ -88,6 +88,7 @@ class FlightsController extends Controller
             'plane_id' => 'required|exists:planes,id',
             'is_international' => 'required|boolean',
             'departure_time' => 'required|date',
+            'flight_status_id' => 'required|exists:flight_statuses,id',
             'arrival_time' => 'required|date|after:departure_time',
             'departure_city_id' => 'required|exists:cities,id',
             'arrival_city_id' => 'required|exists:cities,id',
@@ -100,8 +101,6 @@ class FlightsController extends Controller
             // Generate the flight number
             $flightNumber = $this->generateFlightNumber();
             $flightData['flight_number'] = $flightNumber;
-
-            $flightData['flight_status_id'] = FlightStatus::where('name', 'On-time')->first()->id;
 
             // Create the flight
             $flight = Flight::create($flightData);
@@ -181,10 +180,10 @@ class FlightsController extends Controller
             DB::rollback();
 
             Log::error($e->getMessage());
-            //return response()->json(['error' => 'An error occurred.', 'status' => 0]);
+            return response()->json(['error' => 'An error occurred.', 'status' => 0]);
 
             // For debugging
-             return response()->json(['error' => 'Error: ' . $e->getMessage(), 'status' => 0]);
+            // return response()->json(['error' => 'Error: ' . $e->getMessage(), 'status' => 0]);
         }
     }
 
@@ -216,7 +215,7 @@ class FlightsController extends Controller
             DB::rollback();
 
             Log::error($e->getMessage());
-            return response()->json(['error' => 'An error occurred.', 'status' => 0]);
+            return response()->json(['error' => 'An error occurred. Make sure the flight has no active bookings just in case.', 'status' => 0]);
 
             // For debugging
             // return response()->json(['error' => 'Error: ' . $e->getMessage(), 'status' => 0]);
