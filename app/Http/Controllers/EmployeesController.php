@@ -86,8 +86,7 @@ class EmployeesController extends Controller
             $employeeData = $request->validate([
                 'first_name' => 'required',
                 'last_name' => 'required',
-                //'email' => 'required|email|unique:employees,email',
-                'email' => 'required|email', //For testing only
+                'email' => 'required|email|unique:employees,email',
                 'phone' => 'required',
                 'date_of_birth' => 'required|date',
                 'address' => 'required',
@@ -98,10 +97,7 @@ class EmployeesController extends Controller
                 'skills.*' => 'exists:skills,id',
             ]);
 
-            // For testing only
-            $employeeData['email'] = fake()->email;
-            $employeeData['phone'] = fake()->phoneNumber;
-    
+               
             // Check if the employee already exists based on email
             $existingEmployee = Employee::where('email', $employeeData['email'])->first();
             if($existingEmployee)
@@ -137,7 +133,7 @@ class EmployeesController extends Controller
         
             
     
-            return response()->json(['employee' => $employee, 'status' => 1], 201);
+            return response()->json(['success' => 'Employee added successfully.', 'status' => 1], 201);
 
         }
         catch (\Exception $e) 
@@ -161,8 +157,7 @@ class EmployeesController extends Controller
             $employeeData = $request->validate([
                 'first_name' => 'required',
                 'last_name' => 'required',
-                //'email' => 'required|email|unique:employees,email',
-                'email' => 'required|email', //For testing only
+                'email' => 'required|email|unique:employees,email',
                 'phone' => 'required',
                 'date_of_birth' => 'required|date',
                 'address' => 'required',
@@ -173,10 +168,7 @@ class EmployeesController extends Controller
                 'skills.*' => 'exists:skills,id',
             ]);
     
-            // For testing only
-            $employeeData['email'] = fake()->email;
-            $employeeData['phone'] = fake()->phoneNumber;
-    
+               
             // Fetch the employee
             $employee = Employee::where('employee_id', $employeeId)->first();
             // Make sure the employee exists
