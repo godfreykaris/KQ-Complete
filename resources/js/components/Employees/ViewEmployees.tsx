@@ -30,7 +30,7 @@ type Employee = {
     phone: '',
     date_of_birth: '',
     address: '',
-    job_title:  JobTitle,
+    job_title: JobTitle,
     qualifications: [],
     skills: [],
 };
@@ -143,7 +143,7 @@ const ViewEmployees: React.FC = () => {
                                   <td>{index + 1}</td>
                                   <td>
                                     <Link
-                                      to={`/manage_employees/edit/${item.id}`} // Replace "edit-employee" with the actual URL for the EditEmployeeComponent
+                                      to={`/manage_employees/edit/${item.employee_id}`} // Replace "edit-employee" with the actual URL for the EditEmployeeComponent
                                       className="btn btn-primary"
                                     >
                                       Edit
@@ -151,7 +151,7 @@ const ViewEmployees: React.FC = () => {
                                   </td>
                                   <td>
                                     <Link
-                                      to={`/manage_employees/delete/employees/${item.id}`} // Replace "delete-employee" with the actual URL for the DeleteEmployeeComponent
+                                      to={`/manage_employees/delete/employees/${item.employee_id}`} // Replace "delete-employee" with the actual URL for the DeleteEmployeeComponent
                                       className="btn btn-danger"
                                     >
                                       Delete

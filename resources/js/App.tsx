@@ -36,6 +36,7 @@ import CAFormDeleteComponent from './components/Cities&Airlines/CAFormDeleteComp
 
 import AddEmployeeForm from './components/Employees/AddEmployeeForm';
 import ViewEmployees from './components/Employees/ViewEmployees';
+import EditEmployeeForm from './components/Employees/EditEmployeeForm';
 
 const App = () => {
   
@@ -173,7 +174,7 @@ const App = () => {
                 <Route path="/cities_airlines/airline/delete/:selectedEntity/:id/:name/:code" element={<DeleteFormComponent />} />
 
                 <Route path="/manage_employees/add" element={<AddEmployeeForm />} />
-                <Route path="/manage_employees/edit/:employee_id" element={<EditFlightForm />} />
+                <Route path="/manage_employees/edit/:employee_id" element={<EditEmployeeForm />} />
                 <Route path="/manage_employees/delete/:selectedEntity/:employee_id" element={<DeleteFormComponent />} />
                 <Route path="/manage_employees/view" element={<ViewEmployees />} />
 

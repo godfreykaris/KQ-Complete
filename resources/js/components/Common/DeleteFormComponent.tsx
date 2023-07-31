@@ -10,12 +10,14 @@ interface Entity {
 }
 
 const DeleteFormComponent: React.FC = () => {
-  const { selectedEntity, id, name, country, code, seat_number, plane, plane_id, flight_id } = useParams<{ selectedEntity: string; id: string; name: string; country: string; code: string; seat_number: string; plane: string; plane_id: string; flight_id: string; }>();
+  const { selectedEntity, id, name, country, code, seat_number, plane, plane_id, flight_id, employee_id } = useParams<{ selectedEntity: string; id: string; name: string; country: string; code: string; seat_number: string; plane: string; plane_id: string; flight_id: string; employee_id: string; }>();
 
   const [isLoading, setIsLoading] = useState(true);
 
   const [itemName, setItemName] = useState<string>( name || '');
   const [itemId, setItemId] = useState<string>( id || '');
+
+  const [employeeID, setEmployeeID] = useState<string>('');
 
   const [flightNumber, setFlightNumber] = useState<string>('');
   const [planeId, setPlaneId] = useState<string>( '');
@@ -53,6 +55,10 @@ const DeleteFormComponent: React.FC = () => {
       else if (flight_id) 
       {
         url += `/${flight_id}`;
+      }
+      else if (employee_id) 
+      {
+        url += `/${employee_id}`;
       }      
       else
       {
@@ -84,6 +90,13 @@ const DeleteFormComponent: React.FC = () => {
         setFlightNumber(data.flight.flight_number);
         setPlaneId(data.flight.plane.plane_id);
       }
+      else if(employee_id) 
+      {
+        setItemId(data.employee.employee_id);
+        setItemName(data.employee.first_name + " " + data.employee.last_name);
+        setEmployeeID(data.employee.employee_id);
+      }
+      else
       {
         setItemName(data.item.name);
         setItemId(data.item.id);
@@ -157,13 +170,13 @@ const DeleteFormComponent: React.FC = () => {
 
   return (
     <div className="text-center col-sm-12 col-md-9 col-lg-6">
-      <h2>Delete {seat_number ? 'Seats' : flight_id ? 'Flight' : 'Item'}</h2>
+      <h2>Delete {seat_number ? 'Seats' : flight_id ? 'Flight' : employee_id ? 'Employee': 'Item'}</h2>
       {isLoading ? (
         /**Show loading */
         <LoadingComponent />
       ) : (
         <>
-          <p>Are you sure you want to delete the following {seat_number ? 'seat' : itemName ? 'item' : 'flight'}?</p>
+          <p>Are you sure you want to delete the following {seat_number ? 'seat' : employeeID ? 'employee' : itemName ? 'item' : 'flight'}?</p>
 
           {seat_number ? (
             <p>
@@ -173,6 +186,11 @@ const DeleteFormComponent: React.FC = () => {
             <p>
               <b>Flight Number</b>: {flightNumber} <br/>
               <b>Plane Id</b>: {planeId}
+            </p>
+          ) : employee_id ? (
+            <p>
+              <b>Employee Name</b>: {itemName} <br/>
+              <b>Employee Id</b>: {employeeID}
             </p>
           ) : (
             <p>

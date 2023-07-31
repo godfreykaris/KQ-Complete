@@ -41,9 +41,9 @@ class EmployeesController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage() ,'status' => 0]);
 
-             //return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.' ,'status' => 0]);
         }         
     }
 
@@ -58,7 +58,7 @@ class EmployeesController extends Controller
             // Make sure the employee is valid
             if(!$employee)
             {
-                return response()->json(['error' => 'The employee with id ' . $employeeId . ' does not exist.'], 404);
+                return response()->json(['error' => 'The employee with id ' . $employeeId . ' does not exist.', 'status' => 0], 404);
             }
 
             // Return the employee as a JSON response
@@ -71,9 +71,9 @@ class EmployeesController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred. ' . $e->getMessage() ,'status' => 0]);
 
-             //return response()->json(['error' => 'An error occurred.'], 500);
+             //return response()->json(['error' => 'An error occurred.' ,'status' => 0]);
         } 
         
     }
@@ -102,7 +102,7 @@ class EmployeesController extends Controller
             $existingEmployee = Employee::where('email', $employeeData['email'])->first();
             if($existingEmployee)
             {
-                return response()->json(['error' => 'There exists an employee with the specified email address.'], 500);
+                return response()->json(['error' => 'There exists an employee with the specified email address.' ,'status' => 0]);
             }
 
             // Create an employee ID
@@ -133,7 +133,7 @@ class EmployeesController extends Controller
         
             
     
-            return response()->json(['success' => 'Employee added successfully.', 'status' => 1], 201);
+            return response()->json(['success' => 'Employee added successfully.', 'status' => 1]);
 
         }
         catch (\Exception $e) 
@@ -143,9 +143,9 @@ class EmployeesController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred. ' . $e->getMessage() ,'status' => 0]);
 
-             //return response()->json(['error' => 'An error occurred.'], 500);
+             //return response()->json(['error' => 'An error occurred.' ,'status' => 0]);
         }        
     }
 
@@ -157,7 +157,7 @@ class EmployeesController extends Controller
             $employeeData = $request->validate([
                 'first_name' => 'required',
                 'last_name' => 'required',
-                'email' => 'required|email|unique:employees,email',
+                'email' => 'required|email',
                 'phone' => 'required',
                 'date_of_birth' => 'required|date',
                 'address' => 'required',
@@ -174,9 +174,22 @@ class EmployeesController extends Controller
             // Make sure the employee exists
             if(!$employee)
             {
-                return response()->json(['error' => 'The employee does not exist']);
+                return response()->json(['error' => 'The employee does not exist', 'status' => 0]);
             }
     
+            // Make sure the email if it is not the old one, it is not a duplicate
+            $previousEmail = $employee->email;
+
+            if($previousEmail != $employeeData['email'])
+            {
+                $existingEmployee = Employee::where('email', $employeeData['email'])->first();
+
+                if($existingEmployee)
+                {
+                    return response()->json(['error' => 'The email is not available.' , 'status' => 0]);
+                }
+            }
+
             // Remove the qualifications and skills from $employeeData
             unset($employeeData['qualifications']);
             unset($employeeData['skills']);
@@ -219,7 +232,7 @@ class EmployeesController extends Controller
             $employee->skills()->sync($skillPivotData);
     
             
-            return response()->json(['employee' => $employee, 'status' => 1]);
+            return response()->json(['success' => "Employee updated successfully.", 'status' => 1]);
         }
         catch (\Exception $e) 
         {
@@ -228,9 +241,9 @@ class EmployeesController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred. ' . $e->getMessage() ,'status' => 0]);
 
-             //return response()->json(['error' => 'An error occurred.'], 500);
+             //return response()->json(['error' => 'An error occurred.' ,'status' => 0]);
         }  
         
     }
@@ -246,7 +259,7 @@ class EmployeesController extends Controller
             //Make sure the employee is valid
             if(!$employee)
             {
-                return response()->json(['error' => 'The employee with id ' . $employeeId . ' does not exist.'], 404);
+                return response()->json(['error' => 'The employee with id ' . $employeeId . ' does not exist.', 'status' => 0], 404);
             }
 
             // Detach qualifications and skills from the employee before deletion
@@ -256,7 +269,7 @@ class EmployeesController extends Controller
             // Delete employee
             $employee->delete();
 
-            return response()->json(['message' => 'Employee deleted successfully', 'status' => 1]);
+            return response()->json(['success' => 'Employee deleted successfully', 'status' => 1]);
         }
         catch (\Exception $e) 
         {
@@ -265,9 +278,9 @@ class EmployeesController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred. ' . $e->getMessage() ,'status' => 0]);
 
-             //return response()->json(['error' => 'An error occurred.'], 500);
+             //return response()->json(['error' => 'An error occurred.' ,'status' => 0]);
         }  
         
     }
