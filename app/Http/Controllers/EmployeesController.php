@@ -30,7 +30,7 @@ class EmployeesController extends Controller
     {
         try
         {
-            $employees = Employee::all();
+            $employees = Employee::with('skills', 'qualifications', 'jobTitle')->get();
 
             return response()->json(['employees' => $employees, 'status' => 1]);
         }
@@ -53,7 +53,7 @@ class EmployeesController extends Controller
         try
         {
             // Fetch the employee
-            $employee = Employee::where('employee_id', $employeeId)->first();
+            $employee = Employee::with('skills', 'qualifications', 'jobTitle')->where('employee_id', $employeeId)->first();
 
             // Make sure the employee is valid
             if(!$employee)

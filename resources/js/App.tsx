@@ -35,6 +35,7 @@ import CAFormViewComponent from './components/Cities&Airlines/CAFormViewComponen
 import CAFormDeleteComponent from './components/Cities&Airlines/CAFormDeleteComponent';
 
 import AddEmployeeForm from './components/Employees/AddEmployeeForm';
+import ViewEmployees from './components/Employees/ViewEmployees';
 
 const App = () => {
   
@@ -108,6 +109,9 @@ const App = () => {
                     <NavDropdown.Item as={Link} to="/manage_employees/add" className="menu-item-text">
                       Add Employee
                     </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/manage_employees/view" className="menu-item-text">
+                      View|Edit|Delete Employees
+                    </NavDropdown.Item>
                     
                     {/* Add other menu items as needed */}
                   </NavDropdown>
@@ -169,9 +173,9 @@ const App = () => {
                 <Route path="/cities_airlines/airline/delete/:selectedEntity/:id/:name/:code" element={<DeleteFormComponent />} />
 
                 <Route path="/manage_employees/add" element={<AddEmployeeForm />} />
-                <Route path="/manage_employees/edit/:flight_id" element={<EditFlightForm />} />
-                <Route path="/manage_employees/delete/:selectedEntity/:flight_id" element={<DeleteFormComponent />} />
-                <Route path="/manage_employees/view" element={<ViewFlights />} />
+                <Route path="/manage_employees/edit/:employee_id" element={<EditFlightForm />} />
+                <Route path="/manage_employees/delete/:selectedEntity/:employee_id" element={<DeleteFormComponent />} />
+                <Route path="/manage_employees/view" element={<ViewEmployees />} />
 
                 {/* Add other routes for other menu items as needed */}
               </Routes>
