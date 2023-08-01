@@ -42,6 +42,7 @@ import EditEmployeeForm from './components/Employees/EditEmployeeForm';
 import AddOpeningForm from './components/JobOpenings/AddOpeningForm';
 import ViewOpenings from './components/JobOpenings/ViewOpenings';
 import EditOpeningForm from './components/JobOpenings/EditOpeningForm';
+import MatchEmployeesToOpenings from './components/JobOpenings/MatchEmployeesToOpening';
 
 const App = () => {
   
@@ -117,7 +118,7 @@ const App = () => {
                     </NavDropdown.Item>
                     <NavDropdown.Item as={Link} to="/manage_employees/view" className="menu-item-text">
                       View|Edit|Delete Employees
-                    </NavDropdown.Item>
+                    </NavDropdown.Item>                
                     
                     {/* Add other menu items as needed */}
                   </NavDropdown>
@@ -127,6 +128,9 @@ const App = () => {
                     </NavDropdown.Item>
                     <NavDropdown.Item as={Link} to="/manage_openings/view" className="menu-item-text">
                       View|Edit|Delete Opening
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/manage_openings/employee-opening_matchings" className="menu-item-text">
+                      Match Employees To Openings
                     </NavDropdown.Item>
                     
                     {/* Add other menu items as needed */}
@@ -192,11 +196,13 @@ const App = () => {
                 <Route path="/manage_employees/edit/:employee_id" element={<EditEmployeeForm />} />
                 <Route path="/manage_employees/delete/:selectedEntity/:employee_id" element={<DeleteFormComponent />} />
                 <Route path="/manage_employees/view" element={<ViewEmployees />} />
-
+             
                 <Route path="/manage_openings/add" element={<AddOpeningForm />} />
                 <Route path="/manage_openings/edit/:opening_id" element={<EditOpeningForm />} />
                 <Route path="/manage_openings/delete/:selectedEntity/:opening_id" element={<DeleteFormComponent />} />
                 <Route path="/manage_openings/view" element={<ViewOpenings />} />
+                <Route path="/manage_openings/employee-opening_matchings" element={<MatchEmployeesToOpenings />} />
+
 
                 {/* Add other routes for other menu items as needed */}
               </Routes>
