@@ -41,6 +41,7 @@ import EditEmployeeForm from './components/Employees/EditEmployeeForm';
 
 import AddOpeningForm from './components/JobOpenings/AddOpeningForm';
 import ViewOpenings from './components/JobOpenings/ViewOpenings';
+import EditOpeningForm from './components/JobOpenings/EditOpeningForm';
 
 const App = () => {
   
@@ -193,7 +194,7 @@ const App = () => {
                 <Route path="/manage_employees/view" element={<ViewEmployees />} />
 
                 <Route path="/manage_openings/add" element={<AddOpeningForm />} />
-                <Route path="/manage_openings/edit/:opening_id" element={<EditEmployeeForm />} />
+                <Route path="/manage_openings/edit/:opening_id" element={<EditOpeningForm />} />
                 <Route path="/manage_openings/delete/:selectedEntity/:opening_id" element={<DeleteFormComponent />} />
                 <Route path="/manage_openings/view" element={<ViewOpenings />} />
 

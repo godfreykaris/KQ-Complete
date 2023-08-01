@@ -39,7 +39,7 @@ class OpeningController extends Controller
         try
         {
             // Make sure the opening is valid
-            $opening = Opening::where('id', $openingId)->first();
+            $opening = Opening::with('skills', 'qualifications')->where('id', $openingId)->first();
             if(!$opening)
             {
                 return response()->json(['error' => 'The opening does not exist' , 'status' => 0]);

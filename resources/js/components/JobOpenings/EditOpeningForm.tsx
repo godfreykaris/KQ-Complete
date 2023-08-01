@@ -14,35 +14,25 @@ interface Qualification {
   name: string;
 }
 
-interface JobTitle {
-  id: number;
-  name: string;
-}
 
-const EditEmployeeForm: React.FC = () => {
+const EditOpeningForm: React.FC = () => {
 
-  const { employee_id} = useParams<{employee_id: string; }>();
+  const { opening_id} = useParams<{opening_id: string; }>();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isDropdownsDataLoading, setDropdownsDataLoading] = useState(true);
 
   const sortByNameAscending = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name);
   
-  const [employeeId, setEmployeeID] = useState<string>(employee_id || '');
+  const [openingId, setOpeningID] = useState<string>(opening_id || '');
 
   const [skillsStore, setSkills] = useState<Skill[]>([]);
   const [qualificationsStore, setQualifications] = useState<Qualification[]>([]);
-  const [jobTitles, setJobTitles] = useState<JobTitle[]>([]);
 
   const [formData, setFormData] = useState({
-    employee_id: '',
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone: '',
-    date_of_birth: '',
-    address: '',
-    job_title_id: '',
+    id:'',
+    title: '',
+    description: '',
     qualifications: [] as string [],
     skills: [] as string [],
   });
@@ -51,7 +41,7 @@ const EditEmployeeForm: React.FC = () => {
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchEmployee();
+    fetchOpening();
     fetchData();
   }, []);
 
@@ -63,14 +53,12 @@ const EditEmployeeForm: React.FC = () => {
         Promise.all([
             fetch(`${apiBaseUrl}/skills`),
             fetch(`${apiBaseUrl}/qualifications`),
-            fetch(`${apiBaseUrl}/jobTitles`),
           ])
             .then((responses) => Promise.all(responses.map((response) => response.json())))
-            .then(([skillsData, qualificationsData, jobTitlesData]) => {
+            .then(([skillsData, qualificationsData]) => {
               // Do something with the fetched data
               setSkills(skillsData.items.sort(sortByNameAscending));
               setQualifications(qualificationsData.items.sort(sortByNameAscending));
-              setJobTitles(jobTitlesData.items.sort(sortByNameAscending));
             })
             .catch((error) => {
               // Handle any errors that occurred during fetching
@@ -91,27 +79,23 @@ const EditEmployeeForm: React.FC = () => {
     }
   };
 
-  const fetchEmployee = async () => {
+  const fetchOpening = async () => {
     setIsLoading(true);
 
     try 
     {
-      const response = await fetch(`${apiBaseUrl}/employees/${employeeId}`);
+      const response = await fetch(`${apiBaseUrl}/openings/${openingId}`);
       const data = await response.json();
+      
       setFormData({
-        employee_id: data.employee.employee_id,
-        first_name: data.employee.first_name,
-        last_name: data.employee.last_name,
-        email: data.employee.email,
-        phone: data.employee.phone,
-        date_of_birth: data.employee.date_of_birth,
-        address: data.employee.address,
-        job_title_id: String(data.employee.job_title_id), 
-        qualifications: data.employee.qualifications?.map((qualification:{ id:number}) => String(qualification.id)),       
-        skills: data.employee.skills?.map((skill:{ id:number}) => String(skill.id)),
+        id: data.opening.id,
+        title: data.opening.title,
+        description: data.opening.description, 
+        qualifications: data.opening.qualifications?.map((qualification:{ id:number}) => String(qualification.id)),       
+        skills: data.opening.skills?.map((skill:{ id:number}) => String(skill.id)),
       });
     
-      setEmployeeID(data.employee.employee_id);
+      setOpeningID(data.opening.id);
 
       if(!isDropdownsDataLoading)
           setIsLoading(false);
@@ -160,7 +144,7 @@ const EditEmployeeForm: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`${apiBaseUrl}/employees/change/${employeeId}`, {
+      const response = await fetch(`${apiBaseUrl}/openings/change/${openingId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -177,7 +161,7 @@ const EditEmployeeForm: React.FC = () => {
         {
           setResponseStatus(1); // Success
           setResponseMessage(`Success: ${data.success}`);
-          // Redirect to the employees list page after successful creation
+          // Redirect to the openings list page after successful creation
         } 
         else 
         {
@@ -219,7 +203,7 @@ const EditEmployeeForm: React.FC = () => {
 
   return (
     <div className="col-sm-12 col-md-7 col-lg-5">
-      <h2 className="text-center">Edit Employee</h2>
+      <h2 className="text-center">Edit Opening</h2>
       {isLoading ? (
         /**Show loading */
         <LoadingComponent />
@@ -228,95 +212,30 @@ const EditEmployeeForm: React.FC = () => {
           <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="firstName">First Name</label>
+              <label htmlFor="title">Title</label>
               <input
                 type="text"
-                id="firstName"
+                id="title"
                 className="form-control"
-                name="first_name"
-                value={formData.first_name}
+                name="title"
+                value={formData.title}
                 onChange={handleChange}
                 required
               />
-            </div>
-            <div className="form-group">
-              <label htmlFor="lastName">Last Name</label>
-              <input
-                type="text"
-                id="lastName"
-                className="form-control"
-                name="last_name"
-                value={formData.last_name}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="email">Email</label>
-              <input
-                type="email"
-                id="email"
-                className="form-control"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="phone">Phone</label>
-              <input
-                type="tel"
-                id="phone"
-                className="form-control"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="dateOfBirth">Date of Birth</label>
-              <input
-                type="date"
-                id="dateOfBirth"
-                className="form-control"
-                name="date_of_birth"
-                value={formData.date_of_birth}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="address">Address</label>
-              <textarea
-                id="address"
-                className="form-control"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="jobTitleId">Job Title</label>
-              <select
-                id="jobTitleId"
-                className="form-control"
-                name="job_title_id"
-                value={formData.job_title_id}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select a job title</option>
-                {jobTitles?.map((jobTitle) => (
-                  <option key={jobTitle.id} value={jobTitle.id}>
-                    {jobTitle.name}
-                  </option>
-                ))}
-              </select>
             </div>
             
+            <div className="form-group">
+              <label htmlFor="description">Description</label>
+              <textarea
+                id="description"
+                className="form-control"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                required
+              />
+            </div>
+                        
             <div className="form-group">
               <label htmlFor="skills">Skills</label>
               <select
@@ -365,4 +284,4 @@ const EditEmployeeForm: React.FC = () => {
   );
 };
 
-export default EditEmployeeForm;
+export default EditOpeningForm;
