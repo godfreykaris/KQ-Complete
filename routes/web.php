@@ -148,7 +148,7 @@ Route::put('/openings/change/{openingId}', [OpeningController::class, 'update'])
 Route::post('/openings/add', [OpeningController::class, 'store'])->name('openings.store');
 Route::delete('/openings/delete/{openingId}', [OpeningController::class, 'delete'])->name('openings.delete');
 Route::get('/openings', [OpeningController::class, 'index'])->name('openings.all');
-Route::get('/openings/{openingTitle}', [OpeningController::class, 'show'])->name('openings.show');
+Route::get('/openings/{openingId}', [OpeningController::class, 'show'])->name('openings.show');
 Route::get('/openings/match_employees/{openingId}', [OpeningController::class, 'getMatchingEmployees'])->name('openings.match_employees');
 
 Route::get('/payment/create', [PayPalController::class,'createPayment'])->name('payment.create');

@@ -34,12 +34,12 @@ class OpeningController extends Controller
     }
 
     // Get an opening
-    public function show(Request $request, $openingTitle)
+    public function show(Request $request, $openingId)
     {
         try
         {
             // Make sure the opening is valid
-            $opening = Opening::where('title', $openingTitle)->first();
+            $opening = Opening::where('id', $openingId)->first();
             if(!$opening)
             {
                 return response()->json(['error' => 'The opening does not exist' , 'status' => 0]);

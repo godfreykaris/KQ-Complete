@@ -5,31 +5,21 @@ import apiBaseUrl from '../../config';
 import LoadingComponent from '../LoadingComponent';
 
 
-type JobTitle = {
-  id: number;
-  name: string;
-};
-
-type Employee = {
+type Opening = {
     id:number,
-    employee_id: '',
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone: '',
-    date_of_birth: '',
-    address: '',
-    job_title: JobTitle,
+    
+    title: '',
+    description: '',
     qualifications: [],
     skills: [],
 };
 
-const ViewEmployees: React.FC = () => {
+const ViewOpenings: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(true);
 
   
-  const [employees, setEmployees] = useState<Employee[] | null>(null);
+  const [openings, setOpenings] = useState<Opening[] | null>(null);
 
   const [filterValue, setFilterValue] = useState<string>('');
 
@@ -37,19 +27,19 @@ const ViewEmployees: React.FC = () => {
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchEmployees();    
+    fetchOpenings();    
   }, []); // Empty dependency array ensures the effect runs only once on mount
 
   
 
-  const fetchEmployees = async () => {
+  const fetchOpenings = async () => {
     setIsLoading(true);
 
     try 
     {
-      const response = await fetch(`${apiBaseUrl}/employees`);
+      const response = await fetch(`${apiBaseUrl}/openings`);
       const data = await response.json();
-      setEmployees(data.employees);
+      setOpenings(data.openings);
       setIsLoading(false);
 
     }
@@ -61,9 +51,9 @@ const ViewEmployees: React.FC = () => {
   };
 
   
-  const filteredData = employees
-    ? employees.filter((item) =>
-        item.employee_id.toLowerCase().includes(filterValue.toLowerCase())
+  const filteredData = openings
+    ? openings.filter((item) =>
+        item.title.toLowerCase().includes(filterValue.toLowerCase())
       )
     : [];
 
@@ -89,7 +79,7 @@ const ViewEmployees: React.FC = () => {
       <div className="container mt-4">
         <div className="row justify-content-center">
           <div className="col-lg-12">
-            <h2 className="text-center">View Employees</h2>
+            <h2 className="text-center">View Openings</h2>
             {isLoading ? (
                 /**Show loading */
                 <LoadingComponent />
@@ -97,7 +87,7 @@ const ViewEmployees: React.FC = () => {
                 <>
                     <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
                         
-                    { employees && (
+                    { openings && (
                      <>
                       <div>
                         <input
@@ -105,7 +95,7 @@ const ViewEmployees: React.FC = () => {
                           value={filterValue}
                           onChange={(e) => setFilterValue(e.target.value)}
                           className="form-control mb-3 mt-3"
-                          placeholder="Filter by employee number"
+                          placeholder="Filter by opening title"
                         />
 
                         <div className="table-responsive">
@@ -116,14 +106,8 @@ const ViewEmployees: React.FC = () => {
                                 <th>*</th>
                                 <th>Edit</th>
                                 <th>Delete</th>     
-                                <th>Employee ID</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Date of Birth</th>
-                                <th>Address</th>
-                                <th>Job Title</th>                                                           
+                                <th>Title</th>
+                                <th>Description</th>                                                                                           
                               </tr>
                             </thead>
                             <tbody>
@@ -132,7 +116,7 @@ const ViewEmployees: React.FC = () => {
                                   <td>{index + 1}</td>
                                   <td>
                                     <Link
-                                      to={`/manage_employees/edit/${item.employee_id}`} // Replace "edit-employee" with the actual URL for the EditEmployeeComponent
+                                      to={`/manage_openings/edit/${item.id}`} // Replace "edit-opening" with the actual URL for the EditOpeningComponent
                                       className="btn btn-primary"
                                     >
                                       Edit
@@ -140,21 +124,14 @@ const ViewEmployees: React.FC = () => {
                                   </td>
                                   <td>
                                     <Link
-                                      to={`/manage_employees/delete/employees/${item.employee_id}`} // Replace "delete-employee" with the actual URL for the DeleteEmployeeComponent
+                                      to={`/manage_openings/delete/openings/${item.id}`} // Replace "delete-opening" with the actual URL for the DeleteOpeningComponent
                                       className="btn btn-danger"
                                     >
                                       Delete
                                     </Link>
                                   </td>
-                                  <td>{item.employee_id}</td>
-                                  <td>{item.first_name}</td>
-                                  <td>{item.last_name}</td>
-                                  <td>{item.email}</td>
-                                  <td>{item.phone}</td>
-                                  <td>{item.date_of_birth}</td>
-                                  <td>{item.address}</td>
-                                  <td>{item.job_title.name}</td>  
-                                                                                   
+                                  <td>{item.title}</td>
+                                  <td>{item.description}</td>                                                                                                                     
                                 </tr>
                               ))}
                             </tbody>
@@ -173,4 +150,4 @@ const ViewEmployees: React.FC = () => {
   );
 };
 
-export default ViewEmployees;
+export default ViewOpenings;
