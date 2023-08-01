@@ -16,8 +16,8 @@ class OpeningController extends Controller
     {
         try
         {
-            $openings = Opening::all();
-            return response()->json($openings);
+            $openings = Opening::with('skills', 'qualifications')->get();
+            return response()->json(['openings' => $openings, 'status' => 1]);
         }
         catch (\Exception $e) 
         {
@@ -26,9 +26,9 @@ class OpeningController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage() , 'status' => 0]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.' , 'status' => 0]);
         }
         
     }
@@ -42,7 +42,7 @@ class OpeningController extends Controller
             $opening = Opening::where('title', $openingTitle)->first();
             if(!$opening)
             {
-                return response()->json(['error' => 'The opening does not exist'], 500);
+                return response()->json(['error' => 'The opening does not exist' , 'status' => 0]);
             }
 
             return response()->json(['opening' => $opening, 'status' => 1]);
@@ -54,9 +54,9 @@ class OpeningController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            // return response()->json(['error' => 'An error occurred. ' . $e->getMessage() , 'status' => 0]);
 
-             return response()->json(['error' => 'An error occurred.'], 500);
+             return response()->json(['error' => 'An error occurred.' , 'status' => 0]);
         }
     }
 
@@ -70,7 +70,7 @@ class OpeningController extends Controller
             // Make sure the opening is valid
             if (!$opening) 
             {
-                return response()->json(['error' => 'Opening not found.'], 404);
+                return response()->json(['error' => 'Opening not found.', 'status' => 0], 404);
             }
 
             // Retrieve all openings who meet the qualifications and skills required for the opening
@@ -91,9 +91,9 @@ class OpeningController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-             return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+             return response()->json(['error' => 'An error occurred. ' . $e->getMessage() , 'status' => 0]);
 
-            // return response()->json(['error' => 'An error occurred.'], 500);
+            // return response()->json(['error' => 'An error occurred.' , 'status' => 0]);
         }
         
     }
@@ -111,16 +111,12 @@ class OpeningController extends Controller
                 'skills' => 'nullable|array',
                 'skills.*' => 'exists:skills,id',
             ]);
-    
-            // For testing only
-            $openingData['title'] = fake()->jobTitle;
-            $openingData['description'] = fake()->paragraph;
-    
+        
             // Check if the opening already exists based on email
             $existingOpening = Opening::where('title', $openingData['title'])->first();
             if($existingOpening)
             {
-                return response()->json(['error' => 'There exists an opening with the specified name.'], 500);
+                return response()->json(['error' => 'There exists an opening with the specified title.' , 'status' => 0]);
             }
         
             // Remove the qualifications and skills from $openingData
@@ -146,7 +142,7 @@ class OpeningController extends Controller
         
             
     
-            return response()->json(['opening' => $opening, 'status' => 1], 201);
+            return response()->json(['success' => 'Opening added successfully.', 'status' => 1]);
 
         }
         catch (\Exception $e) 
@@ -156,9 +152,9 @@ class OpeningController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred. ' . $e->getMessage() , 'status' => 0]);
 
-             //return response()->json(['error' => 'An error occurred.'], 500);
+             //return response()->json(['error' => 'An error occurred.' , 'status' => 0]);
         }        
     }
 
@@ -176,16 +172,13 @@ class OpeningController extends Controller
                 'skills.*' => 'exists:skills,id',
             ]);
     
-            // For testing only
-            $openingData['title'] = fake()->jobTitle;
-            $openingData['description'] = fake()->paragraph;
-    
+                
             // Fetch the opening
             $opening = Opening::where('id', $openingId)->first();
             // Make sure the opening exists
             if(!$opening)
             {
-                return response()->json(['error' => 'The opening does not exist']);
+                return response()->json(['error' => 'The opening does not exist', 'status' => 0]);
             }
     
             // Remove the qualifications and skills from $openingData
@@ -230,7 +223,7 @@ class OpeningController extends Controller
             $opening->skills()->sync($skillPivotData);
     
             
-            return response()->json(['opening' => $opening, 'status' => 1]);
+            return response()->json(['success' => 'Opening updated successfully.', 'status' => 1]);
         }
         catch (\Exception $e) 
         {
@@ -239,9 +232,9 @@ class OpeningController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred. ' . $e->getMessage() , 'status' => 0]);
 
-             //return response()->json(['error' => 'An error occurred.'], 500);
+             //return response()->json(['error' => 'An error occurred.' , 'status' => 0]);
         }  
         
     }
@@ -257,7 +250,7 @@ class OpeningController extends Controller
             //Make sure the opening is valid
             if(!$opening)
             {
-                return response()->json(['error' => 'The opening with id ' . $openingId . ' does not exist.'], 404);
+                return response()->json(['error' => 'The opening with id ' . $openingId . ' does not exist.', 'status' => 0], 404);
             }
 
             // Detach qualifications and skills from the opening before deletion
@@ -267,7 +260,7 @@ class OpeningController extends Controller
             // Delete opening
             $opening->delete();
 
-            return response()->json(['message' => 'Opening deleted successfully', 'status' => 1]);
+            return response()->json(['success' => 'Opening deleted successfully', 'status' => 1]);
         }
         catch (\Exception $e) 
         {
@@ -276,9 +269,9 @@ class OpeningController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred. ' . $e->getMessage() , 'status' => 0]);
 
-             //return response()->json(['error' => 'An error occurred.'], 500);
+             //return response()->json(['error' => 'An error occurred.' , 'status' => 0]);
         }  
         
     }

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
@@ -37,6 +38,8 @@ import CAFormDeleteComponent from './components/Cities&Airlines/CAFormDeleteComp
 import AddEmployeeForm from './components/Employees/AddEmployeeForm';
 import ViewEmployees from './components/Employees/ViewEmployees';
 import EditEmployeeForm from './components/Employees/EditEmployeeForm';
+
+import AddOpeningForm from './components/JobOpenings/AddOpeningForm';
 
 const App = () => {
   
@@ -116,6 +119,16 @@ const App = () => {
                     
                     {/* Add other menu items as needed */}
                   </NavDropdown>
+                  <NavDropdown title="Job Openings" id="basic-nav-dropdown" className="menu-item-text">                    
+                    <NavDropdown.Item as={Link} to="/manage_openings/add" className="menu-item-text">
+                      Add Opening
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={Link} to="/manage_openings/view" className="menu-item-text">
+                      View|Edit|Delete Opening
+                    </NavDropdown.Item>
+                    
+                    {/* Add other menu items as needed */}
+                  </NavDropdown>
                   <NavDropdown title="Other Data" id="basic-nav-dropdown" className="menu-item-text">                    
                     <NavDropdown.Item as={Link} to="/" className="menu-item-text">
                       Add Data
@@ -177,6 +190,11 @@ const App = () => {
                 <Route path="/manage_employees/edit/:employee_id" element={<EditEmployeeForm />} />
                 <Route path="/manage_employees/delete/:selectedEntity/:employee_id" element={<DeleteFormComponent />} />
                 <Route path="/manage_employees/view" element={<ViewEmployees />} />
+
+                <Route path="/manage_openings/add" element={<AddOpeningForm />} />
+                <Route path="/manage_openings/edit/:employee_id" element={<EditEmployeeForm />} />
+                <Route path="/manage_openings/delete/:selectedEntity/:employee_id" element={<DeleteFormComponent />} />
+                <Route path="/manage_openings/view" element={<ViewEmployees />} />
 
                 {/* Add other routes for other menu items as needed */}
               </Routes>
