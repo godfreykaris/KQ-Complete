@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import apiBaseUrl from '../../config';
+import LoadingComponent from '../LoadingComponent';
 
 interface Entity {
   id: number;
@@ -9,6 +10,8 @@ interface Entity {
 
 const DeletePlaneForm: React.FC = () => {
   const { id, planeId, model, name } = useParams<{ id: string; planeId: string; model: string; name: string; }>();
+
+  const [isLoading, setIsLoading] = useState(true);
 
   const [planeID, setPlaneID] = useState<string>(planeId || '');
   const [itemName, setItemName] = useState<string>(name || '');
@@ -26,7 +29,9 @@ const DeletePlaneForm: React.FC = () => {
   }, [planeID]);
 
   const fetchData = async (planeID: string) => {
-    try {
+    setIsLoading(true);
+    try 
+    {
 
       const response = await fetch(`${apiBaseUrl}/planes/${planeID}`);
 
@@ -38,17 +43,24 @@ const DeletePlaneForm: React.FC = () => {
         setPlaneID(data.plane.plane_id);
         setPlaneModel(data.plane.model);
         setPlaneCapacity(data.plane.capacity);
+
+        setIsLoading(false);
+
       }     
       
     } 
     catch (error) 
     {
+      setIsLoading(false);
       console.error('Error fetching data:', error);
     }
   };
 
   const handleDelete = async () => {
-    try {
+    setIsLoading(true);
+
+    try 
+    {
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
       if (!csrfToken) {
@@ -66,19 +78,32 @@ const DeletePlaneForm: React.FC = () => {
 
       const data = await response.json();
 
-      if (response.ok) {
-        if (data.status) {
+      if (response.ok) 
+      {
+        if (data.status) 
+        {
           setResponseStatus(1); // Success
           setResponseMessage(`Success: ${data.success}`);
-        } else {
+        } 
+        else 
+        {
           setResponseStatus(0); // Error
           setResponseMessage(`Error: ${data.error}`);
         }
-      } else {
+      } 
+      else 
+      {
         setResponseStatus(0); // Error
         setResponseMessage(`Error: ${data.error}`);
       }
-    } catch (error) {
+
+      setIsLoading(false);
+
+    } 
+    catch (error) 
+    {
+      setIsLoading(false);
+
       setResponseStatus(0); // Error
       setResponseMessage('Error deleting data: An error occurred');
       console.error('Error deleting data:', error);
@@ -96,17 +121,23 @@ const DeletePlaneForm: React.FC = () => {
   };
 
   return (
-    <div className="col-sm-12 col-md-9 col-lg-6">
+    <div className="text-center col-sm-12 col-md-9 col-lg-6">
       <h2>Delete Plane</h2>
-
-      <p>Are you sure you want to delete the following plane?</p>
-      <p><b>Name</b>: {itemName}<br/> <b>Plane ID</b>: {planeID} <br/>  <b>Model</b>: {planeModel} <br/>  <b>Capacity</b>:{planeCapacity}</p>
-      <div className="text-center mt-3">
-        <button type="button" className="btn btn-danger" onClick={handleDelete}>
-          Delete
-        </button>
-      </div>
-      <p className={`response-message ${getResponseClass()} text-center mt-3`}>{responseMessage}</p>
+      {isLoading ? (
+        /**Show loading */
+        <LoadingComponent />
+      ) : (
+          <>
+          <p>Are you sure you want to delete the following plane?</p>
+          <p><b>Name</b>: {itemName}<br/> <b>Plane ID</b>: {planeID} <br/>  <b>Model</b>: {planeModel} <br/>  <b>Capacity</b>:{planeCapacity}</p>
+          <div className="text-center mt-3">
+            <button type="button" className="btn btn-danger" onClick={handleDelete}>
+              Delete
+            </button>
+          </div>
+          <p className={`response-message ${getResponseClass()} text-center mt-3`}>{responseMessage}</p>
+         </>
+      )}
     </div>
   );
 };
