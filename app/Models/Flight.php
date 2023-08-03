@@ -17,6 +17,7 @@ class Flight extends Model
         'duration',
         'departure_time',
         'arrival_time',
+        'return_time',
         'flight_status_id',
         'departure_city_id',
         'arrival_city_id',

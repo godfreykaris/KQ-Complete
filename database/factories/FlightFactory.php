@@ -28,6 +28,7 @@ class FlightFactory extends Factory
             'flight_number' => fake()->unique()->regexify('[A-Z]{2}\d{3}'),
             'departure_time' => $departureTime,
             'arrival_time' => $arrivalTime,
+            'return_time' => fake()->dateTimeBetween($departureTime, '+30 days'),
             'is_international' => fake()->boolean(30),
             'flight_status_id' => FlightStatus::pluck('id')->random(),
             'departure_city_id' => City::pluck('id')->random(),

@@ -51,6 +51,7 @@ const EditFlightForm = () => {
     is_international: false,
     departure_time: '',
     arrival_time: '',
+    return_time: '',
     flight_status_id: '',
     departure_city_id: '',
     arrival_city_id: '',
@@ -294,7 +295,7 @@ const EditFlightForm = () => {
               </div>
               
               <div className="form-group">
-                <label htmlFor="departureTime">Departure Time</label>
+                <label htmlFor="departureTime">Departure Date/Time</label>
                 <input
                   type="datetime-local"
                   id="departureTime"
@@ -306,7 +307,7 @@ const EditFlightForm = () => {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="arrivalTime">Arrival Time</label>
+                <label htmlFor="arrivalTime">Arrival Date/Time</label>
                 <input
                   type="datetime-local"
                   id="arrivalTime"
@@ -317,6 +318,19 @@ const EditFlightForm = () => {
                   required
                 />
               </div>
+
+              <div className="form-group">
+                <label htmlFor="returnTime">Return Date/Time</label>
+                <input
+                  type="datetime-local"
+                  id="returnTime"
+                  className="form-control"
+                  name="return_time"
+                  value={formData.return_time}
+                  onChange={handleChange}
+                  required
+                />
+              </div>  
                         
               <div className="form-group">
                 <label htmlFor="departureCityId">Departure City</label>

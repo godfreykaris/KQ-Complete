@@ -28,6 +28,7 @@ type Flight = {
   flight_status: FlightStatus;
   departure_time: Date;
   arrival_time: Date;
+  return_time: Date;
   departure_city: City;
   arrival_city: City;
 };
@@ -129,6 +130,7 @@ const ViewFlights: React.FC = () => {
                                 <th>Arrival City</th>
                                 <th>Departure Time</th>
                                 <th>Arrival Time</th>
+                                <th>Return Time</th>
                                 <th>Edit</th>
                                 <th>Delete</th>                                
                               </tr>
@@ -142,6 +144,7 @@ const ViewFlights: React.FC = () => {
                                   <td>{item.flight_status.name}</td>
                                   <td>{new Date(item.departure_time).toLocaleString()}</td>
                                   <td>{new Date(item.arrival_time).toLocaleString()}</td>
+                                  <td>{new Date(item.return_time).toLocaleString()}</td>
                                   <td>{item.departure_city.name}</td>
                                   <td>{item.arrival_city.name}</td>  
 
@@ -169,7 +172,7 @@ const ViewFlights: React.FC = () => {
                       </div>
                       </>
                     )}
-                    </>                
+                    </>              
 
               )}
           </div>

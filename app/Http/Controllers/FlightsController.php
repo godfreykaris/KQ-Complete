@@ -90,6 +90,7 @@ class FlightsController extends Controller
             'departure_time' => 'required|date',
             'flight_status_id' => 'required|exists:flight_statuses,id',
             'arrival_time' => 'required|date|after:departure_time',
+            'return_time' => 'required|date|after:arrival_time',
             'departure_city_id' => 'required|exists:cities,id',
             'arrival_city_id' => 'required|exists:cities,id',
         ]);
@@ -131,6 +132,7 @@ class FlightsController extends Controller
             'is_international' => 'required|boolean',
             'departure_time' => 'required|date',
             'arrival_time' => 'required|date|after:departure_time',
+            'return_time' => 'required|date|after:arrival_time',
             'flight_status_id' => 'required|exists:flight_statuses,id',
             'departure_city_id' => 'required|exists:cities,id',
             'arrival_city_id' => 'required|exists:cities,id',
