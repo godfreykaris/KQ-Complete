@@ -3,7 +3,18 @@ import React, { useState } from 'react';
 import { Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 
-const App = () => {
+import DeleteFormComponent from './components/Common/DeleteFormComponent';
+
+import AddEmployeeForm from './components/Employees/AddEmployeeForm';
+import ViewEmployees from './components/Employees/ViewEmployees';
+import EditEmployeeForm from './components/Employees/EditEmployeeForm';
+
+import AddOpeningForm from './components/JobOpenings/AddOpeningForm';
+import ViewOpenings from './components/JobOpenings/ViewOpenings';
+import EditOpeningForm from './components/JobOpenings/EditOpeningForm';
+import MatchEmployeesToOpenings from './components/JobOpenings/MatchEmployeesToOpening';
+
+const HRMComponent = () => {
   
   return (
     <Router> {/* Wrap the entire component with Router */}
@@ -11,7 +22,7 @@ const App = () => {
         <div className="container-fluid sticky-top" style={{ backgroundColor: '#007BFF' }}>
             <Navbar bg="#007BFF" expand="md" variant="light" className="mx-auto" style={{ maxWidth: '800px' }}>
               <Navbar.Brand href="#home" style={{ color: '#FFFFFF' }}>
-                KQ
+                KQ Human Resource Manager
               </Navbar.Brand>
               <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ color: '#FFFFFF' }} />
               <Navbar.Collapse id="basic-navbar-nav">
@@ -83,4 +94,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default HRMComponent;
