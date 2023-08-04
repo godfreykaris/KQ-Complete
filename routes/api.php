@@ -73,11 +73,15 @@ Route::delete('/flightClasses/delete/{flightClassId}', [FlightClassesController:
 Route::get('/flightClasses', [FlightClassesController::class, 'index'])->name('flightClasses.all');
 Route::get('/flightClasses/{flightClassName}', [FlightClassesController::class, 'show'])->name('flightClasses.show');
 
-Route::put('/planes/change/{planeId}', [PlanesController::class, 'update'])->name('planes.update');
-Route::post('/planes/add', [PlanesController::class, 'store'])->name('planes.store');
-Route::delete('/planes/delete/{planeId}', [PlanesController::class, 'delete'])->name('planes.delete');
-Route::get('/planes', [PlanesController::class, 'index'])->name('planes.all');
-Route::get('/planes/{planeId}', [PlanesController::class, 'show'])->name('planes.show');
+Route::middleware('auth:api')->group(function () {
+    Route::put('/planes/change/{planeId}', [PlanesController::class, 'update'])->name('planes.update');
+    Route::post('/planes/add', [PlanesController::class, 'store'])->name('planes.store');
+    Route::delete('/planes/delete/{planeId}', [PlanesController::class, 'delete'])->name('planes.delete');
+    Route::get('/planes', [PlanesController::class, 'index'])->name('planes.all');
+    Route::get('/planes/{planeId}', [PlanesController::class, 'show'])->name('planes.show');
+});
+
+
 
 Route::get('/ticket/{ticket_number}', [TicketsController::class, 'show']);
 Route::get('/tickets/{ticket_number}/report', [TicketsController::class, 'generateTicketReport'])->name('tickets.report');

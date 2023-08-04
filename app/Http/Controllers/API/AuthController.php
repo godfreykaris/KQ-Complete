@@ -22,7 +22,7 @@ class AuthController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
-        if (auth()->attempt($credentials)) {
+        if (Auth::attempt($credentials)) {
             $user = Auth::user();
             $user['token'] = $user->createToken('Laravelia')->accessToken;
             return response()->json([
