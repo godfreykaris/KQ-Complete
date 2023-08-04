@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import apiBaseUrl from '../../config';
-import LoadingComponent from '../LoadingComponent';
+import apiBaseUrl from '../../../config';
+import LoadingComponent from './LoadingComponent';
 
 interface Entity {
   id: number;

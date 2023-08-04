@@ -1,13 +1,10 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-
-import AdminComponent from './AdminComponent';
-import HRMComponent from './HRMComponent';
-import SignInComponent from './SignInComponent';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/app.css';
+
+import App from './App';
 
 const domNode = document.getElementById('app');
 
@@ -18,16 +15,7 @@ if (domNode) {
 
   root.render(
     <React.StrictMode>
-      <Router>
-        {accessToken ? (
-            <>
-              <Route path="/admin" element={<AdminComponent />} />
-              <Route path="/hrm" element={<HRMComponent />} />
-            </>
-          ) : (
-            <Route path="/" element={<SignInComponent />} />
-          )}
-      </Router>
+      <App />      
     </React.StrictMode>,
   );
 }

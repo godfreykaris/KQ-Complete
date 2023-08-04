@@ -33,6 +33,9 @@ use App\Http\Controllers\UsersController;
 |
 */
 
+Route::post('/users/login', [AuthController::class, 'login'])->name('users.login');
+
+
 // Routes for UsersController
 Route::post('/users/register', [UsersController::class, 'register'])->name('user_register.store');
 Route::get('/users', [UsersController::class, 'listUsers'])->name('users.all');

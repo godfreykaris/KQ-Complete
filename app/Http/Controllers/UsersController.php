@@ -24,16 +24,18 @@ class UsersController extends Controller
                     //'password' => 'required|string|min:8|confirmed',
                 ]);
             
+                // For testing only
+                $userData['password'] = "1234567890";
                 // Create the new user
                 $user = User::create([
                     // 'name' => $userData['name'],
                     // 'email' => $userData['email'],
-                    // 'password' => bcrypt($userData['password']),
+                    'password' => bcrypt($userData['password']),
                 
                     /** For testing use only */
                     'name' => fake()->name,
                     'email' => fake()->unique()->safeEmail,
-                    'password' => Hash::make(fake()->password(8)),
+                    //'password' => Hash::make(fake()->password(8)),
                 ]);
 
             } 
