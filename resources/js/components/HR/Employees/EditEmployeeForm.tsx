@@ -165,6 +165,8 @@ const EditEmployeeForm: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': csrfToken,
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
         },
         body: JSON.stringify(formData),
       });

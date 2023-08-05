@@ -19,13 +19,16 @@ const SignInComponent = () => {
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
         },
         body: JSON.stringify({ email, password }),
       })
 
       if (response.ok) {
         const data = await response.json();
-        sessionStorage.setItem('access_token', data.token);
+        sessionStorage.setItem('access_token', data.user.token);
+
         // Determine the role (admin or HRM) based on your backend's response
         const userRole = data.role; // Replace 'role' with the actual key that holds the role
         if (userRole === 'admin') 
