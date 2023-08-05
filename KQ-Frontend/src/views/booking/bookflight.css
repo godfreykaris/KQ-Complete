@@ -1,0 +1,6 @@
+/* Add this CSS to your global CSS file or component CSS */
+.scrollable-form {
+    max-height: 80vh; /* Set the maximum height of the form */
+    overflow-y: auto; /* Enable vertical scrolling when the content exceeds the height */
+  }
+  
