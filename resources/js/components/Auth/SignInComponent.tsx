@@ -20,7 +20,6 @@ const SignInComponent = () => {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
           'Accept': 'application/json',
-          'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
         },
         body: JSON.stringify({ email, password }),
       })

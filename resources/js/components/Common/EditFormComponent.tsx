@@ -75,13 +75,24 @@ const EditFormComponent: React.FC = () => {
     {
       try 
       {
-         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-         if (!csrfToken) 
-         {
-           console.error('CSRF token not found.');
-           return;
-         }
+        const navigate = useNavigate();
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+  
+        if (!csrfToken) 
+        {
+          console.error('CSRF token not found.');
+          setIsLoading(false);
+  
+          navigate('/signin');
+          return;
+        }
+  
+        const accessToken = sessionStorage.getItem('access_token');
+        if (!accessToken) {
+          // Redirect to the sign-in page if the accessToken is not set
+          navigate('/signin');
+          return;
+        }
 
          const requestData = {
             id: itemId,
@@ -96,7 +107,7 @@ const EditFormComponent: React.FC = () => {
              'Content-Type': 'application/json',
              'X-CSRF-TOKEN': csrfToken,
              'Accept': 'application/json',
-             'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`,
+             'Authorization': `Bearer ${accessToken}`,
            },
            body: JSON.stringify(requestData),
          });
