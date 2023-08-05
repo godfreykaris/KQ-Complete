@@ -11,9 +11,12 @@ const App = () => {
     <AuthProvider>
       <Router>
         <Routes>
+          <Route path="/" element={<SignInComponent />} />
           <Route path="/signin" element={<SignInComponent />} />
-          {/* Use ProtectedRoute for AdminComponent */}
-          <ProtectedRoute path="/admin" element={<AdminComponent />} />
+          <Route path="/admin/*" element={<ProtectedRoute element={<AdminComponent />} />} />
+           {/* Use ProtectedRoute for authenticated routes */}
+           
+           {/* Add other unprotected routes here */}
         </Routes>
       </Router>
     </AuthProvider>

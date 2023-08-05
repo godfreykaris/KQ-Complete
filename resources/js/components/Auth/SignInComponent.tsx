@@ -25,7 +25,7 @@ const SignInComponent = () => {
 
       if (response.ok) {
         const data = await response.json();
-        sessionStorage.setItem('access_token', data.access_token);
+        sessionStorage.setItem('access_token', data.token);
         // Determine the role (admin or HRM) based on your backend's response
         const userRole = data.role; // Replace 'role' with the actual key that holds the role
         if (userRole === 'admin') 

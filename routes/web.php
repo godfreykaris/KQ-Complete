@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\AccountBasedBookingInquiriesController;
-use App\Http\Controllers\AirlineController;
 use Illuminate\Support\Facades\Route;
 
 /*

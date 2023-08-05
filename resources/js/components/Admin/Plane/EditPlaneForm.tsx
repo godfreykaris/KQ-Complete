@@ -67,12 +67,14 @@ const EditPlaneForm: React.FC = () => {
             capacity: planeCapacity
             
           };
-
+          const accessToken = sessionStorage.getItem('access_token');
          const response = await fetch(`${apiBaseUrl}/planes/change/${planeId}`, {
            method: 'PUT',
            headers: {
              'Content-Type': 'application/json',
              'X-CSRF-TOKEN': csrfToken,
+             'Accept': 'application/json',
+             'Authorization': `Bearer ${accessToken}`, // Include the access token in the Authorization header
            },
            body: JSON.stringify(requestData),
          });
