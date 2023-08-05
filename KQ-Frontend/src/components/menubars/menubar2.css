@@ -1,0 +1,48 @@
+/* custom-navbar.css */
+.text-glow {
+    font-size: 24px; /* Adjust font size as needed */
+    color: #f0eff4; /* Adjust the color of the glow */
+    text-shadow: 0 0 8px #4a47f7, 0 0 8px #593bf1, 0 0 8px #423ff5; /* Adjust the shadow color and size */
+  }
+
+  .dropdown-menu {
+    background-color: #766ff8; /* Set the desired light blue color */
+  }
+
+  /* for the menubar*/
+  .navbar {
+    background-color: #020507; /* Change the background color */
+  }
+  
+  /* Style for the collapsed navbar toggle button */
+  .navbar-toggler-icon {
+    background-color: #040110; /* Change the toggle button color */
+  }
+  
+  /* Style for the collapsed navbar */
+  .collapse {
+    background-color: #171718; /* Change the background color of the collapsed menu */
+    border-radius: 5%;
+  }
+  
+  /* Style for the dropdown menu */
+  .dropdown-menu-custom {
+    background-color: #86b3f3; /* Change the background color of the dropdown menu */
+    border: none; /* Remove border */
+    box-shadow: 0px 8px 16px 0px rgba(10, 9, 9, 0.2); /* Add shadow */
+    border-radius: 0; /* Remove rounded corners */
+  }
+  
+  /* Style for the dropdown items */
+  .dropdown-item-custom {
+    color: #ffffff; /* Change the text color of dropdown items */
+  }
+  
+  /* Style for the navbar brand */
+  .navbar-brand {
+    font-size: 24px; /* Change the font size */
+    font-weight: bold; /* Add bold font weight */
+    color: #ffffff; /* Change the text color */
+  }
+  
+  

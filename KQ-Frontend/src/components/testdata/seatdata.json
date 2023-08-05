@@ -1,0 +1,21 @@
+
+{
+    "seats": [
+    { 
+      "number": "A1", 
+      "class": "First Class", 
+      "location": "aisle",
+      "availability": "AVAILABLE", 
+      "price": "$100" 
+    },
+    { 
+      "number": "A2", 
+      "class": "First Class",
+      "location": "Middle", 
+      "availability": "BOOKED", 
+      "price": "$150" 
+    }
+      
+    ]
+  }
+  

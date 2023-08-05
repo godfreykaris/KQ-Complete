@@ -1,0 +1,42 @@
+/* custom-navbar.css */
+
+/* Navbar background and text color */
+.navbar {
+    background-color: #007bff; /* Blue color */
+    position: sticky;
+    top: 1%;
+    left: 10%;
+    right: 10%;
+    background-color: #007bff; /* Set your desired background color */
+    color: #ffffff; /* Set your desired text color */
+    z-index: 1000; /* Adjust the z-index as needed to ensure the navbar is above other content */
+  }
+  
+  .navbar-light .navbar-nav .nav-link {
+    color: #ffffff; /* White text color */
+  }
+  
+  /* Activate dropdown on hover */
+  .navbar-light .navbar-nav .nav-item.dropdown:hover .dropdown-menu {
+    display: block;
+  }
+
+  /* MenuBar2.css */
+
+/* Center the navbar horizontally */
+.navbar {
+  display: flex;
+  justify-content: center;
+}
+
+/* Add border radius to the navbar */
+.navbar {
+  border-radius: 10px;
+}
+
+/* Reduce the padding between the navbar items */
+.nav-item {
+  padding: 5px;
+}
+
+  

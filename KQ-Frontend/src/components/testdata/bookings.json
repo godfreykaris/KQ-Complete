@@ -1,0 +1,45 @@
+{
+    "bookings":[
+        {
+            "refNumber": "KQ-454545",
+            "email": "what@gmail.com",
+            "tripType": "One Way",
+            "departure": "15/07/2023",
+            "from": "Baghdad",
+            "to": "London",
+            "planeId": "Boeing 707",
+            "passengers": [
+                {
+                    "refNumber": "KQ-454545",
+                    "passId": "344",
+                    "passport": "123456",
+                    "idNumber": "3867543",            
+                    "name": "Kevin Hart",
+                    "dob": "15/07/2023",
+                    "seat": {                
+                        "number": "A3",            
+                        "class": "Economy",            
+                        "location": "Aisle",            
+                        "availability": "AVAILABLE",            
+                        "price": "$5000"
+                    }
+                },
+                {
+                    "refNumber": "KQ-454545",
+                    "passId": "345",
+                    "passport": "123457",
+                    "idNumber": "2867543",            
+                    "name": "Kelvin Mart",
+                    "dob": "15/07/2023",
+                    "seat": {                
+                        "number": "A3",            
+                        "class": "Economy",            
+                        "location": "Aisle",            
+                        "availability": "AVAILABLE",            
+                        "price": "$5000"
+                    }
+                }
+            ]
+        }
+    ]
+}
