@@ -28,6 +28,7 @@ import ContactUs from "./views/others/contact";
 import ViewOpenings from "./views/others/viewopenings";
 import DashboardLayout from "./components/layouts/dashboardlayout";
 import Skills from "./views/others/viewskills";
+import PrintTicket from "./views/booking/printticket";
 import { ContextProvider } from "./components/miscallenious/contextprovider";
 
 const router = createBrowserRouter([
@@ -166,6 +167,10 @@ const router = createBrowserRouter([
     {
         path: '/viewskills',
         element: <Skills/>
+    },
+    {
+        path: '/printticket',
+        element: <PrintTicket/>
     }
 
     ]

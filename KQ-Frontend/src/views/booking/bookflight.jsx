@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Container, Row, Col, Form, Button, Table, Spinner } from "react-bootstrap";
-import { usePassengerContext } from "../../context/passengers/passengercontext";
-import { useSearchFlightContext } from "../../context/flights/flightcontext";
-import MenuBar1 from "../../components/menubars/menubar1";
-import { useSeatContext } from "../../context/seats/sendseatdata";
-import Seat from "../seats/viewseat";
-
 import './bookflight.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import SeatMap from "../seats/seatmap";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Container, Row, Col, Form, Button, Table, Spinner, OverlayTrigger, Tooltip } from "react-bootstrap";
+
+import { usePassengerContext } from "../../context/passengers/passengercontext";
+import { useSearchFlightContext } from "../../context/flights/flightcontext";
+import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
+import { useSeatContext } from "../../context/seats/sendseatdata";
+import Seat from "../seats/viewseat";
+import SeatMap from "../seats/seatmap";
+
 
 export default function BookFlight() {
 
@@ -25,6 +26,11 @@ export default function BookFlight() {
   const [selectedTo, setSelectedTo] = useState("");
   const [filteredLocations, setFilteredLocations] = useState([]);
 
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // State to manage the seat modal
+  const [showSeatModal, setShowSeatModal] = useState(false);
+
   //data from the search flight component
   const location = useLocation();
   const {state} = location;
@@ -34,7 +40,7 @@ export default function BookFlight() {
     sfReturnDate,
     sfSelectedFrom,
     sfSelectedTo,
-  } = state;
+  } = state || {}; 
 
   const [formData, setFormData] = useState({
     email: '',
@@ -140,6 +146,11 @@ export default function BookFlight() {
     setIsButtonClicked(false);
   };
 
+  //addpassenger message befor selecting flight
+  const renderTooltip = (message) => (
+    <Tooltip id='tooltip'>{message}</Tooltip>
+  )
+
   // Departure locations and destinations
   useEffect(() => {
     if (departureDate !== "") {
@@ -159,6 +170,7 @@ export default function BookFlight() {
         setTableData(filterData);
       })
       .catch((error) => {
+        setErrorMessage("An error occured");
         console.log("Error fetching data: ", error);
       });
   };
@@ -198,12 +210,16 @@ export default function BookFlight() {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    fetchData();
+    try{
+      fetchData();
+    }
+    catch{
+      setErrorMessage("An error occured!");
+      console.log("Error fetching data", error);
+    }
   };
 
-  //the seat modal
-   // State to manage the seat modal
-   const [showSeatModal, setShowSeatModal] = useState(false);
+  //the seat modal  
 
    // Function to open the seat modal
    const handleViewSeat = () => {
@@ -221,7 +237,27 @@ export default function BookFlight() {
 
    //function to handle flight selection
    const handleFlightSelection = (flight) => {
-    setSelectedFlight(flight);
+    if(selectedFlight === null){
+      setSelectedFlight(flight);
+    }else {
+      const confirmUpdate = window.confirm("Changing the flight will clear seats for all passengers. Do you want to continue");
+      if(confirmUpdate){
+        setSelectedFlight(flight);
+
+        //clear seat data for every passenger
+        const updatedPassengers = passengers.map(passenger => ({
+          ...passenger,
+          seat: {},
+        }));
+
+        //update seat data using the context function
+        updateSeat({});
+
+        //update passenger adata using context function
+        updatedPassengers(updatedPassengers);
+      }
+    }
+    
    };
 
    return (
@@ -341,12 +377,15 @@ export default function BookFlight() {
                 )}
               </Form.Group>
               </Form>
-            </Col>          
+            </Col> 
 
-              <br/>
+                {/* Display error message if there's an error */}
+              {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
+
+              <hr/>
           
               {passengers.length > 0 ? (
-              <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+              <div style={{ maxHeight: '300px', overflowY: 'hidden' }}>
                 <Table striped bordered hover>
                   <thead>
                     <tr>
@@ -355,6 +394,8 @@ export default function BookFlight() {
                       <th>ID</th>
                       <th>Birth Date</th>
                       <th>Seat</th>
+                      <th>Edit</th>
+                      <th>Delete</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -397,7 +438,7 @@ export default function BookFlight() {
                 </Table>
               </div>
               ) : (
-                <p className="text-danger"><b>You haven't added any passengers yet</b></p>
+                <p className="text-danger text-center mt-5"><b>You haven't added any passengers yet</b></p>
               )}
 
 
@@ -412,18 +453,31 @@ export default function BookFlight() {
 
               {isButtonClicked && <SeatMap/>}
               <br/>
-              <div className="justify-content-between">
-                <Link to="/addpassenger1">
-                  <Button
-                    variant="primary"
-                    onClick={handleAddPassengerClick}
-                    disabled={!selectedFlight}
-                    title={selectedFlight === null ? "Select a flight inorder to add a passenger" : ""}
-                    type="button"
+              <div className="d-flex justify-content-between align-items-center">
+                
+                <OverlayTrigger
+                  placement='top'
+                  overlay={renderTooltip("Select a flight inorder to add a passenger")}
                   >
-                    Add Passenger
-                  </Button>
-                </Link>
+                    <span>
+                      <Button
+                        variant="primary"
+                        onClick={(event) => {
+                          if (selectedFlight === null) {
+                            event.preventDefault(); // Prevent the default link behavior
+                          } else {
+                            handleAddPassengerClick();
+                            navigate("/addpassenger1");
+                          }
+                        }}
+                        disabled={selectedFlight === null}
+                        type="button"
+                      >
+                        Add Passenger
+                      </Button>
+                    </span>
+                </OverlayTrigger>                  
+                
 
                 <hr/>
 
