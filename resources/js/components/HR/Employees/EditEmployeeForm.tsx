@@ -50,6 +50,8 @@ const EditEmployeeForm: React.FC = () => {
   const [responseMessage, setResponseMessage] = useState('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     fetchEmployee();
     fetchData();
@@ -151,7 +153,6 @@ const EditEmployeeForm: React.FC = () => {
 
     try 
     {
-      const navigate = useNavigate();
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
       if (!csrfToken) 

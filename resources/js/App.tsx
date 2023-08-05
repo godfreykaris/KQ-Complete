@@ -5,12 +5,14 @@ import AdminComponent from '././components/Admin/AdminComponent';
 import ProtectedRoute from '././components/ProtectedRoute';
 import SignInComponent from '././components/Auth/SignInComponent'; // Your login component
 import { AuthProvider } from '././context/AuthContext';
+import Data from './Data';
 
 const App = () => {
   return (
     <AuthProvider>
       <Router>
         <Routes>
+          {/*<Route path="/" element={<Data />} />*/}
           <Route path="/" element={<SignInComponent />} />
           <Route path="/signin" element={<SignInComponent />} />
           <Route path="/admin/*" element={<ProtectedRoute element={<AdminComponent />} />} />

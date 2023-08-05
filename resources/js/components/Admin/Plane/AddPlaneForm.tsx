@@ -15,6 +15,7 @@ const AddPlaneForm = () => {
   const [responseMessage, setResponseMessage] = useState<string>('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
+  const navigate = useNavigate();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -29,8 +30,7 @@ const AddPlaneForm = () => {
 
     try 
     {
-      
-      const navigate = useNavigate();
+    
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
       if (!csrfToken) 

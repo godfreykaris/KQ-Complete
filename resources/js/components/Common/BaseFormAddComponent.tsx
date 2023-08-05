@@ -30,6 +30,8 @@ import { useNavigate } from 'react-router-dom';
     const [responseMessage, setResponseMessage] = useState<string>('');
     const [responseStatus, setResponseStatus] = useState<number | null>(null);
   
+    const navigate = useNavigate();
+
     // Event handler for the entity selection dropdown
     const handleEntityChange = (event: React.ChangeEvent<HTMLSelectElement>) => 
     {
@@ -59,7 +61,6 @@ import { useNavigate } from 'react-router-dom';
         {
             try 
             {
-                const navigate = useNavigate();
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
               
                 if (!csrfToken) 

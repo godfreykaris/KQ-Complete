@@ -16,6 +16,8 @@ const EditPlaneForm: React.FC = () => {
   const [responseMessage, setResponseMessage] = useState<string>('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (planeId) {
       fetchData(planeId);
@@ -51,13 +53,11 @@ const EditPlaneForm: React.FC = () => {
     {
       try 
       {
-        const navigate = useNavigate();
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
   
         if (!csrfToken) 
         {
           console.error('CSRF token not found.');
-          setIsLoading(false);
   
           navigate('/signin');
           return;

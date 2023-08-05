@@ -56,6 +56,8 @@ const AddFlightForm = () => {
   const [responseMessage, setResponseMessage] = useState('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -115,6 +117,7 @@ const AddFlightForm = () => {
     const { name, checked } = e.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: checked }));
   };
+  
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -131,7 +134,6 @@ const AddFlightForm = () => {
         return;
       }
 
-      const navigate = useNavigate();
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
       if (!csrfToken) 
@@ -143,7 +145,7 @@ const AddFlightForm = () => {
         return;
       }
 
-      const accessToken = accessToken;
+      const accessToken = sessionStorage.getItem('access_token');
       if (!accessToken) {
         // Redirect to the sign-in page if the accessToken is not set
         navigate('/signin');

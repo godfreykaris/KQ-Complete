@@ -49,6 +49,8 @@ const EditSeatForm: React.FC = () => {
   const [responseMessage, setResponseMessage] = useState<string>('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     fetchData();
@@ -91,7 +93,6 @@ const EditSeatForm: React.FC = () => {
 
     try 
     {
-      const navigate = useNavigate();
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
       if (!csrfToken) 

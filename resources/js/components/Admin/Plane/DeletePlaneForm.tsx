@@ -22,6 +22,8 @@ const DeletePlaneForm: React.FC = () => {
   const [responseMessage, setResponseMessage] = useState<string>('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (planeID) {
       fetchData(planeID);
@@ -61,7 +63,7 @@ const DeletePlaneForm: React.FC = () => {
 
     try 
     {
-      const navigate = useNavigate();
+      
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
       if (!csrfToken) 

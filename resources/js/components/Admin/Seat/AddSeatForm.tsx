@@ -55,6 +55,8 @@ const AddSeatForm = () => {
   const [responseMessage, setResponseMessage] = useState<string>('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     fetchPlanes();
     fetchFlightClasses();
@@ -243,7 +245,6 @@ const AddSeatForm = () => {
     {
         setIsLoading(true); // Start loading data
 
-        const navigate = useNavigate();
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
         if (!csrfToken) 
@@ -255,7 +256,7 @@ const AddSeatForm = () => {
           return;
         }
 
-        const accessToken = accessToken;
+        const accessToken = sessionStorage.getItem('access_token');
         if (!accessToken) {
           // Redirect to the sign-in page if the accessToken is not set
           navigate('/signin');

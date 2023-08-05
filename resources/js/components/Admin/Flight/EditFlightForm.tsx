@@ -60,6 +60,9 @@ const EditFlightForm = () => {
   const [responseMessage, setResponseMessage] = useState('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
+  const navigate = useNavigate();
+
+
   useEffect(() => {
     fetchFlight();
     fetchData();
@@ -160,7 +163,6 @@ const EditFlightForm = () => {
         return;
       }
 
-      const navigate = useNavigate();
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
       if (!csrfToken) 
