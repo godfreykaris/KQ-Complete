@@ -20,6 +20,7 @@ const menuItems = [
     { label: 'Change Passenger', link: '/changepassenger' },
     { label: 'Delete Passenger', link: '/deletepassenger' },
   ]},
+  {label: 'Print Ticket', link:'/printticket'},
 ];
 
 function useDropdownState() {

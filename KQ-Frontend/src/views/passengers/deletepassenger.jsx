@@ -18,11 +18,11 @@ export default function DeletePassenger() {
     let newValue = value.replace(/\D/g, "");
 
     // Add the "KQ-" prefix and set the error message
-    if (newValue.length === 6) {
+    if (newValue.length <= 6) {
       newValue = `KQ-${newValue}`;
       setRefError("");
     } else {
-      setRefError("The input must be numbers");
+      setRefError("The input must be 6 digits or less");
     }
 
     setFormData((prevFormData) => ({
@@ -96,7 +96,7 @@ export default function DeletePassenger() {
               type="text"
               id="refNumber"
               name="refNumber"
-              maxLength="8"
+              maxLength="9"
               value={formData.refNumber}
               onChange={handleChange}
               required

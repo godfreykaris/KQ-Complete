@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { usePassengerContext } from '../../context/passengers/passengercontext';
 import { useSeatContext } from '../../context/seats/sendseatdata';
-import { Container, Row, Col, Form, Button, Alert, Spinner, Table } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Alert, Spinner, Table, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import MenuBar1 from '../../components/menubars/menubar1';
 import MenuBar2 from '../../components/menubars/menubar2';
 
@@ -149,6 +149,11 @@ export default function AddPassenger1() {
     };
   };
 
+
+  const renderTooltip = (message) => (
+    <Tooltip id='tooltip'>{message}</Tooltip>
+  )
+
   return (
     <div>
       <MenuBar1 />
@@ -219,9 +224,19 @@ export default function AddPassenger1() {
 
                 <hr />
 
-                <Button type="submit" variant="primary" disabled={Object.keys(seat).length === 0}>
-                  Add
-                </Button>
+                <OverlayTrigger
+                  placement='top'
+                  overlay={renderTooltip("Select a Seat before adding a passenger")}
+                >
+                  <span>
+                    <Button type="submit" variant="primary" disabled={Object.keys(seat).length === 0}>
+                      Add
+                    </Button>
+                  </span>
+                
+                </OverlayTrigger>
+
+                
               </Form>
             </Col>
           </Row>

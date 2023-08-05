@@ -20,11 +20,11 @@ export default function ChangePassenger() {
     let newValue = value.replace(/\D/g, "");
 
     // Add the "KQ-" prefix and set the error message
-    if (newValue.length === 6) {
+    if (newValue.length <= 6) {
       newValue = `KQ-${newValue}`;
       setRefError("");
     } else {
-      setRefError("The input must be numbers");
+      setRefError("The input must be 6 digits or less");
     }
 
     setFormData((prevFormData) => ({

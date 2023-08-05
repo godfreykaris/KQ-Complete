@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Row, Col, Carousel } from "react-bootstrap";
+import { Container, Row, Col, Carousel, Button } from "react-bootstrap";
 import Footer from "../../components/homeelements/footer";
 import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
@@ -11,7 +11,7 @@ import "react-bootstrap-carousel/dist/react-bootstrap-carousel.css";
 
 export default function Dashboard() {
   return (
-    <div style={{ backgroundColor: "-moz-initial" }}>
+    <div className="dashboard-fade-in" style={{ backgroundColor: "-moz-initial" }}>
       <MenuBar1 />
       <hr />
       <hr />
@@ -23,14 +23,19 @@ export default function Dashboard() {
       </p>
      <Container className="dashboard-body" fluid>
         <Row>
-          <Col md={8} className="mx-auto">
-            <Carousel fade interval={1000}>
+          <Col md={7} className="mx-auto">
+            <Carousel fade interval={2000}>
               <Carousel.Item>
                 <img
                   className="d-block w-100 image-container carousel-image"
                   src="/hostess.jpg"
                   alt="Dashboard Image 1"
                 />
+                <Carousel.Caption>
+                  <h3>Welcome to KQ Airlines</h3>
+                  <p>Enjoy a seamless travel experience with us.</p>
+                  <Button variant="primary">Book a Flight</Button>
+                </Carousel.Caption>
               </Carousel.Item>
               <Carousel.Item>
                 <img
@@ -52,7 +57,13 @@ export default function Dashboard() {
                   src="/KQ-1.png"
                   alt="Dashboard Image 3"
                 />
+                <Carousel.Caption>
+                  <h3>Relax in Comfort</h3>
+                  <p>Choose your preferred seat and travel in style.</p>
+                  <Button variant="primary">View Seat Options</Button>
+                </Carousel.Caption>
               </Carousel.Item>
+
               {/* Add more Carousel.Items with different images as needed */}
             </Carousel>
           </Col>

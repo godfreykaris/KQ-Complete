@@ -22,7 +22,7 @@
           "airline" : "Qatari Airways",
           "duration": "10:30:00",
           "depdate": {
-            "date": "12/07/2023",
+            "date": "13/07/2023",
             "time": "11:00:00"
           }, 
           "retdate": {
@@ -37,7 +37,7 @@
           "airline" : "Kenya Airways",
           "duration": "06:30:00",
           "depdate": {
-            "date": "14/07/2023",
+            "date": "13/07/2023",
             "time":  "11:00:00"
           },
           "retdate": {
