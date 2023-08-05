@@ -34,7 +34,11 @@ import CAFormEditComponent from './Cities&Airlines/CAFormEditComponent';
 import CAFormViewComponent from './Cities&Airlines/CAFormViewComponent';
 import CAFormDeleteComponent from './Cities&Airlines/CAFormDeleteComponent';
 
+import useLogout from '../Auth/useLogOut';
+
 const AdminComponent = () => {
+
+  const handleLogout = useLogout();
   
   return (
       <div>
@@ -113,6 +117,8 @@ const AdminComponent = () => {
                     </NavDropdown.Item>
                     {/* Add other menu items as needed */}
                   </NavDropdown>
+                  
+                  <Nav.Link onClick={handleLogout} className="menu-item-text">SignOut</Nav.Link>
                 </Nav>
               </Navbar.Collapse>
             </Navbar>

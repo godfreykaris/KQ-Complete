@@ -36,12 +36,11 @@ use App\Http\Controllers\AirlineController;
 */
 
 
-Route::post('/users/login', [AuthController::class, 'login'])->name('users.login');
-
-// Routes for UsersController
+Route::post('/users/login', [UsersController::class, 'login'])->name('users.login');
 Route::post('/users/register', [UsersController::class, 'register'])->name('user_register.store');
 
 Route::middleware('auth:api')->group(function () {
+    Route::post('/users/logout', [UsersController::class, 'logout'])->name('users.logout');
     Route::get('/users', [UsersController::class, 'listUsers'])->name('users.all');
     Route::get('/users/{userId}', [UsersController::class, 'getUser'])->name('users.show');
     Route::delete('/users/delete/{userId}', [UsersController::class, 'deleteUser'])->name('users.delete');

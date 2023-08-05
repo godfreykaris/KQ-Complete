@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {useNavigate} from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
 
 import apiBaseUrl from '../../config';
 import LoadingComponent from '../Common/LoadingComponent';
@@ -34,10 +34,10 @@ const SignInComponent = () => {
       {
         const data = await response.json();
         sessionStorage.setItem('access_token', data.user.token);
-
+        alert(JSON.stringify(data));
         setIsLoading(false);
         // Determine the role (admin or HRM) based on your backend's response
-        const userRole = data.role; // Replace 'role' with the actual key that holds the role
+        const userRole = data.user.role; // Replace 'role' with the actual key that holds the role
         if (userRole === 'admin') 
         {
           navigate('/admin'); // Redirect to admin frontend
@@ -48,22 +48,24 @@ const SignInComponent = () => {
         }
         else
         {
-            navigate('/admin'); // Redirect to admin frontend
+            navigate('/signin'); // Redirect to admin frontend
         }
-      } 
+      }
       else 
       {
         setIsLoading(false);
         setResponseStatus(0); // Error
         setResponseMessage(`Error: Incorrect Login Details.`);
         console.log('Authentication failed.');
+        // const responseData = await response.json();
+        // console.log('Validation Errors:', responseData);
       }
     } 
     catch (error) 
     {
       setIsLoading(false);
       setResponseStatus(0); // Error
-      setResponseMessage(`Error signing. Contact ICT.`);
+      setResponseMessage(`Error signing. Contact Support.`);
       console.log('Error signing in:', error);
     }
   };
@@ -129,6 +131,10 @@ const SignInComponent = () => {
                     <button type="submit" className="btn btn-primary">
                       Sign In
                     </button>
+                  </div>
+                  <div className="text-center mt-3">
+                    {/* Your sign-in form */}
+                    <Link to="/signup">Don't have an account? Sign Up</Link>
                   </div>
                 </form>
               )

@@ -8,35 +8,57 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 
 class UsersController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+    }
+
+    public function login(Request $request)
+    {
+
+        $credentials = $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
+
+
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+            $user['token'] = $user->createToken('Laravelia')->accessToken;
+            $user['role'] = Role::where('id', $user->role)->first()->name;
+            return response()->json(['user' => $user], 200);
+        }
+        return response()->json(['error' => 'Invalid credentials', 'status' => 0], 405);
+    }
+
+
     public function register(Request $request)
     {
         try 
             {
+
                 // Validate the registration form data
                 $userData = $request->validate([
                     'name' => 'required|string|max:255',
                     'email' => 'required|email|unique:users',
-                    //'password' => 'required|string|min:8|confirmed',
+                    'password' => 'required|string|min:8|confirmed',
                 ]);
             
-                // For testing only
-                $userData['password'] = "1234567890";
                 // Create the new user
                 $user = User::create([
-                    // 'name' => $userData['name'],
-                    // 'email' => $userData['email'],
-                    'password' => bcrypt($userData['password']),
-                
-                    /** For testing use only */
-                    'name' => fake()->name,
-                    'email' => fake()->unique()->safeEmail,
-                    //'password' => Hash::make(fake()->password(8)),
+                    'name' => $userData['name'],
+                    'email' => $userData['email'],
+                    'password' => $userData['password'],
+                    'role' => Role::where('name', 'normal')->first()->id,                
                 ]);
+
+                return response()->json(['success' => 'User registered successfully', 'status' => 1]);
 
             } 
             catch (\Exception $e) 
@@ -51,6 +73,11 @@ class UsersController extends Controller
         // Perform any additional actions after registration, e.g., sending verification email, logging in the user, etc.
 
         return response()->json(['user' => $user, 'status' => 1, 'value' => "Registration successful"]);
+    }
+    public function logout()
+    {
+        Auth::user()->tokens()->delete();
+        return response()->json(['success' => 'Successfully logged out', 'status' => 1 ]);
     }
 
     // Get a particular user

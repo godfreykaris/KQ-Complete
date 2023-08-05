@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'wallet',
         'reward_points',
+        'role',
     ];
 
     /**
