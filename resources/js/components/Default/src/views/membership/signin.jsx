@@ -54,17 +54,73 @@ export default function Signin() {
     } 
   };
   
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${apiBaseUrl}/users/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
 
-    // Form submission logic
-    console.log(formData);
+      if (response.ok) 
+      {
+        const data = await response.json();
+        sessionStorage.setItem('access_token', data.user.token);
+  
+        setIsLoading(false);
+        // Determine the role (admin or HRM) based on your backend's response
+        const userRole = data.user.role; // Replace 'role' with the actual key that holds the role
+        if (userRole === 'admin') 
+        {
+          navigate('/admin'); // Redirect to admin frontend
+        } 
+        else if (userRole === 'hrm') 
+        {
+          navigate('/hrm'); // Redirect to HRM frontend
+        }
+        else
+        {
+          navigate('/signin'); // Redirect to admin frontend
+        }
+      }
+      else 
+      {
+        setIsLoading(false);
+        setResponseStatus(0); // Error
+        setResponseMessage(`Error: Incorrect Login Details.`);
+        console.log('Authentication failed.');
+        // const responseData = await response.json();
+        // console.log('Validation Errors:', responseData);
+      }
+    } 
+    catch (error) 
+    {
+      setIsLoading(false);
+      setResponseStatus(0); // Error
+      setResponseMessage(`Error signing. Contact Support.`);
+      console.log('Error signing in:', error);
+    }
+  };
 
-    // Reset form after submission
-    setFormData({
-      email: '',
-      password: '',
-    });
+  const getResponseClass = () => {
+    if (responseStatus === 1) 
+    {
+      return 'text-success'; // Green color for success
+    } 
+    else if (responseStatus === 0) 
+    {
+      return 'text-danger'; // Red color for error
+    } 
+    else 
+    {
+      return ''; // No specific styles (default)
+    }
   };
 
   return (
@@ -82,7 +138,7 @@ export default function Signin() {
           <h2>Login</h2>
         </div>
         <Col md={6} className="mx-auto">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSignIn}>
           <div className="form-group">
             <Form.Label>Email:</Form.Label>
             <Form.Control
