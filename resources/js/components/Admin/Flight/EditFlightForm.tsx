@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import apiBaseUrl from '../../../config';
 
 import LoadingComponent from '../../../components/Common/LoadingComponent';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 type Plane = {
     id: number;
@@ -59,6 +59,9 @@ const EditFlightForm = () => {
 
   const [responseMessage, setResponseMessage] = useState('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
+
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     fetchFlight();
@@ -166,6 +169,15 @@ const EditFlightForm = () => {
       {
         console.error('CSRF token not found.');
         setIsLoading(false);
+
+        navigate('/signin');
+        return;
+      }
+
+      const accessToken = sessionStorage.getItem('access_token');
+      if (!accessToken) {
+        // Redirect to the sign-in page if the accessToken is not set
+        navigate('/signin');
         return;
       }
 
@@ -174,6 +186,8 @@ const EditFlightForm = () => {
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': csrfToken,
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify(formData),
       });

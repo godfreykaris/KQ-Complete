@@ -3,6 +3,9 @@ import apiBaseUrl from '../../../config';
 
 import LoadingComponent from '../../../components/Common/LoadingComponent';
 
+import { useNavigate } from 'react-router-dom';
+
+
 interface Skill {
   id: number;
   name: string;
@@ -41,6 +44,8 @@ const AddEmployeeForm: React.FC = () => {
 
   const [responseMessage, setResponseMessage] = useState('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchData();
@@ -103,12 +108,23 @@ const AddEmployeeForm: React.FC = () => {
 
     setIsLoading(true);
 
-    try {
+    try 
+    {
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-      if (!csrfToken) {
+      if (!csrfToken) 
+      {
         console.error('CSRF token not found.');
         setIsLoading(false);
+
+        navigate('/signin');
+        return;
+      }
+
+      const accessToken = sessionStorage.getItem('access_token');
+      if (!accessToken) {
+        // Redirect to the sign-in page if the accessToken is not set
+        navigate('/signin');
         return;
       }
 
@@ -117,6 +133,8 @@ const AddEmployeeForm: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': csrfToken,
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify(formData),
       });

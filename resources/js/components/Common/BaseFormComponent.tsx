@@ -79,15 +79,15 @@ const BaseFormComponent: React.FC<Props> = ({ dataCategory, formType, entityType
 
       if (item.country) 
       {
-        link = `/${dataCategory.toLowerCase()}/city/${formType.toLowerCase()}/${selectedEntity}/${item.id}/${item.name}/${item.country}`;
+        link = `/admin/${dataCategory.toLowerCase()}/city/${formType.toLowerCase()}/${selectedEntity}/${item.id}/${item.name}/${item.country}`;
       }
       else if (item.code) 
       {
-        link = `/${dataCategory.toLowerCase()}/airline/${formType.toLowerCase()}/${selectedEntity}/${item.id}/${item.name}/${item.code}`;
+        link = `/admin/${dataCategory.toLowerCase()}/airline/${formType.toLowerCase()}/${selectedEntity}/${item.id}/${item.name}/${item.code}`;
       }
       else
       {
-        link = `/${dataCategory.toLowerCase()}/${formType.toLowerCase()}/${selectedEntity}/${item.id}/${item.name}`;
+        link = `/admin/${dataCategory.toLowerCase()}/${formType.toLowerCase()}/${selectedEntity}/${item.id}/${item.name}`;
       }
     
       return link;

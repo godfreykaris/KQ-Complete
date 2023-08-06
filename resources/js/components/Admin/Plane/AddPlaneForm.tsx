@@ -1,6 +1,9 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import apiBaseUrl from '../../../config';
 
+import { useNavigate } from 'react-router-dom';
+
+
 const AddPlaneForm = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -12,6 +15,7 @@ const AddPlaneForm = () => {
   const [responseMessage, setResponseMessage] = useState<string>('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
+  const navigate = useNavigate();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -24,11 +28,23 @@ const AddPlaneForm = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    try {
+    try 
+    {
+    
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-      if (!csrfToken) {
+      if (!csrfToken) 
+      {
         console.error('CSRF token not found.');
+
+        navigate('/signin');
+        return;
+      }
+
+      const accessToken = sessionStorage.getItem('access_token');
+      if (!accessToken) {
+        // Redirect to the sign-in page if the accessToken is not set
+        navigate('/signin');
         return;
       }
 
@@ -37,6 +53,8 @@ const AddPlaneForm = () => {
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': csrfToken,
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify(formData),
       });

@@ -1,19 +1,18 @@
 import React, { useContext } from 'react';
-import { Navigate, Route } from 'react-router-dom';
+import { Navigate, Route, PathRouteProps } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 
-interface ProtectedRouteProps {
-  path: string;
+interface ProtectedRouteProps extends PathRouteProps {
   element: React.ReactElement;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ path, element }) => {
-  const { authenticated } = useContext(AuthContext);
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element, ...rest }) => {
+  const accessToken = sessionStorage.getItem('access_token');
 
-  return authenticated ? (
-    <Route path={path} element={element} />
+  return accessToken ? (
+    element
   ) : (
-    <Navigate to="/login" replace={true} />
+    <Navigate to="/signin" replace={true} />
   );
 };
 
