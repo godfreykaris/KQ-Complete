@@ -132,7 +132,7 @@ const ViewEmployees: React.FC = () => {
                                   <td>{index + 1}</td>
                                   <td>
                                     <Link
-                                      to={`/manage_employees/edit/${item.employee_id}`} // Replace "edit-employee" with the actual URL for the EditEmployeeComponent
+                                      to={`/hrm/manage_employees/edit/${item.employee_id}`} // Replace "edit-employee" with the actual URL for the EditEmployeeComponent
                                       className="btn btn-primary"
                                     >
                                       Edit
@@ -140,7 +140,7 @@ const ViewEmployees: React.FC = () => {
                                   </td>
                                   <td>
                                     <Link
-                                      to={`/manage_employees/delete/employees/${item.employee_id}`} // Replace "delete-employee" with the actual URL for the DeleteEmployeeComponent
+                                      to={`/hrm/manage_employees/delete/employees/${item.employee_id}`} // Replace "delete-employee" with the actual URL for the DeleteEmployeeComponent
                                       className="btn btn-danger"
                                     >
                                       Delete

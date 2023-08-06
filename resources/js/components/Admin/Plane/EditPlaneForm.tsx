@@ -16,6 +16,8 @@ const EditPlaneForm: React.FC = () => {
   const [responseMessage, setResponseMessage] = useState<string>('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (planeId) {
       fetchData(planeId);
@@ -51,13 +53,22 @@ const EditPlaneForm: React.FC = () => {
     {
       try 
       {
-         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-         if (!csrfToken) 
-         {
-           console.error('CSRF token not found.');
-           return;
-         }
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+  
+        if (!csrfToken) 
+        {
+          console.error('CSRF token not found.');
+  
+          navigate('/signin');
+          return;
+        }
+  
+        const accessToken = sessionStorage.getItem('access_token');
+        if (!accessToken) {
+          // Redirect to the sign-in page if the accessToken is not set
+          navigate('/signin');
+          return;
+        }
 
          const requestData = {
             id: itemId,
@@ -67,12 +78,13 @@ const EditPlaneForm: React.FC = () => {
             capacity: planeCapacity
             
           };
-
          const response = await fetch(`${apiBaseUrl}/planes/change/${planeId}`, {
            method: 'PUT',
            headers: {
              'Content-Type': 'application/json',
              'X-CSRF-TOKEN': csrfToken,
+             'Accept': 'application/json',
+             'Authorization': `Bearer ${accessToken}`,
            },
            body: JSON.stringify(requestData),
          });

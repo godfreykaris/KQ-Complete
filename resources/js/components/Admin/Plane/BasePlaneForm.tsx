@@ -92,7 +92,7 @@ const BasePlaneForm: React.FC<Props> = ({ formType}) => {
                             //{/* Link to the EditFormComponent or DeleteFormComponent */}
                             <td>
                               <Link
-                                to={`/planes/${formType.toLowerCase()}/${item.id}/${item.plane_id}/${item.model}/${item.name}`}
+                                to={`/admin/planes/${formType.toLowerCase()}/${item.id}/${item.plane_id}/${item.model}/${item.name}`}
                                 className="btn btn-primary"
                               >
                                 {`${formType}`}

@@ -2,6 +2,8 @@ import React, { useState, ChangeEvent, FormEvent, useEffect, useMemo, useCallbac
 import apiBaseUrl from '../../../config';
 import LoadingComponent from '../../../components/Common/LoadingComponent';
 
+import { useNavigate } from 'react-router-dom';
+
 type Plane = {
     id: number;
     name: string;
@@ -52,6 +54,8 @@ const AddSeatForm = () => {
 
   const [responseMessage, setResponseMessage] = useState<string>('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchPlanes();
@@ -245,8 +249,18 @@ const AddSeatForm = () => {
 
         if (!csrfToken) 
         {
-            console.error('CSRF token not found.');
-            return;
+          console.error('CSRF token not found.');
+          setIsLoading(false);
+
+          navigate('/signin');
+          return;
+        }
+
+        const accessToken = sessionStorage.getItem('access_token');
+        if (!accessToken) {
+          // Redirect to the sign-in page if the accessToken is not set
+          navigate('/signin');
+          return;
         }
 
         // Create an array of seat objects to be submitted
@@ -268,6 +282,8 @@ const AddSeatForm = () => {
           headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': csrfToken,
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
           },
           body: JSON.stringify(seatsData),
         });

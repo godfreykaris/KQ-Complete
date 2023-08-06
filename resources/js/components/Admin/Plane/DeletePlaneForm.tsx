@@ -22,6 +22,8 @@ const DeletePlaneForm: React.FC = () => {
   const [responseMessage, setResponseMessage] = useState<string>('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (planeID) {
       fetchData(planeID);
@@ -61,18 +63,32 @@ const DeletePlaneForm: React.FC = () => {
 
     try 
     {
+      
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-      if (!csrfToken) {
+      if (!csrfToken) 
+      {
         console.error('CSRF token not found.');
+        setIsLoading(false);
+
+        navigate('/signin');
         return;
       }
 
+      const accessToken = sessionStorage.getItem('access_token');
+      if (!accessToken) {
+        // Redirect to the sign-in page if the accessToken is not set
+        navigate('/signin');
+        return;
+      }
+      
       const response = await fetch(`${apiBaseUrl}/planes/delete/${planeID}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': csrfToken,
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
         },
       });
 

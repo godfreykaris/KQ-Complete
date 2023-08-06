@@ -1,5 +1,5 @@
 import React from 'react';
-import BaseFormAddComponent from '../Common/BaseFormAddComponent';
+import BaseFormAddComponent from '../../Common/BaseFormAddComponent';
 
 const BaseFormAddOtherComponent: React.FC = () => {
 
