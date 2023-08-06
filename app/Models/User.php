@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'wallet',
         'reward_points',
+        'role',
     ];
 
     /**
@@ -48,5 +49,10 @@ class User extends Authenticatable
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
     }
 }
