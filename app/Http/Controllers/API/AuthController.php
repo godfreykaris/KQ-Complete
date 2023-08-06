@@ -18,7 +18,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-
+        
         $credentials = $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
@@ -26,13 +26,9 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
             $user['token'] = $user->createToken('Laravelia')->accessToken;
-            return response()->json([
-                'user' => $user
-            ], 200);
+            return response()->json(['user' => $user ], 200);
         }
-        return response()->json([
-            'message' => 'Invalid credentials'
-        ], 405);
+        return response()->json(['error' => 'Invalid credentials', 'status' => 0], 405);
     }
 
     public function register(Request $request)

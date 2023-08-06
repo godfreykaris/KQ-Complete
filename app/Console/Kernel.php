@@ -16,6 +16,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
+        // Add the passport:purge command for token cleanup
+        $schedule->command('passport:purge')->hourly();
+
         // $schedule->command('inspire')->hourly();
         $schedule->call(function () 
         {
@@ -33,6 +36,8 @@ class Kernel extends ConsoleKernel
                 ->delete();
                 
         })->dailyAt('23:59'); // Schedule the task to run daily at 23:59 (end of the day)
+
+        
     }
 
     /**
