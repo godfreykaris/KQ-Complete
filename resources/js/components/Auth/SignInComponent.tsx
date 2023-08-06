@@ -1,20 +1,68 @@
 import React, { useState } from 'react';
 import {Link, useNavigate} from "react-router-dom"
+import { Col, Container, Alert, Form, Button } from 'react-bootstrap';
+
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import { PersonFill } from 'react-bootstrap-icons';
 
 import apiBaseUrl from '../../config';
 import LoadingComponent from '../Common/LoadingComponent';
 
+import '../../../css/signup.css'
+
 const SignInComponent = () => {
+
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
 
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
   const [responseMessage, setResponseMessage] = useState<string>('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
+
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+    //to track password visibility
+    const [passwordVisibility, setPasswordVisibility] = useState(false);
+
+    const togglePasswordVisibility = () => {
+      setPasswordVisibility((prevState) => !prevState);
+    }
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = event.target;
+    
+      if (name === "email") {
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          email: value,
+        }));
+        if (emailRegex.test(value)) {
+          setEmailError("");
+        } else {
+          setEmailError("Invalid email format");
+        }
+      } else if (name === "password") {
+        // Password validation
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          password: value,
+        }));
+        if (value.length < 8) {
+          setPasswordError("Password must be at least 8 characters");
+        } else {
+          setPasswordError("");
+        }
+      }
+    };
+    
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -27,14 +75,14 @@ const SignInComponent = () => {
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
           'Accept': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(formData),
       })
 
       if (response.ok) 
       {
         const data = await response.json();
         sessionStorage.setItem('access_token', data.user.token);
-        alert(JSON.stringify(data));
+  
         setIsLoading(false);
         // Determine the role (admin or HRM) based on your backend's response
         const userRole = data.user.role; // Replace 'role' with the actual key that holds the role
@@ -48,7 +96,7 @@ const SignInComponent = () => {
         }
         else
         {
-            navigate('/signin'); // Redirect to admin frontend
+          navigate('/signin'); // Redirect to admin frontend
         }
       }
       else 
@@ -85,67 +133,76 @@ const SignInComponent = () => {
     }
   };
 
+  
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6 col-lg-4">
-          <div className="card">
-            <div className="card-header">
-              <h2 className="text-center">Sign In</h2>
-            </div>
-            <div className="card-body">
-              <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
-
-              { isLoading ? (
-                  <LoadingComponent/>
-              ):
-              (
-                <form onSubmit={handleSignIn}>
-                  <div className="mb-3">
-                    <label htmlFor="email" className="form-label">
-                      Email:
-                    </label>
-                    <input
-                      type="text"
-                      id="email"
-                      className="form-control"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="password" className="form-label">
-                      Password:
-                    </label>
-                    <input
-                      type="password"
-                      id="password"
-                      className="form-control"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="text-center mt-3">
-                    <button type="submit" className="btn btn-primary">
-                      Sign In
-                    </button>
-                  </div>
-                  <div className="text-center mt-3">
-                    {/* Your sign-in form */}
-                    <Link to="/signup">Don't have an account? Sign Up</Link>
-                  </div>
-                </form>
-              )
-              }
-              
-            </div>
+    <div className="d-flex justify-content-center align-items-center container-md" style={{ height: '100vh' }}>
+      {isLoading ? (
+        <LoadingComponent />
+      ) : (
+        <Container>
+          <div className="text-center mb-4">
+            <h1>
+              <PersonFill size={48} className="text-primary" />
+            </h1>
+            <h2>Login</h2>
           </div>
-        </div>
-      </div>
+          <Col md={6} className="mx-auto">
+            <form onSubmit={handleSignIn}>
+              <div className="form-group">
+                <Form.Label>Email:</Form.Label>
+                <Form.Control
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              {emailError && <Alert variant="danger">{emailError}</Alert>}
+              </div>
+
+              <div className="form-group password-input-container">
+                <Form.Label>Password:</Form.Label>
+                <Form.Control
+                  type={passwordVisibility ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  minLength={8}
+                  required
+                />
+
+                <span
+                  className="password-toggle-icon"
+                  onClick={togglePasswordVisibility}
+                  style={{cursor: "pointer"}}>
+                  <i className={passwordVisibility ? "fas fa-eye" : "fas fa-eye-slash"}></i>
+                </span>            
+
+                {passwordError && <Alert variant="danger">{passwordError}</Alert>}
+              </div>
+
+              <hr/>
+          
+              <div className='d-flex justify-content-center'>
+                <Button type="submit" variant="primary">
+                  Login
+                </Button>
+              </div>
+
+            </form>
+
+            <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+
+            <div className="text-center mt-3">
+              <Link to="/signup">Don't have an account? Sign Up</Link>
+            </div>
+          </Col>
+        </Container>
+      )}
     </div>
   );
-};
+}
 
 export default SignInComponent;
