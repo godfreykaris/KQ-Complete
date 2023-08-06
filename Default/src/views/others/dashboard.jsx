@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Container, Row, Col, Carousel, Button } from "react-bootstrap";
 import Footer from "../../components/homeelements/footer";
 import MenuBar1 from "../../components/menubars/menubar1";
@@ -24,7 +25,7 @@ export default function Dashboard() {
      <Container className="dashboard-body" fluid>
         <Row>
           <Col md={7} className="mx-auto">
-            <Carousel fade interval={2000}>
+            <Carousel fade interval={3000}>
               <Carousel.Item>
                 <img
                   className="d-block w-100 image-container carousel-image"
@@ -34,7 +35,9 @@ export default function Dashboard() {
                 <Carousel.Caption>
                   <h3>Welcome to KQ Airlines</h3>
                   <p>Enjoy a seamless travel experience with us.</p>
-                  <Button variant="primary">Book a Flight</Button>
+                  <Link to="/bookflight">
+                    <Button variant="primary" >Book a Flight</Button>
+                  </Link>                  
                 </Carousel.Caption>
               </Carousel.Item>
               <Carousel.Item>
@@ -60,7 +63,9 @@ export default function Dashboard() {
                 <Carousel.Caption>
                   <h3>Relax in Comfort</h3>
                   <p>Choose your preferred seat and travel in style.</p>
-                  <Button variant="primary">View Seat Options</Button>
+                  <Link to="/searchflight">
+                    <Button variant="primary">View Seat Options</Button>
+                  </Link>                  
                 </Carousel.Caption>
               </Carousel.Item>
 

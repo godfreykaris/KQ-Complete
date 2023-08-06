@@ -1,5 +1,5 @@
 import React from 'react';
-import BaseFormComponent from '../Common/BaseFormComponent';
+import BaseFormComponent from '../../Common/BaseFormComponent';
 
 const BaseFormDeleteComponent: React.FC = () => {
 
