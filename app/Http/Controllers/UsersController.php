@@ -46,9 +46,16 @@ class UsersController extends Controller
                 // Validate the registration form data
                 $userData = $request->validate([
                     'name' => 'required|string|max:255',
-                    'email' => 'required|email|unique:users',
+                    'email' => 'required|email',
                     'password' => 'required|string|min:8|confirmed',
                 ]);
+
+                // Make sure the user does not exist
+                $existingUser = User::where('email', $userData['email'])->first();
+                if($existingUser)
+                {
+                    return response()->json(['error' => 'The email is taken. Use another.', 'status' => 0]);
+                }
             
                 // Create the new user
                 $user = User::create([
