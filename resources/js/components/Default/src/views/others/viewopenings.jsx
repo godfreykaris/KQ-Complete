@@ -1,12 +1,12 @@
 import React, { useState } from "react"
 import { Alert, Button, Col, Container, Row, Table, Spinner } from "react-bootstrap"
-import MenuBar1 from "../../components/menubars/menubar1"
-import MenuBar2 from "../../components/menubars/menubar2"
+import MenuBar1 from "../../components/menubars/menubar1.jsx"
+import MenuBar2 from "../../components/menubars/menubar2.jsx"
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
-import Skills from "./viewskills";
-import Qualifications from "./viewqualifications";
+import Skills from "./viewskills.jsx";
+import Qualifications from "./viewqualifications.jsx";
 
 
 export default function ViewOpenings() {

@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
+import { Form, Button, Alert, Col } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
+
 import LoadingComponent from '../Common/LoadingComponent';
 import apiBaseUrl from '../../config';
 import { useNavigate } from 'react-router-dom';
+
+type PasswordField = "password" | "password_confirmation";
 
 
 const SignUpComponent = () => {
@@ -13,19 +19,90 @@ const SignUpComponent = () => {
   const [responseMessage, setResponseMessage] = useState<string>('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
+  const [emailError, setEmailError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmError, setConfirmError] = useState("");
+
   const [formData, setFormData] = useState({
     name: '',
+    countryCode: "",
+    phone: '',
     email: '',
     password: '',
     password_confirmation: '',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  //to track password visibility
+  const [passwordVisibility, setPasswordVisibility] = useState(false);
+  const [confirmPasswordVisibility, setConfirmPasswordVisibility] = useState(false);
+
+
+  const togglePasswordVisibility = (field: PasswordField) => {
+    if(field === "password"){
+      setPasswordVisibility((prevState) => !prevState);
+    }else if(field === "password_confirmation"){
+      setConfirmPasswordVisibility((prevState) => !prevState);
+    }
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+
+    if (name === "phone") {
+      // Phone number validation
+      const numericValue = value.replace(/\D/g, ""); // Remove non-numeric characters
+      if(/^\d+$/.test(numericValue) || numericValue === ""){
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          [name]: numericValue,
+        }));
+        setPhoneError("");
+      }else{
+        setPhoneError("The input must be numbers");
+      }
+      
+    } else if (name === "email") {
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+      if (emailRegex.test(value)) {
+        setEmailError("");
+      } else {
+        setEmailError("Invalid email format");
+      }
+    } else if (name === "password") {
+      // Password validation
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+      if (value.length < 8) {
+        setPasswordError("Password must be at least 8 characters");
+      } else {
+        setPasswordError("");
+      }
+    } else if (name === "password_confirmation") {
+      // Confirm password validation
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+      if (value !== formData.password) {
+        setConfirmError("Passwords do not match");
+      } else {
+        setConfirmError("");
+      }
+    } else {
+      // Other form fields
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -56,6 +133,7 @@ const SignUpComponent = () => {
         },
         body: JSON.stringify({
           name: formData.name,
+          phone: formData.phone,
           email: formData.email,
           password: formData.password,
           password_confirmation: formData.password_confirmation,
@@ -112,94 +190,142 @@ const SignUpComponent = () => {
     }
   };
 
-  return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6 col-lg-4">
-          <div className="card">
-            <div className="card-header">
-              <h2 className="text-center">Sign Up</h2>
-            </div>
-            <div className="card-body">
-              <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+  return (   
 
-              { isLoading ? (
-                  <LoadingComponent/>
-              ):
-              (
-                <form onSubmit={handleSubmit}>
-                  <div className="mb-3">
-                    <label htmlFor="name" className="form-label">
-                      Name:
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name='name'
-                      className="form-control"
-                      value={formData.name}
-                      onChange={handleChange}
-                      maxLength={255}
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="email" className="form-label">
-                      Email:
-                    </label>
-                    <input
-                      type="text"
-                      id="email"
-                      name='email'
-                      className="form-control"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="password" className="form-label">
-                      Password:
-                    </label>
-                    <input
-                      type="password"
-                      id="password"
-                      name='password'
-                      className="form-control"
-                      value={formData.password}
-                      onChange={handleChange}
-                      minLength={8}
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="password_confirmation" className="form-label">
-                      Confirm Password:
-                    </label>
-                    <input
-                      type="password"
-                      id="password_confirmation"
-                      name="password_confirmation"
-                      className="form-control"
-                      value={formData.password_confirmation}
-                      onChange={handleChange}
-                      minLength={8}
-                      required
-                    />
-                  </div>
-                  <div className="text-center mt-3">
-                    <button type="submit" className="btn btn-primary">
-                      Sign Up
-                    </button>
-                  </div>
-                </form>
-              )
-              }
-              
-            </div>
-          </div>
+  <div className="d-flex justify-content-center align-items-center container-md" style={{ height: "100vh" }}>
+      
+    { isLoading ? (
+      <LoadingComponent/>
+      ):(     
+      <div className="container-fluid">
+      <div className="text-center text-primary mt-5">
+          <FontAwesomeIcon icon={faUserPlus} size="4x" className="mb-3" />
+          <h1>Sign Up</h1>
         </div>
+        <Col md={6} className="mx-auto">
+        <Form onSubmit={handleSubmit}>
+          <Form.Group>
+            <Form.Label>Name:</Form.Label>
+            <Form.Control
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group>
+            <Form.Label>Phone:</Form.Label>
+            <div className="input-group">
+              <div className="input-group-prepend">
+                <Form.Control
+                  as="select"
+                  id="countryCode"
+                  name="countryCode"
+                  value={formData.countryCode}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="+254">KE (+254)</option>
+                  <option value="+255">TZ (+255)</option>
+                  <option value="+1">USA (+1)</option>
+                </Form.Control>
+              </div>
+              <Form.Control
+                type="tel"
+                id="phone"
+                name="phone"
+                maxLength={9}
+                value={formData.phone}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            {phoneError && <p className="text-danger">{phoneError}</p>}
+          </Form.Group>
+
+          <Form.Group>
+            <Form.Label>Email:</Form.Label>
+            <Form.Control
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+            {emailError && <p className="text-danger">{emailError}</p>}
+          </Form.Group>
+
+          <Form.Group className="password-input-container">
+            <Form.Label>Password:</Form.Label>
+            <Form.Control
+              type={passwordVisibility ? "text" : "password"}
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              minLength={8}
+              required
+            />
+
+            <span
+              className="password-toggle-icon"
+              onClick={() => togglePasswordVisibility("password")}
+              style={{ cursor: "pointer" }}
+            >
+              <i className={passwordVisibility ? "fas fa-eye" : "fas fa-eye-slash"}></i>
+            </span>
+
+            {passwordError && <Alert variant="danger">{passwordError}</Alert>}
+          </Form.Group>
+
+          <Form.Group className="password-input-container">
+            <Form.Label>Confirm Password:</Form.Label>
+            <Form.Control
+              type={confirmPasswordVisibility ? "text" : "password"}
+              id="password_confirmation"
+              name="password_confirmation"
+              value={formData.password_confirmation}
+              onChange={handleChange}
+              minLength={8}
+              required
+            />
+
+            <span
+              className="password-toggle-icon"
+              onClick={() => togglePasswordVisibility("password_confirmation")}
+              style={{ cursor: "pointer" }}
+            >
+              <i className={confirmPasswordVisibility ? "fas fa-eye" : "fas fa-eye-slash"}></i>
+            </span>
+
+            {confirmError && <Alert variant="danger">{confirmError}</Alert>}
+          </Form.Group>
+          <br/>
+          
+          <div className='d-flex justify-content-center'>
+            <Button type="submit" variant="primary">
+              Submit
+            </Button>
+          </div>
+
+          <br />
+
+          <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+
+          <p className="text-center">
+            <a href="/signin" style={{ textDecoration: "none" }}>
+              Already a Member?
+            </a>
+          </p>
+        </Form>
+        </Col>
       </div>
+      )}
+
     </div>
   );
 };

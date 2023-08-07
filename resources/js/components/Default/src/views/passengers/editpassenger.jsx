@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-import SeatMap from "../seats/seatmap";
+import SeatMap from "../seats/seatmap.jsx";
 
 export default function EditPassenger({ showEditModal, handleResubmission, passengerDataObject, handleClose }) {
   

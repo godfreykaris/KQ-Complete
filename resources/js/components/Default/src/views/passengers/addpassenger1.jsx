@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { usePassengerContext } from '../../context/passengers/passengercontext';
-import { useSeatContext } from '../../context/seats/sendseatdata';
+import { usePassengerContext } from '../../context/passengers/passengercontext.jsx';
+import { useSeatContext } from '../../context/seats/sendseatdata.jsx';
 import { Container, Row, Col, Form, Button, Alert, Spinner, Table, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import MenuBar1 from '../../components/menubars/menubar1';
-import MenuBar2 from '../../components/menubars/menubar2';
+import MenuBar1 from '../../components/menubars/menubar1.jsx';
+import MenuBar2 from '../../components/menubars/menubar2.jsx';
 
 export default function AddPassenger1() {
   const location = useLocation();

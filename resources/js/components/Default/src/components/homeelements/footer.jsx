@@ -1,7 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faInstagram, faTwitter, faSnapchat } from '@fortawesome/free-brands-svg-icons';
-import "/src/views/others/dashboard-image.css";
+//import "/resources/components/js/Default/src/views/others/dashboard-image.css";
 import { Container, Row, Col } from 'react-bootstrap';
 
 export default function Footer() {

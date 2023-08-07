@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Container, Form, Button, Row, Col } from "react-bootstrap";
-import MenuBar1 from "../../components/menubars/menubar1";
+import MenuBar1 from "../../components/menubars/menubar1.jsx";
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import MenuBar2 from "../../components/menubars/menubar2";
+import MenuBar2 from "../../components/menubars/menubar2.jsx";
 
 export default function AddBookingInquiry() {
   const [formData, setFormData] = useState({

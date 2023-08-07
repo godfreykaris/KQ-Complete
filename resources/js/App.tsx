@@ -7,17 +7,30 @@ import SignUpComponent from './components/Auth/SignUpComponent';
 import SignInComponent from '././components/Auth/SignInComponent'; // Your login component
 import { AuthProvider } from '././context/AuthContext';
 import HRMComponent from './components/HR/HRMComponent';
+import router from "./components/Default/src/router.jsx";
+
+
 
 import Data from './Data';
 
 
 const App = () => {
+  //alert(JSON.stringify(router[0].children))
+
+  
   return (
     <AuthProvider>
-      <Router>
+      <Router>        
         <Routes>
-          {/*<Route path="/" element={<Data />} />*/}
-          <Route path="/" element={<SignInComponent />} />
+          {/*<Route path="/" element={<Data />} />*/} 
+          {router.map((route: any, index: number) =>(
+            <Route
+              key={index}
+              path={route.path}
+              element={route.element}
+            />
+          ))} 
+                  
           <Route path="/signin" element={<SignInComponent />} />
           <Route path="/signup" element={<SignUpComponent />} />
           <Route path="/admin/*" element={<ProtectedRoute element={<AdminComponent />} />} />
