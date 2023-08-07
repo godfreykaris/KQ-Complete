@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import apiBaseUrl from '../../../config';
 import LoadingComponent from '../../../components/Common/LoadingComponent';
 
+import { useNavigate } from 'react-router-dom';
+
 
 type Opening = {
     id: number;
@@ -12,6 +14,9 @@ type Opening = {
 
   
 const MatchEmployeesToOpenings = () => {
+
+  const navigate = useNavigate();
+
   const [openings, setOpenings] = useState<Opening[]>([]);
   const [selectedOpeningId, setSelectedOpeningId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,17 +44,33 @@ const MatchEmployeesToOpenings = () => {
   };
 
   const getMatchingEmployeesPDF = async () => {
-    try {
-      if (selectedOpeningId) {
+    try 
+    {
+      const accessToken = sessionStorage.getItem('access_token');
+      if (!accessToken) {
+        // Redirect to the sign-in page if the accessToken is not set
+        navigate('/signin');
+        return;
+      }
+
+      if (selectedOpeningId) 
+      {
         const response = await fetch(`${apiBaseUrl}/openings/match_employees/${selectedOpeningId}`, {
           method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
         });
 
-        if (response.ok) {
+        if (response.ok) 
+        {
           const pdfBlob = await response.blob();
           const pdfUrl = URL.createObjectURL(pdfBlob);
           setPdfUrl(pdfUrl);
-        } else {
+        } 
+        else 
+        {
           console.error('Error getting matching employees PDF:', response);
         }
       }

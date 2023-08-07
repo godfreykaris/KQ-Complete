@@ -116,7 +116,7 @@ const ViewOpenings: React.FC = () => {
                                   <td>{index + 1}</td>
                                   <td>
                                     <Link
-                                      to={`/manage_openings/edit/${item.id}`} // Replace "edit-opening" with the actual URL for the EditOpeningComponent
+                                      to={`/hrm/manage_openings/edit/${item.id}`} // Replace "edit-opening" with the actual URL for the EditOpeningComponent
                                       className="btn btn-primary"
                                     >
                                       Edit
@@ -124,7 +124,7 @@ const ViewOpenings: React.FC = () => {
                                   </td>
                                   <td>
                                     <Link
-                                      to={`/manage_openings/delete/openings/${item.id}`} // Replace "delete-opening" with the actual URL for the DeleteOpeningComponent
+                                      to={`/hrm/manage_openings/delete/openings/${item.id}`} // Replace "delete-opening" with the actual URL for the DeleteOpeningComponent
                                       className="btn btn-danger"
                                     >
                                       Delete

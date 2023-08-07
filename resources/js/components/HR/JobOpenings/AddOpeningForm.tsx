@@ -43,7 +43,8 @@ const AddOpeningForm: React.FC = () => {
   const fetchData = async () => {
     setIsLoading(true);
 
-    try {
+    try 
+    {
       const [
         skillsResponse,
         qualificationsResponse,
@@ -64,7 +65,9 @@ const AddOpeningForm: React.FC = () => {
       setQualifications(qualificationsData.items.sort(sortByNameAscending));
 
       setIsLoading(false);
-    } catch (error: any) {
+    } 
+    catch (error: any) 
+    {
       setIsLoading(false);
       setResponseStatus(0); // Error
       setResponseMessage(`Error fetching data: ${error.message}`);
@@ -76,13 +79,16 @@ const AddOpeningForm: React.FC = () => {
     const { name, value, type } = e.target;
   
     // Handle multiple selections for skills and qualifications
-    if (type === 'select-multiple') {
+    if (type === 'select-multiple') 
+    {
       const selectedOptions = Array.from((e.target as HTMLSelectElement).options)
         .filter((option) => option.selected)
         .map((option) => option.value);
   
       setFormData((prevFormData) => ({ ...prevFormData, [name]: selectedOptions }));
-    } else {
+    } 
+    else 
+    {
       setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     }
   };

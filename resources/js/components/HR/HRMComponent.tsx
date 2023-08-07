@@ -54,7 +54,7 @@ const HRMComponent = () => {
                     {/* Add other menu items as needed */}
                   </NavDropdown>
                 
-                  <Nav.Link onClick={handleLogout} className="menu-item-text">SignOut</Nav.Link>
+                  <Nav.Link onClick={handleLogout} className="nav-link-text">SignOut</Nav.Link>
 
                 </Nav>
               </Navbar.Collapse>

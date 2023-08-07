@@ -5,6 +5,10 @@
   color: #d40d0d; /* Replace with the desired text color */
 }
 
+.nav-link-text {
+  color: #20311b; /* Replace with the desired text color */
+}
+
 
 /* Custom styles for the form container */
 .form-container {
