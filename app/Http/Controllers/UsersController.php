@@ -47,6 +47,7 @@ class UsersController extends Controller
                 $userData = $request->validate([
                     'name' => 'required|string|max:255',
                     'email' => 'required|email',
+                    'phone' => 'required|string',
                     'password' => 'required|string|min:8|confirmed',
                 ]);
 
@@ -61,6 +62,7 @@ class UsersController extends Controller
                 $user = User::create([
                     'name' => $userData['name'],
                     'email' => $userData['email'],
+                    'phone' => $userData['phone'],
                     'password' => $userData['password'],
                     'role' => Role::where('name', 'normal')->first()->id,                
                 ]);
@@ -112,11 +114,20 @@ class UsersController extends Controller
             $userData = $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email,' . $id,
+                'phone' => 'required|string',
                 'password' => 'required|string|min:8|confirmed',
             ]);
 
+            // Make sure the user does not exist
+            $existingUser = User::where('email', $userData['email'])->first();
+            if($existingUser->id != $user->id)
+            {
+                return response()->json(['error' => 'The email is taken. Use another.', 'status' => 0]);
+            }
+
             $user->name = $userData['name'];
             $user->email = $userData['email'];
+            $user->phone = $userData['phone'];
             $user->password = $userData['password'];
 
             $user->save();
