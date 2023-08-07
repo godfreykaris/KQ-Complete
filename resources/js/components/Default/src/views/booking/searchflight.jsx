@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, Table, Container, Row, Col, Spinner, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { useSearchFlightContext } from "../../context/flights/flightcontext";
-import MenuBar1 from "../../components/menubars/menubar1";
-import MenuBar2 from "../../components/menubars/menubar2";
+import { useSearchFlightContext } from "../../context/flights/flightcontext.jsx";
+import MenuBar1 from "../../components/menubars/menubar1.jsx";
+import MenuBar2 from "../../components/menubars/menubar2.jsx";
 import "./searchflight.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 

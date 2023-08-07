@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Container, Form, Button, Alert, Spinner, Table, Col } from 'react-bootstrap';
-import MenuBar1 from '../../components/menubars/menubar1';
+import MenuBar1 from '../../components/menubars/menubar1.jsx';
 
 export default function AddPassenger() {
 

@@ -1,10 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Carousel, Button } from "react-bootstrap";
-import Footer from "../../components/homeelements/footer";
-import MenuBar1 from "../../components/menubars/menubar1";
-import MenuBar2 from "../../components/menubars/menubar2";
-import Cards from "../../components/homeelements/cards";
+import Footer from "../../components/homeelements/footer.jsx";
+import MenuBar1 from "../../components/menubars/menubar1.jsx";
+import MenuBar2 from "../../components/menubars/menubar2.jsx";
+import Cards from "../../components/homeelements/cards.jsx";
 import "./dashboard-image.css";
 
 import "bootstrap/dist/css/bootstrap.min.css";

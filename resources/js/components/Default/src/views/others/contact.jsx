@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Container, Form, Button, Col } from "react-bootstrap";
-import MenuBar1 from "../../components/menubars/menubar1";
-import MenuBar2 from "../../components/menubars/menubar2";
+import MenuBar1 from "../../components/menubars/menubar1.jsx";
+import MenuBar2 from "../../components/menubars/menubar2.jsx";
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({

@@ -1,5 +1,5 @@
 
-import { useStateContext } from "../miscallenious/contextprovider";
+import { useStateContext } from "../miscallenious/contextprovider.jsx";
 import { Outlet } from "react-router-dom";
 
 export default function DashboardLayout() {
