@@ -40,6 +40,8 @@ const SignUpComponent = () => {
       {
         setIsLoading(false);
 
+        setResponseStatus(0); // Error
+        setResponseMessage('Password and Confirm Password do not match.');
         // Handle password mismatch
         console.error('Password and Confirm Password do not match.');
         return;
@@ -60,14 +62,25 @@ const SignUpComponent = () => {
         }),
       });
 
+      const data = await response.json();
+
       if (response.ok) 
       {
-        setIsLoading(false);
-        // Registration successful
-        alert("User registered successfully");
-        // Redirect to sign in
-        navigate('/signin'); 
-      } 
+         setIsLoading(false);
+
+         if (data.status) 
+         {
+            // Registration successful
+            alert("User registered successfully");
+            // Redirect to sign in
+            navigate('/signin');
+         } 
+         else 
+         {
+           setResponseStatus(0); // Error
+           setResponseMessage(`Error: ${data.error}`);
+         }
+      }
       else 
       {
         setIsLoading(false);
