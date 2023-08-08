@@ -24,11 +24,13 @@ const menuItems = [
 ];
 
 function useDropdownState() {
-  const [dropdownState, setDropdownState] = useState({});
+  
+  const [dropdownState, setDropdownState] = useState<{ [key: string]: boolean }>({});
 
-  const toggleDropdown = (dropdownName) => {
+  const toggleDropdown = (dropdownName: any) => {
 
-    setDropdownState((prevState) => ({
+    //setDropdownState((prevState) => ({
+    setDropdownState((prevState: any) => ({
       ...prevState,
       [dropdownName]: !prevState[dropdownName],
     }));
@@ -47,12 +49,13 @@ export default function MenuBar2() {
 
   //listen for any clicks out of the dropdown
   useEffect(() => {
-    const closeDropdownsOnOutsideClick = (event) => {
-      const clickedElement = event.target;
+    const closeDropdownsOnOutsideClick = (event: Event) => {
+      const clickedElement = event.target as HTMLElement;
       const dropdowns = document.querySelectorAll('dropdown-menu-custom');
 
       dropdowns.forEach((dropdown) => {
-        if (!dropdown.contains(clickedElement)) {
+        if (!dropdown.contains(clickedElement)) 
+        {
           // Close the dropdown if it's open
           toggleDropdown(dropdown.getAttribute('data-link'));
         }
@@ -61,11 +64,14 @@ export default function MenuBar2() {
 
     // Attach the click listener to the Navbar component
     const navbar = document.querySelector('.navbar');
-    navbar.addEventListener('click', closeDropdownsOnOutsideClick);
+
+    if(navbar)
+        navbar.addEventListener('click', closeDropdownsOnOutsideClick);
 
     // Clean up the event listener on component unmount
     return () => {
-      navbar.removeEventListener('click', closeDropdownsOnOutsideClick);
+      if(navbar)
+          navbar.removeEventListener('click', closeDropdownsOnOutsideClick);
     };
   }, [toggleDropdown]);
 
@@ -78,7 +84,7 @@ export default function MenuBar2() {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" onClick={toggleNavbar} />
         <Navbar.Collapse id="responsive-navbar-nav" className={collapsed ? 'collapse' : ''}>
           <Nav className="mr-auto">
-            {menuItems.map((item, index) => (
+            {menuItems.map((item , index) => (
               <React.Fragment key={index}>
                 {item.dropdown ? (
                   <NavDropdown

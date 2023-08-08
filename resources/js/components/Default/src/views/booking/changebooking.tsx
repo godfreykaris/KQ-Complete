@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Form, Button, Table, Spinner, Col } from "react-bootstrap";
-import MenuBar1 from "../../components/menubars/menubar1.jsx";
-import MenuBar2 from "../../components/menubars/menubar2.jsx";
-import EditBooking from "./editbooking.jsx";
+import MenuBar1 from "../../components/menubars/menubar1";
+import MenuBar2 from "../../components/menubars/menubar2";
+import EditBooking from "./editbooking";
 
 export default function ChangeBooking() {
   const [formData, setFormData] = useState({

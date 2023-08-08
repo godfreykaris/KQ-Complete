@@ -1,6 +1,6 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
-import MenuBar1 from "../../components/menubars/menubar1.jsx";
+import MenuBar1 from "../../components/menubars/menubar1";
 import "./about.css"
 
 export default function About() {
