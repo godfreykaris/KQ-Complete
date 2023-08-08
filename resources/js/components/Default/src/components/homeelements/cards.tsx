@@ -5,6 +5,14 @@ import { useNavigate } from "react-router-dom";
 import { FaPlane, FaPlaneDeparture } from "react-icons/fa";
 import './cards.css';
 
+import tokyoImage from "../../../public/tokyo.jpg";
+import newYorkImage from "../../../public/new-york.jpg";
+import beijingImage from "../../../public/beijing.jpg";
+import dubaiImage from "../../../public/dubai.jpg";
+import rioImage from "../../../public/rio.jpg";
+import searchGif from "../../../public/search.gif";
+import pamplonaImage from "../../../public/pamplona.avif";
+
 interface Partner {
   amenity: string;
   link: string;
@@ -69,7 +77,7 @@ export default function Cards() {
             <Row className="mt-3">
               <Col>
                 <Card>
-                  <Card.Img variant="top" src="/tokyo.jpg" alt="Tokyo" />
+                  <Card.Img variant="top" src={tokyoImage} alt="Tokyo" />
                   <Card.Body>
                     <Card.Title>Tokyo</Card.Title>
                     <Card.Text>
@@ -86,7 +94,7 @@ export default function Cards() {
               </Col>
               <Col>
                 <Card>
-                  <Card.Img variant="top" src="/pamplona.avif" alt="Pamplona" />
+                  <Card.Img variant="top" src={pamplonaImage} alt="Pamplona" />
                   <Card.Body>
                     <Card.Title>Pamplona</Card.Title>
                     <Card.Text>
@@ -104,14 +112,14 @@ export default function Cards() {
               
               <Col>
                 <Card>
-                  <Card.Img variant="top" src="/rio.jpg" alt="Tokyo" />
+                  <Card.Img variant="top" src={rioImage} alt="Rio" />
                   <Card.Body>
                     <Card.Title>Rio</Card.Title>
                     <Card.Text>
                       
                     </Card.Text>
                     <Button
-                      onClick={() => handleBookNow("Tokyo")}
+                      onClick={() => handleBookNow("Rio")}
                       variant="primary"
                     >
                       Book Now
@@ -122,14 +130,14 @@ export default function Cards() {
               <hr/>
               <Col>
                 <Card>
-                  <Card.Img variant="top" src="/dubai.jpg" alt="Tokyo" />
+                  <Card.Img variant="top" src={dubaiImage} alt="Dubai" />
                   <Card.Body>
                     <Card.Title>Dubai</Card.Title>
                     <Card.Text>
                    
                     </Card.Text>
                     <Button
-                      onClick={() => handleBookNow("Tokyo")}
+                      onClick={() => handleBookNow("Dubai")}
                       variant="primary"
                     >
                       Book Now
@@ -140,14 +148,14 @@ export default function Cards() {
              
               <Col>
                 <Card>
-                  <Card.Img variant="top" src="/new-york.jpg" alt="Tokyo" />
+                  <Card.Img variant="top" src={newYorkImage} alt="New York" />
                   <Card.Body>
                     <Card.Title>New York</Card.Title>
                     <Card.Text>
                       
                     </Card.Text>
                     <Button
-                      onClick={() => handleBookNow("Tokyo")}
+                      onClick={() => handleBookNow("New York")}
                       variant="primary"
                     >
                       Book Now
@@ -157,14 +165,14 @@ export default function Cards() {
               </Col>
               <Col>
                 <Card>
-                  <Card.Img variant="top" src="/beijing.jpg" alt="Tokyo" />
+                  <Card.Img variant="top" src={beijingImage} alt="Beijing" />
                   <Card.Body>
                     <Card.Title>Beijing</Card.Title>
                     <Card.Text>
                       
                     </Card.Text>
                     <Button
-                      onClick={() => handleBookNow("Tokyo")}
+                      onClick={() => handleBookNow("Beijing")}
                       variant="primary"
                     >
                       Book Now
@@ -219,7 +227,7 @@ export default function Cards() {
             </Card.Header>
             <Card.Body>
               <Card.Title>Search a Flight</Card.Title>
-              <Card.Img variant="top" src="/search.gif" alt="Tokyo"/>
+              <Card.Img variant="top" src={searchGif} alt="Search GIF"/>
               <button
                 onClick={handleRedirectToSearchFlight}
                 type="button"

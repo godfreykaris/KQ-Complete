@@ -5,7 +5,8 @@ import { Outlet } from "react-router-dom";
 export default function DashboardLayout() {
     const {isLoggedIn} = useStateContext();
 
-    if(isLoggedIn){
+    if(isLoggedIn)
+    {
       return <Navigate to="/dashboard"/>
     }
 

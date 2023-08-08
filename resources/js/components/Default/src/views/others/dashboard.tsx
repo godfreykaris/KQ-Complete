@@ -10,10 +10,16 @@ import "./dashboard-image.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-bootstrap-carousel/dist/react-bootstrap-carousel.css";
 
+import hostessImage from "../../../public/hostess.jpg";
+import seatsImage from "../../../public/seats.webp";
+import planeImage from "../../../public/787-8.png";
+import kqImage from "../../../public/KQ-1.png";
+
+
 export default function Dashboard() {
   return (
     <div className="dashboard-fade-in" style={{ backgroundColor: "-moz-initial" }}>
-      <MenuBar1 />
+      <MenuBar1 isAuthenticated={false} />
       <hr />
       <hr />
       <hr />
@@ -29,8 +35,9 @@ export default function Dashboard() {
               <Carousel.Item>
                 <img
                   className="d-block w-100 image-container carousel-image"
-                  src="/hostess.jpg"
+                  src={hostessImage}
                   alt="Dashboard Image 1"
+                  style={{ width: '100%', height: 'auto', maxHeight: '500px' }} // Adjust the maxHeight as needed
                 />
                 <Carousel.Caption>
                   <h3>Welcome to KQ Airlines</h3>
@@ -43,21 +50,21 @@ export default function Dashboard() {
               <Carousel.Item>
                 <img
                   className="d-block w-100 image-container carousel-image"
-                  src="/seats.webp"
+                  src={seatsImage}
                   alt="Dashboard Image 2"
                 />
               </Carousel.Item>
               <Carousel.Item>
                 <img
                   className="d-block w-100 image-container carousel-image"
-                  src="/787-8.png"
+                  src={planeImage}
                   alt="Dashboard Image 3"
                 />
               </Carousel.Item>
              <Carousel.Item>
                 <img
                   className="d-block w-100 image-container carousel-image"
-                  src="/KQ-1.png"
+                  src={kqImage}
                   alt="Dashboard Image 3"
                 />
                 <Carousel.Caption>
