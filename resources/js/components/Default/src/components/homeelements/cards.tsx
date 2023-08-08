@@ -5,6 +5,11 @@ import { useNavigate } from "react-router-dom";
 import { FaPlane, FaPlaneDeparture } from "react-icons/fa";
 import './cards.css';
 
+interface Partner {
+  amenity: string;
+  link: string;
+}
+
 export default function Cards() {
   const navigate = useNavigate();
   const navigate1 = useNavigate();
@@ -13,29 +18,30 @@ export default function Cards() {
     navigate("/signup");
   };
 
-  const handleBookNow = (destination) => {
+  const handleBookNow = (destination: string) => {
     // Redirect to the booking page with the selected destination
     navigate(`/bookflight`);
   };
 
   //before landing preparations
-  const beforeLanding = [
-    {amenity: "Book Cab", link: "https://www.uber.com/ke/en/"},
-    {amenity: "View Hotels", link: "https://www.booking.com/city/ke/nairobi.en/"},
-    {amenity: "Recreation", link: "https://www.tripadvisor.com/Attractions-g294207-Activities-c57-t70-Nairobi.html"},   
-    
+  const beforeLanding: Partner[] = [
+    { amenity: "Book Cab", link: "https://www.uber.com/ke/en/" },
+    { amenity: "View Hotels", link: "https://www.booking.com/city/ke/nairobi.en/" },
+    { amenity: "Recreation", link: "https://www.tripadvisor.com/Attractions-g294207-Activities-c57-t70-Nairobi.html" },
   ];
 
-  const [selectedPartner, setSelectedPartner] = useState(null);
+  const [selectedPartner, setSelectedPartner] = useState<string | null>(null);
 
-  const handlePartnerButtonClick = (amenity, link) => {
+  const handlePartnerButtonClick = (amenity: string, link: string) => {
     setSelectedPartner(amenity);
     window.location.href = link;
   }
 
-  const handleBeforeLanding = (amenityName) => {
-    // navigate to cab, hotels and other recreational center sites
+
+  const handleBeforeLanding = (amenityName: string) => {
+    // navigate to cab, hotels, and other recreational center sites
   };
+  
 
   //travel offers
   const travelOffers = [

@@ -1,94 +1,112 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, ChangeEvent, FormEvent } from 'react';
 import { Container, Form, Button, Alert, Spinner, Table, Col } from 'react-bootstrap';
-import MenuBar1 from '../../components/menubars/menubar1.jsx';
+import MenuBar1 from '../../components/menubars/menubar1';
+
+interface Passenger {
+  name: string;
+  passport: string;
+  idNumber: string;
+  birthDate: Date | null;
+}
+
+interface Seat {
+  number: string;
+  location: string;
+  availability: string;
+  price: number;
+}
 
 export default function AddPassenger() {
-
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    bookingReference: string;
+    passport: string;
+    idNumber: string;
+    name: string;
+    birthDate: Date | null;
+  }>({
     bookingReference: '',
+    passport: '',
+    idNumber: '',
+    name: '',
+    birthDate: null,
   });
-
+  
   const [loading, setLoading] = useState(false);
-  const [bookingData, setBookingData] = useState(null);
-  const [refError, setRefError] = useState("");
-  const [passengers, setPassengers] = useState([]);
-  const [seats, setSeats] = useState([]);
-  const [selectedSeat, setSelectedSeat] = useState(null);
-  const [nameError, setNameError] = useState("");
-  const [displaySeatTable, setDisplaySeatTable] = useState(false);
-  const [selectedSeatNumber, setSelectedSeatNumber] = useState('');
-  // Create a ref for the container that wraps the table
-  const tableContainerRef = useRef(null);
+  const [bookingData, setBookingData] = useState<any>(null);
+  const [refError, setRefError] = useState<string>('');
+  const [passengers, setPassengers] = useState<Passenger[]>([]);
+  const [seats, setSeats] = useState<Seat[]>([]);
+  const [selectedSeat, setSelectedSeat] = useState<Seat | null>(null);
+  const [nameError, setNameError] = useState<string>('');
+  const [displaySeatTable, setDisplaySeatTable] = useState<boolean>(false);
+  const [selectedSeatNumber, setSelectedSeatNumber] = useState<string>('');
+  const tableContainerRef = useRef<HTMLDivElement | null>(null);
 
-  //keeping track of the visibility of the seat table
   const handleButtonClick = () => {
-    //toggle the seat table visibility
     setDisplaySeatTable(!displaySeatTable);
-    tableContainerRef.current.scrollIntoView({ behavior: 'smooth' });
+    tableContainerRef.current?.scrollIntoView({ behavior: 'smooth' });
   }
 
-  //function to handle seat selection
-  const handleSeatSelect = (index) => {
+  const handleSeatSelect = (index: number) => {
     setSelectedSeatNumber(seats[index].number);
     setSelectedSeat(seats[index]);
   };
 
-  //handling change in form data
-  const handleChange = (event) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-
-    // Validate for the 'Name' field to contain only alphabetic characters
+  
     if (name === 'name' && !/^[A-Za-z\s]+$/.test(value)) {
       setNameError('Name must contain only alphabetic characters.');
     } else {
-      setNameError(''); // Clear the error message if the input is valid
+      setNameError('');
     }
-
+  
     if (name === 'bookingReference') {
-      // Remove any non-numeric characters from the input
       let newValue = value.replace(/\D/g, '');
-
-      // Add the "KQ-" prefix and set the error message
+  
       if (newValue.length === 6) {
         newValue = `KQ-${newValue}`;
         setRefError('');
       } else {
         setRefError('The input must be numbers');
       }
-
+  
       setFormData((prevFormData) => ({
         ...prevFormData,
         [name]: newValue,
       }));
-    } else if (name === 'birthDate') {
-      // Parse the date string into a date object
-      const dateObject = value ? new Date(value) : null; // Check for truthy value before converting to a Date object
+    } 
+    else if (name === 'birthDate') 
+    {
+      const dateObject = value ? new Date(value) : null;
       setFormData((prevFormData) => ({
         ...prevFormData,
         [name]: dateObject,
       }));
-    } else {
+    }
+    else 
+    {
       setFormData((prevFormData) => ({
         ...prevFormData,
         [name]: value,
       }));
     }
   };
+  
 
-  //handleSubmitPassenger  function to send new passenger data to the database
-  const handleSubmitPassenger  = async (event) => {
+  const handleSubmitPassenger = async (event: FormEvent) => {
     event.preventDefault();
 
-    //extract passenger data from the form data
-    const newPassenger = {
+    const newPassenger: Passenger = {
       name: formData.name,
       passport: formData.passport,
       idNumber: formData.idNumber,
-      birthDate: formData.birthDate,
+      birthDate: formData.birthDate || null, // Use null if formData.birthDate is null
     };
+    
 
-    try{
-      const response = await fetch('/src/components/bookings',{
+    try {
+      const response = await fetch('/src/components/bookings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,77 +114,56 @@ export default function AddPassenger() {
         body: JSON.stringify(newPassenger),
       });
 
-      if(response.ok){
-        // If the API call is successful, add the new passenger to the passengers state
+      if (response.ok) {
         setPassengers((prevPassengers) => [...prevPassengers, newPassenger]);
-        //show success message and reset form here
       }
-    }catch(error){
-      throw new Error("An error occured during submission");
+    } catch (error) {
+      throw new Error("An error occurred during submission");
     }
   }
 
-  //handleRetrieveBooking function
+  const handleRetrieveBooking = async (event: FormEvent) => {
+    event.preventDefault();
+    setRefError("");
+    setBookingData(null);
 
-  const handleRetrieveBooking = async (event) => {
-     event.preventDefault();
-    
-     //clear previous error and booking data
-     setRefError("");
-     setBookingData(null);
+    const { bookingReference } = formData;
 
-     const {bookingReference} = formData;
-
-     //validate to make sure that the reference number was provided
-     if(!bookingReference){
+    if (!bookingReference) {
       setRefError("Booking Reference is required");
       return;
-     }
+    }
 
-     //show loading state while fetching data
-     setLoading(true);
+    setLoading(true);
 
-     try{
-      //make api call to backed to fetch the booking data
+    try {
       const response = await fetch("/src/components/testdata/bookings");
       const data = await response.json();
 
-      //check if the response is successful and contains the booking data
-      if(response.ok && data && data.bookings && data.bookings.length > 0){
-        const booking = data.bookings[0];//only one booking
-
-        //extract planeId and passengers array from the booking
-        const {planeId, passengers: passengerData} = booking;
+      if (response.ok && data && data.bookings && data.bookings.length > 0) {
+        const booking = data.bookings[0];
+        const { planeId, passengers: passengerData } = booking;
 
         setBookingData(booking);
-
-        //update the passengers state with passengersData
         setPassengers(passengerData);
 
-        //make another api call to fetch seat data using the extracted planeId
         const seatResponse = await fetch(`/src/components/${planeId}`);
         const seatData = await seatResponse.json();
 
-        //check if the seat data response is successful
-        if(seatResponse.ok && seatData && seatData.seats){
+        if (seatResponse.ok && seatData && seatData.seats) {
           setSeats(seatData.seats);
-        }else{
+        } else {
           throw new Error("Seats not Found");
         }
-
-      }else{
-        //booking data not found
+      } else {
         setRefError("Booking not found, Check the booking reference and try again");
       }
-     }catch(error){
-      //handle errors that occured during API call
+    } catch (error) {
       setRefError("An error occurred while fetching the booking. Please try again later");
-     }finally {
-      //hide the loading state after the API call
+    } finally {
       setLoading(false);
-     }
+    }
   }
-  
 
   return (
     <div>
@@ -183,7 +180,7 @@ export default function AddPassenger() {
               type="text"
               id="bookingReference"
               name="bookingReference"
-              maxLength="8"
+              maxLength={8}
               value={formData.bookingReference}
               onChange={handleChange}
               required
@@ -229,7 +226,7 @@ export default function AddPassenger() {
                     name="passport"
                     value={formData.passport}
                     onChange={handleChange}
-                    maxLength="8"
+                    maxLength={8}
                     required
                   />
                 </Form.Group>
@@ -242,7 +239,7 @@ export default function AddPassenger() {
                     name="idNumber"
                     value={formData.idNumber}
                     onChange={handleChange}
-                    maxLength="8"
+                    maxLength={8}
                     required
                   />
                 </Form.Group>
@@ -253,7 +250,7 @@ export default function AddPassenger() {
                     type="date"
                     id="birthdate"
                     name="birthDate"
-                    value={formData.birthDate ? formData.birthDate.toISOString().split('T')[0] : ''}
+                    value={formData.birthDate ? (formData.birthDate as Date).toISOString().split('T')[0] : ''}
                     onChange={handleChange}
                     required
                   />

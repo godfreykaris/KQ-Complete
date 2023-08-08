@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Container, Form, Button, Alert } from "react-bootstrap";
-import MenuBar1 from "../../components/menubars/menubar1.jsx";
+import MenuBar1 from "../../components/menubars/menubar1";
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import MenuBar2 from "../../components/menubars/menubar2.jsx";
+import MenuBar2 from "../../components/menubars/menubar2";
 
 export default function ApplyJob() {
   const [formData, setFormData] = useState({
