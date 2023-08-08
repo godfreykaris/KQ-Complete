@@ -12,6 +12,7 @@ import dubaiImage from "../../../public/dubai.jpg";
 import rioImage from "../../../public/rio.jpg";
 import searchGif from "../../../public/search.gif";
 import pamplonaImage from "../../../public/pamplona.avif";
+import welcomeGif from "../../../public/welcome.gif";
 
 interface Partner {
   amenity: string;
@@ -209,7 +210,7 @@ export default function Cards() {
                   Store data for seamless bookings
                 </ListGroup.Item>
             </ListGroup>
-            <Card.Img variant="top" src="/welcome.gif" alt="Tokyo" style={{ height: "200px" }}/>
+            <Card.Img variant="top" src={welcomeGif} alt="Welcome" style={{ height: "200px" }}/>
             <hr/>
             <button
               onClick={handleRedirectToSignup}
