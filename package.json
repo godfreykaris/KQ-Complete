@@ -9,6 +9,7 @@
         "@types/react": "^18.2.18",
         "@types/react-dom": "^18.2.6",
         "axios": "^1.4.0",
+        "file-loader": "^6.2.0",
         "laravel-vite-plugin": "^0.7.8",
         "ts-loader": "^9.4.4",
         "typescript": "^5.1.6",

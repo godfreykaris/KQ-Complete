@@ -1,18 +1,23 @@
-.dashboard-body {
+.dashboard-body 
+{
   justify-content: center;
   align-items: center;
-  width: 500px;
+  width: 800px;
+
 }
 
 /* dashboard-animation.css */
 
-.dashboard-fade-in {
+.dashboard-fade-in 
+{
   animation: fadeIn 3s ease-in-out;
   opacity: 1;
 }
 
-@keyframes fadeIn {
-  from {
+@keyframes fadeIn 
+{
+  from 
+  {
     opacity: 0;
   }
   to {
@@ -23,7 +28,9 @@
 .image-container {
   border-radius: 10%; /* Set the border-radius to 50% to make it round */
   overflow: hidden; /* Hide any content that might overflow outside the round container */
-  width: 4000px; 
+  width: 1000px; 
+  height: 300px;
+
 }
 
 /* Improve readability of text on images */

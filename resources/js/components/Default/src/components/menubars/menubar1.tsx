@@ -9,8 +9,7 @@ const menuItems = [
   { label: 'About', link: '/about' },
 ];
 
-//export default function MenuBar1({ isAuthenticated: any }) {
-export default function MenuBar1() {
+  export default function MenuBar1({ isAuthenticated }: { isAuthenticated: boolean }) {
   const AuthenticatedMenuBar = () => (
       <div>
         {/* Add any additional menu items for authenticated users */}
@@ -55,7 +54,7 @@ export default function MenuBar1() {
          ))}
         </Nav>
           {/* Conditionally render the appropriate menu bar */}
-          {/*isAuthenticated ? <AuthenticatedMenuBar /> : <GuestMenuBar />*/}
+          {isAuthenticated ? <AuthenticatedMenuBar /> : <GuestMenuBar />}
         </Navbar.Collapse>
       </Container>
     </Navbar>

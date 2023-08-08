@@ -24,6 +24,10 @@ export default defineConfig({
             test: /\.css$/,
             use: ['style-loader', 'css-loader'],
           },
+          { 
+            test: /\\.(png|jp(e*)g|svg|gif|webp|avif)$/, 
+            use: ['file-loader'],
+          }
         ],
       },
       resolve: {

@@ -2,37 +2,39 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
-import Dashboard from 'src/views/others/dashboard';
-import NotFound from "src/views/others/notfound";
-import BookFlight from "src/views/booking/bookflight";
-import SeatMap from "src/views/seats/seatmap";
-import AddPassenger from "src/views/passengers/addpassenger";
-import AddPassenger1 from "src/views/passengers/addpassenger1";
-import EditPassenger from "src/views/passengers/editpassenger";
-import Seat from "src/views/seats/viewseat";
-import DeletePassenger from "src/views/passengers/deletepassenger";
-import ChangePassenger from "src/views/passengers/changepassenger";
-import EditBooking from "src/views/booking/editbooking";
-import Deletebooking from "src/views/booking/deletebooking";
-import ChangeBooking from "src/views/booking/changebooking";
-import AddBookingInquiry from "src/views/inquiries/addbookinginquiry";
-import ChangeBookingInquiry from "src/views/inquiries/changebookinginquiry";
-import DeleteBookingInquiry from "src/views/inquiries/deletebookinginquiry";
-import PassengerProvider from "src/context/passengers/passengercontext";
-import SeatProvider from "src/context/seats/sendseatdata";
-import Footer from "src/components/homeelements/footer";
-import Cards from "src/components/homeelements/cards";
-import SearchFlight from "src/views/booking/searchflight";
-import FlightProvider from "src/context/flights/flightcontext";
-import About from "src/views/others/about";
-import ContactUs from "src/views/others/contact";
-import ViewOpenings from "src/views/others/viewopenings";
-import DashboardLayout from "src/components/layouts/dashboardlayout";
-import Skills from "src/views/others/viewskills";
-import PrintTicket from "src/views/booking/printticket";
-import { ContextProvider } from "src/components/miscallenious/contextprovider";
+import Dashboard from '././src/views/others/dashboard';
+import NotFound from "./src/views/others/notfound";
+import BookFlight from "./src/views/booking/bookflight";
+import SeatMap from "./src/views/seats/seatmap";
+import AddPassenger from "./src/views/passengers/addpassenger";
+import AddPassenger1 from "./src/views/passengers/addpassenger1";
+import EditPassenger from "./src/views/passengers/editpassenger";
+import Seat from "./src/views/seats/viewseat";
+import DeletePassenger from "./src/views/passengers/deletepassenger";
+import ChangePassenger from "./src/views/passengers/changepassenger";
+import EditBooking from "./src/views/booking/editbooking";
+import Deletebooking from "./src/views/booking/deletebooking";
+import ChangeBooking from "./src/views/booking/changebooking";
+import AddBookingInquiry from "./src/views/inquiries/addbookinginquiry";
+import ChangeBookingInquiry from "./src/views/inquiries/changebookinginquiry";
+import DeleteBookingInquiry from "./src/views/inquiries/deletebookinginquiry";
+import PassengerProvider from "./src/context/passengers/passengercontext";
+import SeatProvider from "./src/context/seats/sendseatdata";
+import Footer from "./src/components/homeelements/footer";
+import Cards from "./src/components/homeelements/cards";
+import SearchFlight from "./src/views/booking/searchflight";
+import FlightProvider from "./src/context/flights/flightcontext";
+import About from "./src/views/others/about";
+import ContactUs from "./src/views/others/contact";
+import ViewOpenings from "./src/views/others/viewopenings";
+import DashboardLayout from "./src/components/layouts/dashboardlayout";
+import Skills from "./src/views/others/viewskills";
+import PrintTicket from "./src/views/booking/printticket";
+import { ContextProvider } from "./src/components/miscallenious/contextprovider";
 
 import { Navigate, createBrowserRouter } from "react-router-dom";
+import SignInComponent from '../Auth/SignInComponent';
+import SignUpComponent from '../Auth/SignUpComponent';
 
 
 const router = [
@@ -42,7 +44,7 @@ const router = [
       element: <Dashboard/>,
     },
     {
-      path: "/bookflight",
+      path: "bookflight",
       element: (
           <SeatProvider>
               <PassengerProvider>
@@ -52,7 +54,7 @@ const router = [
       )        
     },
     {
-      path: '/seatmap',
+      path: 'seatmap',
       element: (
           <SeatProvider>
               <SeatMap planeId={undefined} onSeatSelected={undefined}/>
@@ -65,18 +67,14 @@ const router = [
   },
   {
       path: '/signup',
-      element: (
-          <ContextProvider>
-              <SignUpComponent/>
-          </ContextProvider>
-      )
+      element: <SignUpComponent/>
   },
   {
-      path: '/addpassenger',
+      path: 'addpassenger',
       element: <AddPassenger/>
   },
   {
-      path: '/addpassenger1',
+      path: 'addpassenger1',
       element: (
           <SeatProvider>
               <PassengerProvider>
@@ -86,7 +84,7 @@ const router = [
       )
   },
   {
-      path: '/changepassenger',
+      path: 'changepassenger',
       element: (
           <SeatProvider>
               <ChangePassenger/>
@@ -94,11 +92,11 @@ const router = [
       )
   },
   {
-      path: '/viewseat',
+      path: 'viewseat',
       element: <Seat showSeatModal={undefined} handleCloseSeatModal={undefined} seatObject={undefined}/>
   },
   {
-      path: '/editpassenger',
+      path: 'editpassenger',
       element: (
           <SeatProvider>
               <EditPassenger showEditModal={undefined} handleResubmission={undefined} passengerDataObject={undefined} handleClose={undefined}/>
@@ -106,43 +104,43 @@ const router = [
       )
   },
   {
-      path: '/deletepassenger',
+      path: 'deletepassenger',
       element: <DeletePassenger/>
   },
   {
-      path: '/changebooking',
+      path: 'changebooking',
       element: <ChangeBooking/>
   },
   {
-      path: '/editbooking',
+      path: 'editbooking',
       element: <EditBooking showEditModal={undefined} handleResubmission={undefined} bookingDataObject={undefined} handleClose={undefined}/>
   },
   {
-      path: '/deletebooking',
+      path: 'deletebooking',
       element: <Deletebooking/>
   },
   {
-      path: '/addbookinginquiry',
+      path: 'addbookinginquiry',
       element: <AddBookingInquiry/>
   },
   {
-      path: '/changebookinginquiry',
+      path: 'changebookinginquiry',
       element: <ChangeBookingInquiry/>
   },
   {
-      path: '/deletebookinginquiry',
+      path: 'deletebookinginquiry',
       element: <DeleteBookingInquiry/>
   },
   {
-      path: '/footer',
+      path: 'footer',
       element: <Footer/>
   },
   {
-      path: '/cards',
+      path: 'cards',
       element: <Cards/>
   },
   {
-      path: '/searchflight',
+      path: 'searchflight',
       element: (
           <FlightProvider>
               <SearchFlight/>
@@ -150,11 +148,11 @@ const router = [
       )
   },
   {
-    path:'/about',
+    path:'about',
     element:<About/>
   },
   {
-    path: '/contact',
+    path: 'contact',
     element: <ContactUs/>
   },
   {
@@ -162,11 +160,11 @@ const router = [
     element: <ViewOpenings/>
   },
   {
-      path: '/viewskills',
+      path: 'viewskills',
       element: <Skills showSkillsModal={undefined} handleCloseModal={undefined} skillsArray={undefined}/>
   },
   {
-      path: '/printticket',
+      path: 'printticket',
       element: <PrintTicket/>
   },
 
@@ -179,30 +177,17 @@ const router = [
 const DefaultComponent = () => {
    
     return (
-      <AuthProvider>
-        <Router>        
-          <Routes>          
+          <Routes>         
             
-          {router.map((route: any, index:number) => (
-                <Route
-                  key={index}
-                  path={route.path}
-                  element={route.element}
-                  
-                />
-              ))}
-  
-            <Route path="/" element={<SignInComponent />} />
-            <Route path="/signup" element={<SignUpComponent />} />
-            <Route path="/admin/*" element={<ProtectedRoute element={<AdminComponent />} />} />
-            <Route path="/hrm/*" element={<ProtectedRoute element={<HRMComponent />} />} />
-  
-             {/* Use ProtectedRoute for authenticated routes */}
-             
-             {/* Add other unprotected routes here */}
+                {router.map((route: any, index:number) => (
+                    <Route
+                      key={index}
+                      path={route.path}
+                      element={route.element}
+
+                    />
+                  ))}  
           </Routes>
-        </Router>
-      </AuthProvider>
     );
   };
   
