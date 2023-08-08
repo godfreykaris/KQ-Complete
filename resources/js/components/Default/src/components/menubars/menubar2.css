@@ -9,18 +9,16 @@
     background-color: #766ff8; /* Set the desired light blue color */
   }
 
-  /* for the menubar*/
-  .navbar {
+  /* Apply styles only to the element with the ID "myNavBar" */
+  #myNavBar .navbar {
     background-color: #020507; /* Change the background color */
   }
   
-  /* Style for the collapsed navbar toggle button */
-  .navbar-toggler-icon {
+  #myNavBar .navbar-toggler-icon {
     background-color: #040110; /* Change the toggle button color */
   }
   
-  /* Style for the collapsed navbar */
-  .collapse {
+  #myNavBar .collapse {
     background-color: #171718; /* Change the background color of the collapsed menu */
     border-radius: 5%;
   }

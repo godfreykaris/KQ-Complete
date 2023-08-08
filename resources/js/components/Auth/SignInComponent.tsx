@@ -80,24 +80,36 @@ const SignInComponent = () => {
 
       if (response.ok) 
       {
-        const data = await response.json();
-        sessionStorage.setItem('access_token', data.user.token);
-  
         setIsLoading(false);
-        // Determine the role (admin or HRM) based on your backend's response
-        const userRole = data.user.role; // Replace 'role' with the actual key that holds the role
-        if (userRole === 'admin') 
-        {
-          navigate('/admin'); // Redirect to admin frontend
-        } 
-        else if (userRole === 'hrm') 
-        {
-          navigate('/hrm'); // Redirect to HRM frontend
-        }
-        else
-        {
-          navigate('/signin'); // Redirect to admin frontend
-        }
+
+        const data = await response.json();
+
+        if (data.user) 
+         {
+            sessionStorage.setItem('access_token', data.user.token);
+          
+            // Determine the role (admin or HRM) based on your backend's response
+            const userRole = data.user.role; // Replace 'role' with the actual key that holds the role
+            if (userRole === 'admin') 
+            {
+              navigate('/admin'); // Redirect to admin frontend
+            } 
+            else if (userRole === 'hrm') 
+            {
+              navigate('/hrm'); // Redirect to HRM frontend
+            }
+            else
+            {
+              navigate('/'); // Redirect to admin frontend
+            }
+         } 
+         else 
+         {
+           setResponseStatus(0); // Error
+           setResponseMessage(`Error: ${data.error}`);
+         }
+
+        
       }
       else 
       {
@@ -113,7 +125,7 @@ const SignInComponent = () => {
     {
       setIsLoading(false);
       setResponseStatus(0); // Error
-      setResponseMessage(`Error signing. Contact Support.`);
+      setResponseMessage(`Error signing in. Contact Support.`);
       console.log('Error signing in:', error);
     }
   };

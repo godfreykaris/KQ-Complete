@@ -34,7 +34,7 @@ class UsersController extends Controller
             $user['role'] = Role::where('id', $user->role)->first()->name;
             return response()->json(['user' => $user], 200);
         }
-        return response()->json(['error' => 'Invalid credentials', 'status' => 0], 405);
+        return response()->json(['error' => 'Invalid credentials', 'status' => 0]);
     }
 
 

@@ -76,7 +76,7 @@ export default function MenuBar2() {
   }, [toggleDropdown]);
 
   return (
-    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" sticky="top">
+    <Navbar id="myNavBar" collapseOnSelect expand="lg" bg="dark" variant="dark" sticky="top">
       <Container>
         <Navbar.Brand>
             <h3 className='text-glow'>The Pride of Africa|</h3>
