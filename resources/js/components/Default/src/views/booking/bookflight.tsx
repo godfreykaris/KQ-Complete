@@ -5,13 +5,13 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Container, Row, Col, Form, Button, Table, Spinner, OverlayTrigger, Tooltip } from "react-bootstrap";
 
-import { usePassengerContext } from "../../context/passengers/passengercontext.jsx";
-import { useSearchFlightContext } from "../../context/flights/flightcontext.jsx";
-import MenuBar1 from "../../components/menubars/menubar1.jsx";
-import MenuBar2 from "../../components/menubars/menubar2.jsx";
-import { useSeatContext } from "../../context/seats/sendseatdata.jsx";
-import Seat from "../seats/viewseat.jsx";
-import SeatMap from "../seats/seatmap.jsx";
+import { usePassengerContext } from "../../context/passengers/passengercontext";
+import { useSearchFlightContext } from "../../context/flights/flightcontext";
+import MenuBar1 from "../../components/menubars/menubar1";
+import MenuBar2 from "../../components/menubars/menubar2";
+import { useSeatContext } from "../../context/seats/sendseatdata";
+import Seat from "../seats/viewseat.js";
+import SeatMap from "../seats/seatmap.js";
 
 
 export default function BookFlight() {
