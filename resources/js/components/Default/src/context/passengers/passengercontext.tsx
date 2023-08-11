@@ -1,11 +1,29 @@
 import React, { createContext, useState, useContext } from 'react';
 
-const PassengerContext = createContext();
+interface passenger{
+  name: string;
+  passport: number;
+  idNumber: number;
+  birthDate: string;
+}
 
-export default function PassengerProvider ({ children }) {
-  const [passengers, setPassengers] = useState([]);
+interface PassengerContextType{
+  passengers: passenger[];
+  addPassenger: (passengerData: passenger) => void;
+  updatePassenger: (index: number, passengerData: passenger) => void;
+  removePassenger: (index: number) => void;
+}
 
-  const addPassenger = (passengerData) => {
+interface passengerProviderProps{
+  children: React.ReactNode;
+}
+
+const PassengerContext = createContext<PassengerContextType | undefined>(undefined);
+
+export default function PassengerProvider ({ children }: passengerProviderProps) {
+  const [passengers, setPassengers] = useState<passenger[]>([]);
+
+  const addPassenger = (passengerData: passenger) => {
     const newPassenger = {
         ...passengerData,
         index: passengers.length,
@@ -13,13 +31,13 @@ export default function PassengerProvider ({ children }) {
     setPassengers([...passengers, newPassenger]);    
   };
 
-  const updatePassenger = (index, passengerData) => {
+  const updatePassenger = (index: number, passengerData: passenger) => {
     setPassengers((prevPassengers) => 
         prevPassengers.map((passenger, i) => (i === index ? {...passenger, ...passengerData} : passenger))
     )
   }
 
-  const removePassenger = (index) => {
+  const removePassenger = (index: number) => {
     setPassengers((prevPassengers) => prevPassengers.filter((_, i) => i !== index))
   };
 
@@ -31,6 +49,7 @@ export default function PassengerProvider ({ children }) {
 };
 
 export function usePassengerContext() {
-
     return  useContext(PassengerContext);
 }
+
+export type {PassengerContextType};

@@ -90,6 +90,8 @@ export default function MenuBar2() {
                   <NavDropdown
                     title={item.label}
                     id={`navbarDropdown-${index}`}
+                    onMouseEnter={() => toggleDropdown(item.link)}
+                    onMouseLeave={() => toggleDropdown(item.link)}
                     show={dropdownState[item.link]}
                     onClick={() => toggleDropdown(item.link)}
                     data-link={item.link}
