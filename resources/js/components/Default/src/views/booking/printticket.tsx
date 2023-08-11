@@ -42,23 +42,35 @@ export default function PrintTicket() {
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = e.target;
-      const sanitizedValue = value.replace(/[^a-zA-Z0-9]/g, ""); // Allow only letters and numbers
+    const { name, value } = e.target;
+    const sanitizedValue = value.replace(/[^a-zA-Z0-9]/g, ""); // Allow only letters and numbers
 
-      if (sanitizedValue.length <= 8) 
-      {
-          const newValue = `KQ-${sanitizedValue.slice(2, 9)}`; // Use the first 6 characters
-          setFormData((prevFormData) => ({
-              ...prevFormData,
-              [name]: newValue,
-          }));
-          setRefError(""); // Clear any previous errors
-      } 
-      else 
-      {
-          setRefError("The input must be 'KQ-' followed by 6 characters or less");
-      }
-  };
+    let prefix = ""; // Initialize prefix based on context
+
+    if (name === "bookingReference") 
+    {
+        prefix = "KQ-BR-"; // Booking reference prefix
+    } 
+    else if (name === "ticketNumber") 
+    {
+        prefix = "KQ-TK-"; // Ticket number prefix
+    }
+
+    if (sanitizedValue.length <= 10) 
+    {
+        const newValue = `${prefix}${sanitizedValue.slice(4, 11)}`; // Use the first 7 characters
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            [name]: newValue,
+        }));
+        setRefError(""); // Clear any previous errors
+    } 
+    else 
+    {
+        setRefError("The input must be the appropriate prefix followed by 6 characters or less");
+    }
+};
+
 
    const getResponseClass = () => {
      if (responseStatus === 1) 
@@ -189,7 +201,7 @@ export default function PrintTicket() {
                   type="text"
                   id="bookingReference"
                   name="bookingReference"
-                  maxLength={9}
+                  maxLength={12}
                   value={formData.bookingReference}
                   onChange={handleChange}
                   required
@@ -205,7 +217,7 @@ export default function PrintTicket() {
                   type="text"
                   id="ticketNumber"
                   name="ticketNumber"
-                  maxLength={9}
+                  maxLength={12}
                   value={formData.ticketNumber}
                   onChange={handleChange}
                   required
@@ -241,6 +253,7 @@ export default function PrintTicket() {
                     <div>
                     <Col md={6} lg={5} className="mx-auto">
                       <hr />
+                      
                       <h4 className="text-center">Your Ticket:</h4>
                       <embed
                         src={pdfUrl}

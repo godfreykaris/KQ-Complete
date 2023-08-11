@@ -21,9 +21,9 @@ class TicketFactory extends Factory
     public function definition(): array
     {
         return [
-            'ticket_number' => 'KQ-' . fake()->unique()->regexify('[A-Z0-9]{6}'),
+            'ticket_number' => 'KQ-TK-' . fake()->unique()->regexify('[A-Z0-9]{6}'),
             'ticket_price' => fake()->randomFloat(2, 100, 1000),
-            'booking_reference' => fake()->unique()->regexify('[A-Z0-9]{6}'),
+            'booking_reference' => 'KQ-BR-' . fake()->unique()->regexify('[A-Z0-9]{6}'),
             'boarding_pass' => fake()->unique()->regexify('[A-Z0-9]{10}'),
             'flight_status_id' => FlightStatus::pluck('id')->random(),
             'flight_id' => Flight::pluck('id')->random(),

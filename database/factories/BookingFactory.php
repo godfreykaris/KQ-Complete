@@ -23,7 +23,7 @@ class BookingFactory extends Factory
         return [
             
             'email' => fake()->safeEmail,
-            'booking_reference' => 'KQ-' . fake()->unique()->regexify('[A-Z0-9]{6}'),
+            'booking_reference' => 'KQ-BR-' . fake()->unique()->regexify('[A-Z0-9]{6}'),
             'booking_date' => fake()->dateTime(),
             'flight_id' => Flight::pluck('id')->random(),
         ];
