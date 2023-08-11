@@ -1,63 +1,114 @@
 import React, { useState } from "react";
 import { Container, Form, Col, Button, Alert } from "react-bootstrap";
+import { useNavigate } from 'react-router-dom';
+
+import LoadingComponent from "../../../../Common/LoadingComponent";
+
 import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
 
 export default function PrintTicket() {
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const [refError, setRefError] = useState("");
+
   const [formData, setFormData] = useState({
     bookingReference: "",
     ticketNumber: "",
   });
-  const [pdfUrl, setPdfUrl] = useState("");
-  const [error, setError] = useState("");
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    let newValue = value.replace(/\D/g, "");
-  
-    // Add the "KQ-" prefix and set the error message
-    if (newValue.length <= 8) {
-      newValue = `KQ-${newValue}`;
-      setRefError("");
-    } else {
-      setRefError("The input must be 6 digits or less");
-    }
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: newValue,
-    }));
+
+  const [pdfUrl, setPdfUrl] = useState("");
+
+  const [responseMessage, setResponseMessage] = useState('');
+  const [responseStatus, setResponseStatus] = useState<number | null>(null);
+
+  const navigate = useNavigate();
+
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = e.target;
+      const sanitizedValue = value.replace(/[^a-zA-Z0-9]/g, ""); // Allow only letters and numbers
+
+      if (sanitizedValue.length <= 8) 
+      {
+          const newValue = `KQ-${sanitizedValue.slice(2, 9)}`; // Use the first 6 characters
+          setFormData((prevFormData) => ({
+              ...prevFormData,
+              [name]: newValue,
+          }));
+          setRefError(""); // Clear any previous errors
+      } 
+      else 
+      {
+          setRefError("The input must be 'KQ-' followed by 6 characters or less");
+      }
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+   const getResponseClass = () => {
+     if (responseStatus === 1) 
+     {
+       return 'text-success'; // Green color for success
+     } 
+     else if (responseStatus === 0) 
+     {
+       return 'text-danger'; // Red color for error
+     } 
+     else 
+     {
+       return ''; // No specific styles (default)
+     }
+   };
+
+  const handleSubmit = async (e:  React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    setIsLoading(true);
 
     try 
     {
-      const response = await fetch("/api/ticket", {
-        method: "POST",
+
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+      if (!csrfToken) 
+      {
+        console.error('CSRF token not found.');
+        setIsLoading(false);
+
+        navigate('/');
+        return;
+      }
+
+      const response = await fetch(`/tickets/report/${formData.bookingReference}/${formData.ticketNumber}`, {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
+          'X-CSRF-TOKEN': csrfToken,
         },
-        body: JSON.stringify(formData),
       });
 
       if (response.ok) 
       {
-        const { pdfUrl } = await response.json();
-        setPdfUrl(pdfUrl);
-        setError("");
+          const pdfBlob = await response.blob();
+          const pdfUrl = URL.createObjectURL(pdfBlob);
+          setPdfUrl(pdfUrl);
       } 
       else 
       {
-        const errorData = await response.json();
-        setError(errorData.message || "An error occurred");
-        setPdfUrl("");
+        setResponseStatus(0); // Error
+        setResponseMessage(`Error getting the ticket please contact support.`);
       }
+
+      setIsLoading(false);
+
     } 
     catch (error) 
     {
-      setError("An error occurred");
+      setIsLoading(false);
+      setResponseStatus(0); // Error
+      setResponseMessage('Error submitting data. Please try again or contact support.');
+      console.error('Error submitting data:', error);
       setPdfUrl("");
     }
   };
@@ -77,7 +128,11 @@ export default function PrintTicket() {
           <h2 className="text-primary text-center">Print Ticket|</h2>
           <hr />
           <Col md={6} className="mx-auto">
-            {error && <Alert variant="danger">{error}</Alert>}
+          {isLoading ? (
+                /**Show loading */
+                <LoadingComponent />
+              ) : (
+            <>
             <Form onSubmit={handleSubmit}>
               <Form.Group>
                 <Form.Label>Booking Reference:</Form.Label>
@@ -101,13 +156,16 @@ export default function PrintTicket() {
                   type="text"
                   id="ticketNumber"
                   name="ticketNumber"
-                  maxLength={9s}
+                  maxLength={9}
                   value={formData.ticketNumber}
                   onChange={handleChange}
                   required
                 />
               </Form.Group>
               <hr />
+
+              <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+
               <Button type="submit" variant="primary">
                 Retrieve Ticket
               </Button>
@@ -124,6 +182,8 @@ export default function PrintTicket() {
                 />
               </div>
             )}
+            </>
+      )}
           </Col>
         </Container>
       </Container>
