@@ -88,17 +88,51 @@ export default function PrintTicket() {
         },
       });
 
-      if (response.ok) 
-      {
-          const pdfBlob = await response.blob();
-          const pdfUrl = URL.createObjectURL(pdfBlob);
-          setPdfUrl(pdfUrl);
-      } 
-      else 
-      {
+      if (response.ok) {
+        const contentType = response.headers.get("content-type");
+    
+        if(contentType)
+        {
+          if (contentType.includes("application/json")) 
+          {
+              const jsonResponse = await response.json();
+              
+              setResponseStatus(0); // Error
+              setResponseMessage(`Error: ${jsonResponse.error}`);
+              setPdfUrl("");
+
+          } 
+          else if (contentType.includes("application/pdf")) 
+          {
+              const pdfBlob = await response.blob();
+              const pdfUrl = URL.createObjectURL(pdfBlob);
+              setPdfUrl(pdfUrl);
+              setResponseMessage('');
+
+          } 
+          else 
+          {
+              setResponseStatus(0); // Error
+              setResponseMessage("Unknown response format. Please contact support");
+              setPdfUrl("");
+
+          }
+        }
+        else 
+          {
+              setResponseStatus(0); // Error
+              setResponseMessage("An error occurred. Please contact support");
+              setPdfUrl("");
+
+          }
+        
+    } 
+    else 
+    {
         setResponseStatus(0); // Error
-        setResponseMessage(`Error getting the ticket please contact support.`);
-      }
+        setResponseMessage(`Error getting the ticket, please contact support.`);
+        setPdfUrl("");
+    }
 
       setIsLoading(false);
 
@@ -127,12 +161,13 @@ export default function PrintTicket() {
         <Container fluid>
           <h2 className="text-primary text-center">Print Ticket|</h2>
           <hr />
-          <Col md={6} className="mx-auto">
           {isLoading ? (
                 /**Show loading */
                 <LoadingComponent />
               ) : (
             <>
+            <Col md={6} className="mx-auto">
+          
             <Form onSubmit={handleSubmit}>
               <Form.Group>
                 <Form.Label>Booking Reference:</Form.Label>
@@ -166,14 +201,19 @@ export default function PrintTicket() {
 
               <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
 
-              <Button type="submit" variant="primary">
-                Retrieve Ticket
-              </Button>
+              <div className='d-flex justify-content-center'>
+                <Button type="submit" variant="primary">
+                  Retrieve Ticket
+                </Button>
+              </div>
+              
             </Form>
-            {pdfUrl && (
+            
+          </Col>
+          {pdfUrl && (
               <div>
                 <hr />
-                <h4>Your Ticket:</h4>
+                <h4 className="text-center">Your Ticket:</h4>
                 <embed
                   src={pdfUrl}
                   type="application/pdf"
@@ -182,9 +222,9 @@ export default function PrintTicket() {
                 />
               </div>
             )}
+          
             </>
       )}
-          </Col>
         </Container>
       </Container>
     </div>
