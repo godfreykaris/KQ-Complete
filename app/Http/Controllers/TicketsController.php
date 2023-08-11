@@ -28,7 +28,7 @@ class TicketsController extends Controller
             // Make sure it exists
             if(!$ticket)
             {
-                return response()->json(['error' => 'This ticket number does not exist. Ticket Number: ' . $ticket_number], 500);
+                return response()->json(['error' => 'This ticket number does not exist. Ticket Number: ' . $ticket_number]);
             }
                    
             return response()->json(['ticket' => $ticket, 'status' => 1]);
@@ -41,24 +41,25 @@ class TicketsController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            //return response()->json(['error' => 'An error occurred. '.$e->getMessage()], 500);
+            //return response()->json(['error' => 'An error occurred. '.$e->getMessage()]);
 
-            return response()->json(['error' => 'An error occurred.'], 500);
+            return response()->json(['error' => 'An error occurred.']);
         }
        
     }
 
-    public function generateTicketReport($ticket_number)
+    public function generateTicketReport($booking_reference, $ticket_number)
     {
         try
         {
+        
              // Retrieve ticket data based on the ticket number
             $ticket = Ticket::where('ticket_number', $ticket_number)->first();
 
             // Make sure the ticket is valid
             if(!$ticket)
             {
-                return response()->json(['error' => 'The ticket ' . $ticket_number . ' cannot be found'], 500);
+                return response()->json(['error' => 'The ticket ' . $ticket_number . ' cannot be found']);
             }
 
             // Get the booking associated with the ticket number
@@ -67,7 +68,15 @@ class TicketsController extends Controller
             // Make sure the booking exists
             if(!$booking)
             {
-                return response()->json(['error' => 'The ticket is connected to an invalid booking reference.'], 500);
+                return response()->json(['error' => 'The ticket is connected to an invalid booking reference.']);
+            }
+            else
+            {
+                // Make sure the booking references match
+                if($booking_reference !== $ticket->booking_reference)
+                {
+                    return response()->json(['error' => 'Incorrect details. Please check the details again.']);
+                }
             }
 
             // Get the passengers under the found booking
@@ -76,7 +85,7 @@ class TicketsController extends Controller
             // Make sure we have valid passengers
             if(!$passengers)
             {
-                return response()->json(['error' => 'No passengers available for the ticket.'], 500);
+                return response()->json(['error' => 'No passengers available for the ticket.']);
             }
                     
             // Ticket data to be passed to the PDF template
@@ -106,9 +115,9 @@ class TicketsController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            return response()->json(['error' => 'An error occurred. '.$e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred. '.$e->getMessage()]);
 
-            //return response()->json(['error' => 'An error occurred.'], 500);
+            //return response()->json(['error' => 'An error occurred.']);
         }
        
     }

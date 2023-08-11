@@ -97,7 +97,7 @@ Route::get('/planes/{planeId}', [PlanesController::class, 'show'])->name('planes
 
 
 Route::get('/ticket/{ticket_number}', [TicketsController::class, 'show']);
-Route::get('/tickets/{ticket_number}/report', [TicketsController::class, 'generateTicketReport'])->name('tickets.report');
+Route::get('/tickets/report/{booking_reference}/{ticket_number}', [TicketsController::class, 'generateTicketReport'])->name('tickets.report');
 
 Route::middleware('auth:api')->group(function () {
     Route::put('/cities/change/{cityId}', [CitiesController::class, 'update'])->name('cities.update');
