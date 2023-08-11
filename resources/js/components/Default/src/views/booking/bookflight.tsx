@@ -1,17 +1,45 @@
 import './bookflight.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Container, Row, Col, Form, Button, Table, Spinner, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Container, Row, Col, Form, Button, Table, Spinner, OverlayTrigger, Tooltip, Alert } from "react-bootstrap";
 
-import { usePassengerContext } from "../../context/passengers/passengercontext";
+import { usePassengerContext, PassengerContextType } from "../../context/passengers/passengercontext";
 import { useSearchFlightContext } from "../../context/flights/flightcontext";
 import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
-import { useSeatContext } from "../../context/seats/sendseatdata";
+import { useSeatContext, SeatContextType } from "../../context/seats/sendseatdata";
 import Seat from "../seats/viewseat.js";
 import SeatMap from "../seats/seatmap.js";
+
+interface passenger{
+  name: string;
+  passport: number;
+  idNumber: number;
+  birthDate: string;
+}
+
+interface depdate{
+  date: string;
+}
+interface retdate{
+  date: string;
+}
+
+interface flight{
+  name: string;
+  flightNumber: number;
+  destination: string;
+  airline: string;
+  duration: string;
+  depdate: depdate;
+  retdate: retdate;
+}
+
+interface location{
+  name: string;
+}
 
 
 export default function BookFlight() {
@@ -60,7 +88,6 @@ export default function BookFlight() {
         selectedFrom: sfSelectedFrom,
         selectedTo: sfSelectedTo,
       }));
-      console.log("sfDep", departureDate);
     }
   }, [sfDepartureDate, sfReturnDate, sfSelectedFrom, sfSelectedTo]);
 
@@ -68,28 +95,28 @@ export default function BookFlight() {
 
 
   // Access the "passengers" array from the context using the usePassengerContext hook
-  const { passengers, removePassenger } = usePassengerContext();
+  const {passengers, removePassenger, updatePassenger} = usePassengerContext() as PassengerContextType;
 
   //access seats from seat context
-  const {seat, updateSeat} = useSeatContext();
+  const {seat, updateSeat} = useSeatContext() as SeatContextType;
 
 
   const navigate2 = useNavigate();
 
   //to remove passenger when delete button is clicked
-  const handleDeletePassenger = (index) => {
+  const handleDeletePassenger = (index: number) => {
     removePassenger(index);
   };
 
   //to edit passenger when the edit button is clicked
-  const handleEditPassenger = (passenger, index) => {   
+  const handleEditPassenger = (passenger: passenger, index: number) => {   
     navigate2('/addpassenger1', {state: {passenger, index}});
   };
 
   const [emailError, setEmailError] = useState("");
 
   // Format date imported from AddPassenger1
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     const dateObj = new Date(dateString);
     const year = dateObj.getFullYear();
     const month = String(dateObj.getMonth() + 1).padStart(2, "0");
@@ -98,7 +125,7 @@ export default function BookFlight() {
   };  
 
   // Handle change
-  const handleChange = (event) => {
+  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     const { name, value } = event.target;
 
     if (name === "email") {
@@ -135,19 +162,24 @@ export default function BookFlight() {
     navigate('/seatmap');
   };
 
-  const handleTripType = (e) => {
+  const handleTripType = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setTripType(e.target.value);
   };
 
   // Handle Add passenger click
   const handleAddPassengerClick = () => {
-    updateSeat({});
-    console.log('Seat:', seat);
+    updateSeat({
+      number: 0,
+      class: '',
+      location: '',
+      availability: false,
+      price: ''
+    });
     setIsButtonClicked(false);
   };
 
   //addpassenger message befor selecting flight
-  const renderTooltip = (message) => (
+  const renderTooltip = (message: string) => (
     <Tooltip id='tooltip'>{message}</Tooltip>
   )
 
@@ -162,7 +194,7 @@ export default function BookFlight() {
     fetch("/src/components/testdata/planes.json")
       .then((response) => response.json())
       .then((data) => {
-        const filterData = data.flights.filter((item) => {
+        const filterData = data.flights.filter((item: any) => {
           const itemDate = item.depdate.date;
           const selectedDate = departureDate.split("-").reverse().join("/");
           return itemDate === selectedDate;
@@ -193,21 +225,21 @@ export default function BookFlight() {
       });
   }, []);
 
-  const handleFromChange = (selectedOption) => {
+  const handleFromChange = (selectedOption: string) => {
     setSelectedFrom(selectedOption);
     const filteredLocations = locations.filter(
-      (location) => location.name !== selectedOption
+      (location: location) => location.name !== selectedOption
     );
     setSelectedTo("");
     setFilteredLocations(filteredLocations);
   };
 
-  const handleToChange = (selectedOption) => {
+  const handleToChange = (selectedOption: string) => {
     setSelectedTo(selectedOption);
   };
 
   // Handle submit
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     try{
@@ -215,7 +247,6 @@ export default function BookFlight() {
     }
     catch{
       setErrorMessage("An error occured!");
-      console.log("Error fetching data", error);
     }
   };
 
@@ -233,10 +264,10 @@ export default function BookFlight() {
   
 
    //to handle flight selection
-   const [selectedFlight, setSelectedFlight] = useState(null);
+   const [selectedFlight, setSelectedFlight] = useState<flight | null>(null);
 
    //function to handle flight selection
-   const handleFlightSelection = (flight) => {
+   const handleFlightSelection = (flight: flight) => {
     if(selectedFlight === null){
       setSelectedFlight(flight);
     }else {
@@ -245,16 +276,24 @@ export default function BookFlight() {
         setSelectedFlight(flight);
 
         //clear seat data for every passenger
-        const updatedPassengers = passengers.map(passenger => ({
+        const updatedPassengers = passengers.map((passenger: passenger) => ({
           ...passenger,
-          seat: {},
+          seat: {}
         }));
 
         //update seat data using the context function
-        updateSeat({});
+        updateSeat({
+          number: 0,
+          class: '',
+          location: '',
+          availability: false,
+          price: ''
+        });
 
         //update passenger adata using context function
-        updatedPassengers(updatedPassengers);
+        updatedPassengers.forEach((updatedPassenger, index: number) => {
+          updatePassenger(index, updatedPassenger)
+        })
       }
     }
     
@@ -262,7 +301,7 @@ export default function BookFlight() {
 
    return (
     <div>
-      <MenuBar1/>
+      <MenuBar1 isAuthenticated={false}/>
       <br/>
       <br/>
       <br/>
@@ -293,7 +332,7 @@ export default function BookFlight() {
                   as="select"
                   id="trip-type"
                   value={tripType}
-                  onChange={handleTripType}
+                  onChange={(event) => handleTripType(event)}
                   required
                 >
                   <option value="">Select Trip Type</option>
@@ -338,7 +377,7 @@ export default function BookFlight() {
                     required
                   >
                     <option value="">Select Departure Location</option>
-                    {locations.map((option, index) => (
+                    {locations.map((option: location, index: number) => (
                       <option key={index} value={option.name}>
                         {option.name}
                       </option>
@@ -363,7 +402,7 @@ export default function BookFlight() {
                     required
                   >
                     <option value="">Select Destination</option>
-                    {filteredLocations.map((option, index) => (
+                    {filteredLocations.map((option: location, index: number) => (
                       <option key={index} value={option.name}>
                         {option.name}
                       </option>
@@ -399,7 +438,7 @@ export default function BookFlight() {
                     </tr>
                   </thead>
                   <tbody>
-                    {passengers.map((passenger, index) => (
+                    {passengers.map((passenger: passenger, index: number) => (
                       <tr key={index}>
                         <td>{passenger.name}</td>
                         <td>{passenger.passport}</td>
@@ -451,7 +490,7 @@ export default function BookFlight() {
 
               <br/>
 
-              {isButtonClicked && <SeatMap/>}
+              {isButtonClicked && <SeatMap planeId={undefined} onSeatSelected={undefined}/>}
               <br/>
               <div className="d-flex justify-content-between align-items-center">
                 
@@ -509,7 +548,7 @@ export default function BookFlight() {
                         </tr>
                       </thead>
                       <tbody>
-                        {tableData.map((item, index) => (
+                        {tableData.map((item: flight, index: number) => (
                           <tr
                             key={index}
                             className={selectedFlight === item ? "selected-row" : ""}
