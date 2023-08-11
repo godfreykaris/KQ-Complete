@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Form, Col, Button, Alert } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
 
@@ -25,6 +25,20 @@ export default function PrintTicket() {
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
   const navigate = useNavigate();
+
+  // Detect if the device is mobile
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+      const isMobileDevice = window.innerWidth <= 768; // Adjust the breakpoint if needed
+      setIsMobile(isMobileDevice);
+  }, []);
+
+  const openPdfInNewTab = () => {
+      if (pdfUrl) {
+          window.open(pdfUrl, '_blank');
+      }
+  };
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -211,17 +225,34 @@ export default function PrintTicket() {
             
           </Col>
           {pdfUrl && (
-              <div>
-                <hr />
-                <h4 className="text-center">Your Ticket:</h4>
-                <embed
-                  src={pdfUrl}
-                  type="application/pdf"
-                  width="100%"
-                  height="600px"
-                />
-              </div>
-            )}
+          <div className="mt-4">
+               {isMobile ? (
+                  <>
+                    <hr />
+
+                    <div className='d-flex justify-content-center'>
+                      <hr />
+                      <Button onClick={openPdfInNewTab} variant="primary">
+                          View PDF ticket on a new tab.
+                      </Button>
+                    </div>
+                  </>
+                  ) : (
+                    <div>
+                    <Col md={6} lg={5} className="mx-auto">
+                      <hr />
+                      <h4 className="text-center">Your Ticket:</h4>
+                      <embed
+                        src={pdfUrl}
+                        type="application/pdf"
+                        width="100%"
+                        height="600px"
+                      />
+                    </Col>
+                  </div>
+                )}
+            </div>
+          )}
           
             </>
       )}
