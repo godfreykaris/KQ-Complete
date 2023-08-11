@@ -35,6 +35,10 @@
   .dropdown-item-custom {
     color: #ffffff; /* Change the text color of dropdown items */
   }
+
+  .dropdown:hover .dropdown-menu-custom{
+    display: block;
+  }
   
   /* Style for the navbar brand */
   .navbar-brand {

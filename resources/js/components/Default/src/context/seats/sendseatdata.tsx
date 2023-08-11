@@ -1,12 +1,28 @@
 import React, {createContext, useState, useContext} from "react";
 
-const SeatContext = createContext();
+interface seat{
+  number: number;
+  class: string;
+  location: string;
+  availability: boolean;
+  price: string;
+}
 
-export default function SeatProvider({children}) {
-    const [seat, setSeat] = useState({});
+interface SeatContextType{
+  seat: seat | {};
+  updateSeat: (newSeatData: seat) => void;
+}
 
-    const updateSeat = (newSeatData) => {
-      console.log("Updating seats...");
+interface seatProviderProps{
+  children: React.ReactNode;
+}
+
+const SeatContext = createContext<SeatContextType | undefined>(undefined);
+
+export default function SeatProvider({children} : seatProviderProps) {
+    const [seat, setSeat] = useState<seat | {}>({});
+
+    const updateSeat = (newSeatData: seat) => {
         setSeat((prevSeat) => ({
             ...prevSeat,
             ...newSeatData,
@@ -23,3 +39,5 @@ export default function SeatProvider({children}) {
 export function useSeatContext(){
     return useContext(SeatContext);
 }
+
+export type {SeatContextType};
