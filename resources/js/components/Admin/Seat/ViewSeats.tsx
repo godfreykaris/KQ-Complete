@@ -185,7 +185,7 @@ const ViewSeats: React.FC = () => {
                                   <td>{item.price}</td>  
                                   <td>
                                     <Link
-                                      to={`/plane_seats/edit/${item.plane_id}/${item.flight_class_id}/${item.location_id}/${item.price}/${item.seat_number}`} // Replace "edit-seat" with the actual URL for the EditSeatComponent
+                                      to={`/admin/plane_seats/edit/${item.plane_id}/${item.flight_class_id}/${item.location_id}/${item.price}/${item.seat_number}`} // Replace "edit-seat" with the actual URL for the EditSeatComponent
                                       className="btn btn-primary"
                                     >
                                       Edit
@@ -193,7 +193,7 @@ const ViewSeats: React.FC = () => {
                                   </td>
                                   <td>
                                     <Link
-                                      to={`/plane_seats/delete/seats/${getPlaneID(item.plane_id)}/${item.seat_number}/${item.plane_id}`} // Replace "delete-seat" with the actual URL for the DeleteSeatComponent
+                                      to={`/admin/plane_seats/delete/seats/${getPlaneID(item.plane_id)}/${item.seat_number}/${item.plane_id}`} // Replace "delete-seat" with the actual URL for the DeleteSeatComponent
                                       className="btn btn-danger"
                                     >
                                       Delete

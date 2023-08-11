@@ -156,7 +156,7 @@ export default function AddPassenger1() {
 
   return (
     <div>
-      <MenuBar1 />
+      <MenuBar1 isAuthenticated={false} />
       <br/>
       <br/>
       <br/>
