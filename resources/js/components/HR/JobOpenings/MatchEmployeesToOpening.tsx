@@ -4,6 +4,7 @@ import apiBaseUrl from '../../../config';
 import LoadingComponent from '../../../components/Common/LoadingComponent';
 
 import { useNavigate } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 
 
 type Opening = {
@@ -15,12 +16,32 @@ type Opening = {
   
 const MatchEmployeesToOpenings = () => {
 
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const [openings, setOpenings] = useState<Opening[]>([]);
   const [selectedOpeningId, setSelectedOpeningId] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+
+  const [responseMessage, setResponseMessage] = useState('');
+  const [responseStatus, setResponseStatus] = useState<number | null>(null);
+
+  // Detect if the device is mobile
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+      const isMobileDevice = window.innerWidth <= 768; // Adjust the breakpoint if needed
+      setIsMobile(isMobileDevice);
+  }, []);
+
+  const openPdfInNewTab = () => {
+      if (pdfUrl) {
+          window.open(pdfUrl, '_blank');
+      }
+  };
 
   useEffect(() => {
     fetchOpenings();
@@ -43,13 +64,34 @@ const MatchEmployeesToOpenings = () => {
     setSelectedOpeningId(value ? parseInt(value) : null);
   };
 
+  const getResponseClass = () => {
+     if (responseStatus === 1) 
+     {
+       return 'text-success'; // Green color for success
+     } 
+     else if (responseStatus === 0) 
+     {
+       return 'text-danger'; // Red color for error
+     } 
+     else 
+     {
+       return ''; // No specific styles (default)
+     }
+   };
+   
   const getMatchingEmployeesPDF = async () => {
+
+    setIsLoading(true);
+
     try 
     {
       const accessToken = sessionStorage.getItem('access_token');
-      if (!accessToken) {
+      if (!accessToken) 
+      {
+        setIsLoading(false);
         // Redirect to the sign-in page if the accessToken is not set
         navigate('/signin');
+        
         return;
       }
 
@@ -65,17 +107,62 @@ const MatchEmployeesToOpenings = () => {
 
         if (response.ok) 
         {
-          const pdfBlob = await response.blob();
-          const pdfUrl = URL.createObjectURL(pdfBlob);
-          setPdfUrl(pdfUrl);
+          
+            const contentType = response.headers.get("content-type");
+          
+            if(contentType)
+            {
+              if (contentType.includes("application/json")) 
+              {
+                  const jsonResponse = await response.json();
+
+                  setResponseStatus(0); // Error
+                  setResponseMessage(`Error: ${jsonResponse.error}`);
+                  setPdfUrl("");
+              
+              } 
+              else if (contentType.includes("application/pdf")) 
+              {
+                  const pdfBlob = await response.blob();
+                  const pdfUrl = URL.createObjectURL(pdfBlob);
+                  setPdfUrl(pdfUrl);
+                  setResponseMessage('');
+              
+              } 
+              else 
+              {
+                  setResponseStatus(0); // Error
+                  setResponseMessage("Unknown response format. Please contact support");
+                  setPdfUrl("");
+              
+              }
+            }
+            else 
+              {
+                  setResponseStatus(0); // Error
+                  setResponseMessage("An error occurred. Please contact support");
+                  setPdfUrl("");
+              
+              }
+            
         } 
         else 
         {
-          console.error('Error getting matching employees PDF:', response);
+            setResponseStatus(0); // Error
+            setResponseMessage(`Error getting matched employees, please contact support.`);
+            setPdfUrl("");
         }
+
+        setIsLoading(false);
+
       }
-    } catch (error) {
-      console.error('Error getting matching employees PDF:', error);
+    } 
+    catch (error) 
+    {
+      setResponseStatus(0); // Error
+      setResponseMessage(`Error getting matched employees, please contact support.`);
+      setPdfUrl("");
+      console.error('Error getting matched employees PDF:', error);
     }
   };
 
@@ -85,12 +172,16 @@ const MatchEmployeesToOpenings = () => {
     }
   }, [selectedOpeningId]);
 
+
   return (
     <div className="text-center">
         <h2>Match Employees to Openings</h2>
         {isLoading ? (
           <LoadingComponent />
         ) : (
+          <>
+          <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+
           <div className="row justify-content-center">
             <div className="col-md-6"> {/* Set the desired width */}
               <label htmlFor="openingSelect">Select an Opening:</label>
@@ -109,11 +200,20 @@ const MatchEmployeesToOpenings = () => {
               </select>
             </div>
           </div>
+          </>
         )}
         
         {pdfUrl && (
           <div className="mt-4">
-            <iframe title="Matching Employees PDF" src={pdfUrl} width="80%" height="500px" />
+             {isMobile ? (
+                  <div className='d-flex justify-content-center'>
+                    <Button onClick={openPdfInNewTab} variant="primary">
+                        View PDF report on a new tab.
+                    </Button>
+                  </div>
+                ) : (
+                    <iframe title="Matching Employees PDF" src={pdfUrl} width="80%" height="500px" />
+              )}
           </div>
         )}
     </div>
