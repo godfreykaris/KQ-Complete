@@ -71,7 +71,7 @@ export default function ViewOpenings() {
 
   return (
     <div>
-      <MenuBar1 />
+      <MenuBar1 isAuthenticated={false} />
       <br />
       <br />
       <br />

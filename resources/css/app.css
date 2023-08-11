@@ -92,6 +92,13 @@
     align-items: center;
   }
   
+
+  .center-div {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
   
   /* Add any other custom styles as needed */
   

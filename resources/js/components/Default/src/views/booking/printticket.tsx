@@ -32,7 +32,8 @@ export default function PrintTicket() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    try {
+    try 
+    {
       const response = await fetch("/api/ticket", {
         method: "POST",
         headers: {
@@ -41,16 +42,21 @@ export default function PrintTicket() {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
+      if (response.ok) 
+      {
         const { pdfUrl } = await response.json();
         setPdfUrl(pdfUrl);
         setError("");
-      } else {
+      } 
+      else 
+      {
         const errorData = await response.json();
         setError(errorData.message || "An error occurred");
         setPdfUrl("");
       }
-    } catch (error) {
+    } 
+    catch (error) 
+    {
       setError("An error occurred");
       setPdfUrl("");
     }
@@ -58,7 +64,7 @@ export default function PrintTicket() {
 
   return (
     <div>
-      <MenuBar1 />
+      <MenuBar1 isAuthenticated={false} />
       <br />
       <br />
       <br />
@@ -79,7 +85,7 @@ export default function PrintTicket() {
                   type="text"
                   id="bookingReference"
                   name="bookingReference"
-                  maxLength="9"
+                  maxLength={9}
                   value={formData.bookingReference}
                   onChange={handleChange}
                   required
@@ -95,7 +101,7 @@ export default function PrintTicket() {
                   type="text"
                   id="ticketNumber"
                   name="ticketNumber"
-                  maxLength="9"
+                  maxLength={9s}
                   value={formData.ticketNumber}
                   onChange={handleChange}
                   required

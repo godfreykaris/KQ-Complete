@@ -117,7 +117,7 @@ export default function SearchFlight() {
 
   return (
     <div>
-      <MenuBar1 />
+      <MenuBar1 isAuthenticated={false} />
       <br />
       <br />
       <br />
