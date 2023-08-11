@@ -28,7 +28,7 @@ class TicketsController extends Controller
             // Make sure it exists
             if(!$ticket)
             {
-                return response()->json(['error' => 'This ticket number does not exist. Ticket Number: ' . $ticket_number]);
+                return response()->json(['error' => 'This ticket number does not exist. Ticket Number: ' . $ticket_number, 'status' => 0]);
             }
                    
             return response()->json(['ticket' => $ticket, 'status' => 1]);
@@ -43,7 +43,7 @@ class TicketsController extends Controller
             // For debugging
             //return response()->json(['error' => 'An error occurred. '.$e->getMessage()]);
 
-            return response()->json(['error' => 'An error occurred.']);
+            return response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
        
     }
@@ -52,6 +52,17 @@ class TicketsController extends Controller
     {
         try
         {
+            // Validate booking reference
+            if (strpos($booking_reference, 'KQ-BR-') !== 0) 
+            {
+                return response()->json(['error' => 'Invalid booking reference format', 'status' => 0]);
+            }
+
+            // Validate ticket number
+            if (strpos($ticket_number, 'KQ-TK-') !== 0) 
+            {
+                return response()->json(['error' => 'Invalid ticket number format', 'status' => 0]);
+            }
         
              // Retrieve ticket data based on the ticket number
             $ticket = Ticket::where('ticket_number', $ticket_number)->first();
@@ -59,7 +70,7 @@ class TicketsController extends Controller
             // Make sure the ticket is valid
             if(!$ticket)
             {
-                return response()->json(['error' => 'The ticket ' . $ticket_number . ' cannot be found']);
+                return response()->json(['error' => 'The ticket ' . $ticket_number . ' cannot be found', 'status' => 0]);
             }
 
             // Get the booking associated with the ticket number
@@ -68,14 +79,14 @@ class TicketsController extends Controller
             // Make sure the booking exists
             if(!$booking)
             {
-                return response()->json(['error' => 'The ticket is connected to an invalid booking reference.']);
+                return response()->json(['error' => 'The ticket is connected to an invalid booking reference.', 'status' => 0]);
             }
             else
             {
                 // Make sure the booking references match
                 if($booking_reference !== $ticket->booking_reference)
                 {
-                    return response()->json(['error' => 'Incorrect details. Please check the details again.']);
+                    return response()->json(['error' => 'Incorrect details. Please check the details again.', 'status' => 0]);
                 }
             }
 
@@ -85,7 +96,7 @@ class TicketsController extends Controller
             // Make sure we have valid passengers
             if(!$passengers)
             {
-                return response()->json(['error' => 'No passengers available for the ticket.']);
+                return response()->json(['error' => 'No passengers available for the ticket.', 'status' => 0]);
             }
                     
             // Ticket data to be passed to the PDF template
@@ -105,6 +116,7 @@ class TicketsController extends Controller
             // Load the blade template view that is used to organize and style the ticket data
             $pdf = FacadePdf::loadView('ticket.pdf_template', $ticketData);
 
+            
             return $pdf->stream('ticket.pdf'); // Stream the PDF to the browser
 
         }
@@ -115,9 +127,9 @@ class TicketsController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            return response()->json(['error' => 'An error occurred. '.$e->getMessage()]);
+            //return response()->json(['error' => 'An error occurred. '.$e->getMessage(), 'status' => 0]);
 
-            //return response()->json(['error' => 'An error occurred.']);
+             response()->json(['error' => 'An error occurred.', 'status' => 0]);
         }
        
     }

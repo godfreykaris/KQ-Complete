@@ -43,6 +43,7 @@
     </style>
 </head>
 <body>
+    <h2 class='text-center'>Kenya Airways Ticket</h2>
     <div class="ticket-details">
         <h2>Ticket Details</h2>
         <div>

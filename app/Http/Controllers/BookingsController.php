@@ -18,15 +18,16 @@ use Illuminate\Support\Str;
 
 class BookingsController extends Controller
 {
+    private $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
     public function generateBookingReference()
     {
-        $bookingReference = 'KQ-BR-' . strtoupper(Str::random(8));
+        $bookingReference = 'KQ-BR-' . strtoupper(Str::random(6, $this->characters));
 
         // Check if the generated booking reference already exists in the database
         while (Booking::where('booking_reference', $bookingReference)->exists()) 
         {
-            $bookingReference = 'KQ-BR-' . strtoupper(Str::random(8));
+            $bookingReference = 'KQ-BR-' . strtoupper(Str::random(6, $this->characters));
         }
     
            
@@ -35,16 +36,14 @@ class BookingsController extends Controller
 
     public function generateTicketNumber()
     {
-        $ticketPrefix = 'KQ-TK-'; 
-        $randomNumber = mt_rand(100000, 999999); // Generate a random 6-digit number
-        
-        $ticketNumber = $ticketPrefix . $randomNumber;
+        $ticketNumber = 'KQ-TK-' . strtoupper(Str::random(6, $this->characters));
+
 
         // Check if the generated ticket number already exists in the database
         while (Ticket::where('ticket_number', $ticketNumber)->exists()) 
         {
-            $randomNumber = mt_rand(100000, 999999);
-            $ticketNumber = $ticketPrefix . $randomNumber;
+            $ticketNumber = 'KQ-TK-' . strtoupper(Str::random(6, $this->characters));
+
         }
 
         
@@ -54,13 +53,13 @@ class BookingsController extends Controller
     
     public function generateBoardingPass()
     {
-        $boardingPass = 'KQ-BP-' . strtoupper(Str::random(10));
+        $boardingPass = 'KQ-BP-' . strtoupper(Str::random(6, $this->characters));
 
 
         // Check if the generated boarding pass already exists in the database
         while (Ticket::where('boarding_pass', $boardingPass)->exists()) 
         {
-            $boardingPass = 'KQ-BP-' . strtoupper(Str::random(10));
+            $boardingPass = 'KQ-BP-' . strtoupper(Str::random(6, $this->characters));
         }
     
            
