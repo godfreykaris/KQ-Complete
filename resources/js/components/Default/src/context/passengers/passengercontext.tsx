@@ -1,10 +1,20 @@
 import React, { createContext, useState, useContext } from 'react';
 
+interface seat{
+  _id: number;
+  number: number;
+  class: string;
+  location: string;
+  availability: boolean;
+  price: string;
+}
+
 interface passenger{
   name: string;
   passport: number;
   idNumber: number;
   birthDate: string;
+  seat: seat | {};
 }
 
 interface PassengerContextType{

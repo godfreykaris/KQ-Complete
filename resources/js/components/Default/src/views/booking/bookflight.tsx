@@ -1,44 +1,50 @@
 import './bookflight.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import React, { ChangeEvent, useEffect, useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Container, Row, Col, Form, Button, Table, Spinner, OverlayTrigger, Tooltip, Alert } from "react-bootstrap";
 
 import { usePassengerContext, PassengerContextType } from "../../context/passengers/passengercontext";
-import { useSearchFlightContext } from "../../context/flights/flightcontext";
 import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
 import { useSeatContext, SeatContextType } from "../../context/seats/sendseatdata";
 import Seat from "../seats/viewseat.js";
 import SeatMap from "../seats/seatmap.js";
 
+import apiBaseUrl from '../../../../../config';
+
+interface seat{
+  _id: number;
+  number: number;
+  class: string;
+  location: string;
+  availability: boolean;
+  price: string;
+}
+
 interface passenger{
   name: string;
   passport: number;
   idNumber: number;
   birthDate: string;
-}
-
-interface depdate{
-  date: string;
-}
-interface retdate{
-  date: string;
+  seat: seat | {};
 }
 
 interface flight{
+  id: number;
   name: string;
-  flightNumber: number;
+  flight_number: number;
   destination: string;
   airline: string;
   duration: string;
-  depdate: depdate;
-  retdate: retdate;
+  departure_time:  string;
+  return_time: string;
 }
 
 interface location{
   name: string;
+  country: string;
 }
 
 
@@ -47,12 +53,16 @@ export default function BookFlight() {
   const [tripType, setTripType] = useState("");
   const [departureDate, setDepartureDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
-  const [tableData, setTableData] = useState([]);
+  const [flightTableData, setFlightTableData] = useState<flight[]>([]);
 
   const [locations, setLocations] = useState([]);
   const [selectedFrom, setSelectedFrom] = useState("");
   const [selectedTo, setSelectedTo] = useState("");
   const [filteredLocations, setFilteredLocations] = useState([]);
+
+  const [flightId, setFlightId] = useState<number>(0);
+
+  const [loading, setLoading] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -173,7 +183,8 @@ export default function BookFlight() {
       class: '',
       location: '',
       availability: false,
-      price: ''
+      price: '',
+      _id: 0
     });
     setIsButtonClicked(false);
   };
@@ -186,44 +197,62 @@ export default function BookFlight() {
   // Departure locations and destinations
   useEffect(() => {
     if (departureDate !== "") {
-      fetchData();
+      fetchFlightsByDeparture();
+    }
+    else{
+      fectchAllFlights();
     }
   }, [departureDate]);
 
-  const fetchData = () => {
-    fetch("/src/components/testdata/planes.json")
+
+  const fetchFlightsByDeparture = () => {
+    fetch(`${apiBaseUrl}/flights/byDepartureDate/${departureDate}`)
       .then((response) => response.json())
-      .then((data) => {
-        const filterData = data.flights.filter((item: any) => {
-          const itemDate = item.depdate.date;
-          const selectedDate = departureDate.split("-").reverse().join("/");
-          return itemDate === selectedDate;
-        });
-        setTableData(filterData);
-      })
-      .catch((error) => {
-        setErrorMessage("An error occured");
+      .then((data: { flights: flight[] }) => {
+        setFlightTableData(data.flights);
+        }) 
+     
+      .catch((error: any) => {
+        setErrorMessage("An error occurred");
         console.log("Error fetching data: ", error);
       });
   };
 
+  const fectchAllFlights = () => {
+    fetch(`${apiBaseUrl}/flights`)
+      .then((response) => {
+        if (!response.ok) {          
+          throw new Error("Error fetching data");
+        }     
+        return response.json(); // This will automatically parse the JSON response
+      })
+      .then((data) => {
+        setFlightTableData(data.flights); 
+      })
+      .catch((error) => {        
+        throw new Error("Error fetching data: ");
+      });
+  } 
+
   
   //locations
   useEffect(() => {
-    fetch("/src/components/testdata/destinations.json")
+    fetch(`${apiBaseUrl}/cities`)
       .then((response) => {
-        if (!response.ok) {
+        if (!response.ok) {          
           throw new Error("Error fetching data");
-        }
-        return response.json();
+        }     
+        return response.json(); // This will automatically parse the JSON response
       })
       .then((data) => {
-        setLocations(data.locations);
+        setLocations(data.cities); 
       })
-      .catch((error) => {
-        console.error("Error fetching data: ", error);
+      .catch((error) => {        
+        throw new Error("Error fetching data: ");
       });
   }, []);
+  
+  
 
   const handleFromChange = (selectedOption: string) => {
     setSelectedFrom(selectedOption);
@@ -238,16 +267,60 @@ export default function BookFlight() {
     setSelectedTo(selectedOption);
   };
 
-  // Handle submit
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  //----------- Handle submit --------------//
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
+    setErrorMessage(""); //clear previous errors
+
     try{
-      fetchData();
+      const passengersWithSeats = passengers.filter(
+        (passenger) => Object.keys(passenger.seat).length > 0
+      );
+
+      if(passengersWithSeats.length === 0){
+        setErrorMessage("Please select seats for passengers");
+        return;
+      }
+      
+      //data to be sent
+      const sendData = {
+        email: formData.email,
+        flightId: flightId,
+        passengers: passengers,
+      }
+  
+      setLoading(true);
+  
+      //perform POST reuest
+      const response = await fetch("", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(sendData),
+      });
+  
+      if(!response.ok){
+        if(response.status === 400){
+          const errorData = await response.json();
+          throw new Error(`Bad Request: ${errorData.message}`);
+        }else if(response.status === 500){
+          throw new Error("Internal server error");
+        }else{
+          throw new Error("Error sending data");
+        }        
+      }
+  
+      setLoading(false);
+    }catch (error){
+      setErrorMessage("An error occured while booking the flight");
+
+      setLoading(false);
     }
-    catch{
-      setErrorMessage("An error occured!");
-    }
+    
   };
 
   //the seat modal  
@@ -270,6 +343,7 @@ export default function BookFlight() {
    const handleFlightSelection = (flight: flight) => {
     if(selectedFlight === null){
       setSelectedFlight(flight);
+      setFlightId(flight.id);
     }else {
       const confirmUpdate = window.confirm("Changing the flight will clear seats for all passengers. Do you want to continue");
       if(confirmUpdate){
@@ -287,7 +361,8 @@ export default function BookFlight() {
           class: '',
           location: '',
           availability: false,
-          price: ''
+          price: '',
+          _id: 0         
         });
 
         //update passenger adata using context function
@@ -493,10 +568,16 @@ export default function BookFlight() {
               {isButtonClicked && <SeatMap planeId={undefined} onSeatSelected={undefined}/>}
               <br/>
               <div className="d-flex justify-content-between align-items-center">
-                
+               
                 <OverlayTrigger
-                  placement='top'
-                  overlay={renderTooltip("Select a flight inorder to add a passenger")}
+                  placement="top"
+                  overlay={
+                    selectedFlight === null ? (
+                      renderTooltip("Select a flight inorder to add a passenger")
+                    ) : (
+                      <></> // An empty fragment, effectively disabling the overlay
+                    )
+                  }
                   >
                     <span>
                       <Button
@@ -515,7 +596,8 @@ export default function BookFlight() {
                         Add Passenger
                       </Button>
                     </span>
-                </OverlayTrigger>                  
+                </OverlayTrigger>
+                
                 
 
                 <hr/>
@@ -548,19 +630,19 @@ export default function BookFlight() {
                         </tr>
                       </thead>
                       <tbody>
-                        {tableData.map((item: flight, index: number) => (
+                        {flightTableData.map((item: flight, index: number) => (
                           <tr
                             key={index}
                             className={selectedFlight === item ? "selected-row" : ""}
                             onClick={() => handleFlightSelection(item)}
                           >
                             <td>{item.name}</td>
-                            <td>{item.flightNumber}</td>
+                            <td>{item.flight_number}</td>
                             <td>{item.destination}</td>
                             <td>{item.airline}</td>
                             <td>{item.duration}</td>
-                            <td>{item.depdate.date}</td>
-                            <td>{item.retdate.date}</td>
+                            <td>{item.departure_time}</td>
+                            <td>{item.return_time}</td>
                             <td>
                               <Button
                                 onClick={() => {
@@ -581,8 +663,7 @@ export default function BookFlight() {
                   </div>
                 </Col>
               </Row>
-
-
+        
         </Row>
       </Container>
     </Container>

@@ -4,7 +4,7 @@ import { Modal, Button } from "react-bootstrap";
 export default function Seat({showSeatModal, handleCloseSeatModal, seatObject}) {
 
   //formating seat price to dollars
-  const formatPriceToDollars = (price) => {
+  const formatPriceToDollars = (price: string) => {
     if (price === undefined || price === null) {
       return ""; // Or any default value you want to display for an empty price
     }
