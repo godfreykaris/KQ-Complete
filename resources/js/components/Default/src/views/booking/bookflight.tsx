@@ -31,21 +31,34 @@ interface passenger{
   seat: seat | {};
 }
 
+interface status{
+  name: string;
+}
+
+interface airline{
+  name: string;
+}
+
 interface flight{
   id: number;
-  name: string;
+  flight_status: status;
   flight_number: number;
-  destination: string;
-  airline: string;
+  departure_city: location;
+  arrival_city: location;
+  airline: airline;
   duration: string;
   departure_time:  string;
   return_time: string;
+
 }
 
 interface location{
   name: string;
   country: string;
+  id: number;
 }
+
+
 
 
 export default function BookFlight() {
@@ -196,17 +209,49 @@ export default function BookFlight() {
 
   // Departure locations and destinations
   useEffect(() => {
-    if (departureDate !== "") {
-      fetchFlightsByDeparture();
+    if (departureDate !== "" && selectedFrom !== "") {
+      fetchFlightsByDepartureDateAndCity();      
+    }else if(departureDate !== ""){
+      fetchFlightsByDepartureDate();
+    }else if(selectedFrom !== ""){
+      fetchFlightsByCity();
     }
     else{
       fectchAllFlights();
     }
-  }, [departureDate]);
+  }, [departureDate, selectedFrom]);
 
 
-  const fetchFlightsByDeparture = () => {
-    fetch(`${apiBaseUrl}/flights/byDepartureDate/${departureDate}`)
+  //flight filters
+  const fetchFlightsByCity = () => {
+    fetch(`${apiBaseUrl}/flights/byDepartureCityId/${selectedFrom}`)
+      .then((response) => response.json())
+      .then((data: { flights: flight[] }) => {
+        alert(JSON.stringify(data));
+        setFlightTableData(data.flights);
+        }) 
+     
+      .catch((error: any) => {
+        setErrorMessage("An error occurred");
+        console.log("Error fetching data: ", error);
+      });
+  };
+
+  const fetchFlightsByDepartureDate = () => {
+    fetch(`${apiBaseUrl}/flights/byDepartureDate/${departureDate}`)    
+      .then((response) => response.json())
+      .then((data: { flights: flight[] }) => {
+        setFlightTableData(data.flights);
+        }) 
+     
+      .catch((error: any) => {
+        setErrorMessage("An error occurred");
+        console.log("Error fetching data: ", error);
+      });
+  };
+
+  const fetchFlightsByDepartureDateAndCity = () => {
+    fetch(`${apiBaseUrl}/flights/byDepartureDateCity/${departureDate}/${selectedFrom}`)
       .then((response) => response.json())
       .then((data: { flights: flight[] }) => {
         setFlightTableData(data.flights);
@@ -233,6 +278,8 @@ export default function BookFlight() {
         throw new Error("Error fetching data: ");
       });
   } 
+
+  //end of flight filters
 
   
   //locations
@@ -453,7 +500,7 @@ export default function BookFlight() {
                   >
                     <option value="">Select Departure Location</option>
                     {locations.map((option: location, index: number) => (
-                      <option key={index} value={option.name}>
+                      <option key={index} value={option.id}>
                         {option.name}
                       </option>
                     ))}
@@ -478,7 +525,7 @@ export default function BookFlight() {
                   >
                     <option value="">Select Destination</option>
                     {filteredLocations.map((option: location, index: number) => (
-                      <option key={index} value={option.name}>
+                      <option key={index} value={option.id}>
                         {option.name}
                       </option>
                     ))}
@@ -619,8 +666,9 @@ export default function BookFlight() {
                     <Table striped bordered hover>
                       <thead>
                         <tr>
-                          <th>Name</th>
+                          <th>Status</th>
                           <th>Flight Number</th>
+                          <th>Departure</th>
                           <th>Destination</th>
                           <th>AirLine</th>
                           <th>Duration</th>
@@ -636,10 +684,11 @@ export default function BookFlight() {
                             className={selectedFlight === item ? "selected-row" : ""}
                             onClick={() => handleFlightSelection(item)}
                           >
-                            <td>{item.name}</td>
+                            <td>{item.flight_status.name}</td>
                             <td>{item.flight_number}</td>
-                            <td>{item.destination}</td>
-                            <td>{item.airline}</td>
+                            <td>{item.departure_city.name}</td>
+                            <td>{item.arrival_city.name}</td>
+                            <td>{item.airline.name}</td>
                             <td>{item.duration}</td>
                             <td>{item.departure_time}</td>
                             <td>{item.return_time}</td>

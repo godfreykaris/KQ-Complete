@@ -334,7 +334,8 @@ class FlightsController extends Controller
             }
 
             // Get flights that depart on the specified departure date
-            $flights = Flight::whereDate('departure_time', $departureDate)->get();
+            $flights = Flight::with(['plane', 'airline', 'flightStatus', 'departureCity', 'arrivalCity'])
+                        ->whereDate('departure_time', $departureDate)->get();
 
             return response()->json(['flights' => $flights, 'status' => 1]);
         } 
