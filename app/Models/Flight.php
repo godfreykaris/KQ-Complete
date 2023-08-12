@@ -64,6 +64,11 @@ class Flight extends Model
         return $this->belongsTo(Plane::class);
     }
 
+    public function airline()
+    {
+        return $this->belongsTo(Airline::class, 'airline_id');
+    }
+
     // Define the relationship with the FlightStatus model
     public function flightStatus()
     {

@@ -36,7 +36,7 @@ class FlightsController extends Controller
     {
         try 
         {
-           $flights = Flight::with('plane', 'flightStatus', 'departureCity', 'arrivalCity')->get();
+           $flights = Flight::with('plane', 'airline', 'flightStatus', 'departureCity', 'arrivalCity')->get();
         
             return response()->json(['flights' => $flights, 'status' => 1]);
         } 
@@ -58,7 +58,7 @@ class FlightsController extends Controller
     {
         try 
         {
-            $flight = Flight::with(['plane', 'flightStatus', 'departureCity', 'arrivalCity'])
+            $flight = Flight::with(['plane', 'airline', 'flightStatus', 'departureCity', 'arrivalCity'])
                      ->findOrFail($flightId);
 
             return response()->json(['flight' => $flight, 'status' => 1]);
@@ -232,7 +232,45 @@ class FlightsController extends Controller
             // Make sure the departure city is valid
             $city = City::findOrFail($departureCityId);
 
-            $flights = Flight::where('departure_city_id', $city->id)->get();
+            $flights = Flight::with(['plane', 'airline', 'flightStatus', 'departureCity', 'arrivalCity'])
+                            ->where('departure_city_id', $city->id)->get();
+
+            return response()->json(['flights' => $flights, 'status' => 1]);
+        }
+        catch (ModelNotFoundException $e) 
+        {
+            Log::error($e->getMessage());
+
+            return response()->json(['error' => 'Departure city not found', 'status' => 0], 404);
+        }
+        catch (\Exception $e) 
+        {
+            Log::error($e->getMessage());
+            return response()->json(['error' => 'An error occurred.', 'status' => 0]);
+
+            // For debugging
+            // return response()->json(['error' => 'Error: ' . $e->getMessage(), 'status' => 0]);
+        }
+    }
+
+    // Get flights with a particular departure date and city
+    public function getFlightsByDepartureDateCity($departureDate, $departureCityId)
+    {
+        try 
+        {
+            // Make sure the departure city is valid
+            $city = City::findOrFail($departureCityId);
+
+            // Validate that the provided departure date is a valid date format
+            if (!strtotime($departureDate)) 
+            {
+                return response()->json(['error' => 'Invalid departure date format.', 'status' => 1], 400);
+            }
+
+            $flights = Flight::with(['plane', 'airline', 'flightStatus', 'departureCity', 'arrivalCity'])
+                        ->where('departure_city_id', $city->id)
+                        ->whereDate('departure_time', $departureDate)
+                        ->get();
 
             return response()->json(['flights' => $flights, 'status' => 1]);
         }
@@ -269,7 +307,8 @@ class FlightsController extends Controller
             $departureTime = Carbon::now()->addHours($hours);
 
             // Get flights that depart within the calculated departure time
-            $flights = Flight::where('departure_time', '<', $departureTime)->get();
+            $flights = Flight::with(['plane', 'airline', 'flightStatus', 'departureCity', 'arrivalCity'])
+                                ->where('departure_time', '<', $departureTime)->get();
 
             return response()->json(['flights' => $flights, 'status' => 1]);
         }

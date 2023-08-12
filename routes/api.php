@@ -67,6 +67,7 @@ Route::get('/flights/{flightId}', [FlightsController::class, 'show'])->name('fli
 Route::get('/flights/byDepartureCityId/{departureCityId}', [FlightsController::class, 'getFlightsByDepartureCity'])->name('flights.getFlightsByDepartureCity');
 Route::get('/flights/byHours/{hours}', [FlightsController::class, 'getFlightsDepartingWithinHours'])->name('flights.getFlightsDepartingWithinHours');
 Route::get('/flights/byDepartureDate/{departureDate}', [FlightsController::class, 'getFlightsByDepartureDate'])->name('flights.getFlightsByDepartureDate');
+Route::get('/flights/byDepartureDateCity/{departureDate}/{departureCityId}', [FlightsController::class, 'getFlightsByDepartureDateCity'])->name('flights.getFlightsByDepartureDateCity');
 
 Route::middleware('auth:api')->group(function () {
     Route::put('/flightStatuses/change/{flightStatusId}', [FlightStatusesController::class, 'update'])->name('flightStatuses.update');
