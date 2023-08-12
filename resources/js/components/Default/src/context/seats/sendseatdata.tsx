@@ -1,6 +1,7 @@
 import React, {createContext, useState, useContext} from "react";
 
 interface seat{
+  _id: number;
   number: number;
   class: string;
   location: string;
