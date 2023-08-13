@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\FlightsController;
@@ -38,6 +39,16 @@ use App\Http\Controllers\AirlineController;
 
 Route::post('/users/login', [UsersController::class, 'login'])->name('users.login');
 Route::post('/users/register', [UsersController::class, 'register'])->name('user_register.store');
+
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+ 
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+ 
+    return redirect('/');
+})->middleware(['auth', 'signed'])->name('verification.verify');
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/users/logout', [UsersController::class, 'logout'])->name('users.logout');
