@@ -14,7 +14,8 @@ import ViewOpenings from '../../components/HR/JobOpenings/ViewOpenings';
 import EditOpeningForm from '../../components/HR/JobOpenings/EditOpeningForm';
 import MatchEmployeesToOpenings from '../../components/HR/JobOpenings/MatchEmployeesToOpening';
 
-import useLogout from '../Auth/useLogOut';
+import useLogout from '../Auth/useLogout';
+import HRMLandingPage from './HRMLandingPage';
 
 const HRMComponent = () => {
 
@@ -29,8 +30,10 @@ const HRMComponent = () => {
               </Navbar.Brand>
               <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ color: '#FFFFFF' }} />
               <Navbar.Collapse id="basic-navbar-nav">
-                <Nav className="me-auto justify-content-center">                  
-                   <NavDropdown title="Employees" id="basic-nav-dropdown" className="menu-item-text">                    
+                <Nav className="me-auto justify-content-center">
+                   <Nav.Link as={Link} to="/hrm" className="menu-item-text">Home</Nav.Link>
+                  
+                   <NavDropdown title="Employees" id="basic-nav-dropdown" className="custom-dropdown">                    
                     <NavDropdown.Item as={Link} to="manage_employees/add" className="menu-item-text">
                       Add Employee
                     </NavDropdown.Item>
@@ -40,7 +43,7 @@ const HRMComponent = () => {
                     
                     {/* Add other menu items as needed */}
                   </NavDropdown>
-                  <NavDropdown title="Job Openings" id="basic-nav-dropdown" className="menu-item-text">                    
+                  <NavDropdown title="Job Openings" id="basic-nav-dropdown" className="custom-dropdown">                    
                     <NavDropdown.Item as={Link} to="manage_openings/add" className="menu-item-text">
                       Add Opening
                     </NavDropdown.Item>
@@ -54,7 +57,7 @@ const HRMComponent = () => {
                     {/* Add other menu items as needed */}
                   </NavDropdown>
                 
-                  <Nav.Link onClick={handleLogout} className="nav-link-text">SignOut</Nav.Link>
+                  <Nav.Link onClick={handleLogout} className="menu-item-text">SignOut</Nav.Link>
 
                 </Nav>
               </Navbar.Collapse>
@@ -64,6 +67,9 @@ const HRMComponent = () => {
         <div className="container mt-4">
           <div className="row justify-content-center">
               <Routes>
+
+                <Route path="/" element={<HRMLandingPage />} />
+
                 <Route path="manage_employees/add" element={<AddEmployeeForm />} />
                 <Route path="manage_employees/edit/:employee_id" element={<EditEmployeeForm />} />
                 <Route path="manage_employees/delete/:selectedEntity/:employee_id" element={<DeleteFormComponent />} />

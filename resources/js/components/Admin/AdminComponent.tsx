@@ -34,7 +34,7 @@ import CAFormEditComponent from './Cities&Airlines/CAFormEditComponent';
 import CAFormViewComponent from './Cities&Airlines/CAFormViewComponent';
 import CAFormDeleteComponent from './Cities&Airlines/CAFormDeleteComponent';
 
-import useLogout from '../Auth/useLogOut';
+import useLogout from '../Auth/useLogout';
 import AdminLandingPage from './AdminLandingPage';
 
 const AdminComponent = () => {
