@@ -120,7 +120,7 @@ const SignInComponent = () => {
       {
         setIsLoading(false);
         setResponseStatus(0); // Error
-        setResponseMessage(`Error: Incorrect Login Details.`);
+        setResponseMessage(`Error: ${response.statusText}.`);
         console.log('Authentication failed.');
         // const responseData = await response.json();
         // console.log('Validation Errors:', responseData);

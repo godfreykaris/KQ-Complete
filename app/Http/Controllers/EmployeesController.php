@@ -11,14 +11,17 @@ use Illuminate\Support\Str;
 
 class EmployeesController extends Controller
 {
+    private $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+
     public function generateEmployeeId()
     {
-        $employeeId = 'KQ-EP-' . strtoupper(Str::random(15));
+        $employeeId = 'KQ-EP-' . strtoupper(Str::random(6, $this->characters));
 
         // Check if the generated booking reference already exists in the database
         while (Employee::where('employee_id', $employeeId)->exists()) 
         {
-            $employeeId = 'KQ-EP-' . strtoupper(Str::random(15));
+            $employeeId = 'KQ-EP-' . strtoupper(Str::random(6, $this->characters));
         }
     
            

@@ -163,7 +163,7 @@ const SignUpComponent = () => {
       {
         setIsLoading(false);
         setResponseStatus(0); // Error
-        setResponseMessage(`Error: An error occurred Please try again later or contact support.`);
+        setResponseMessage(`Error: ${response.statusText}.`);
       }
     } 
     catch (error) 

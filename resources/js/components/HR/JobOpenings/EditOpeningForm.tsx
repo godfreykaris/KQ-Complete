@@ -185,7 +185,7 @@ const EditOpeningForm: React.FC = () => {
       else 
       {
         setResponseStatus(0); // Error
-        setResponseMessage(`Error: ${data.error}`);
+        setResponseMessage(`Error: ${response.statusText}`);
       }
 
       setIsLoading(false);

@@ -118,7 +118,7 @@ import { useNavigate } from 'react-router-dom';
                 else 
                 {
                     setResponseStatus(0); // Error
-                    setResponseMessage(`Error: ${data.error}`);
+                    setResponseMessage(`Error: ${response.statusText}`);
                 }
             } 
             catch (error) 
