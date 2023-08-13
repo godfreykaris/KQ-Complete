@@ -1,14 +1,9 @@
 
 /* styles.css (or styles.scss) */
 
-.menu-item-text {
-  color: #d40d0d; /* Replace with the desired text color */
+.custom-dropdown .nav-link, .menu-item-text  {
+  color: #000; /* Set the text color to black */
 }
-
-.nav-link-text {
-  color: #20311b; /* Replace with the desired text color */
-}
-
 
 /* Custom styles for the form container */
 .form-container {
@@ -99,7 +94,64 @@
     left: 50%;
     transform: translate(-50%, -50%);
 }
-  
+
+/* LandingPage.css */
+.landing-page {
+  text-align: center;
+  padding: 40px;
+}
+
+.landing-header {
+  margin-bottom: 30px;
+}
+
+.landing-content {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.landing-section {
+  flex: 1;
+  max-width: 30%;
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  text-align: center;
+}
+
+.landing-section h2 {
+  margin-bottom: 10px;
+}
+
+.landing-section p {
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.landing-btn {
+  display: block;
+  margin: 10px auto;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #fff;
+  background-color: #007BFF;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.landing-btn:hover {
+  background-color: #0056b3;
+}
+
+
   /* Add any other custom styles as needed */
   
   
