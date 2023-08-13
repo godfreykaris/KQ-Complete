@@ -80,7 +80,7 @@ class OpeningController extends Controller
 
 
             // Load the blade template view that is used to organize and style the matches data
-            $pdf = FacadePdf::loadView('matched_employees.pdf_template', ['matched_employees' => $data]);
+            $pdf = FacadePdf::loadView('matched_employees.pdf_template', ['matched_employees' => $data, 'opening' => $opening->title]);
 
             return $pdf->stream('employee-matches.pdf'); // Stream the PDF to the browser
            

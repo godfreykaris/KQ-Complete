@@ -48,15 +48,21 @@ const MatchEmployeesToOpenings = () => {
   }, []);
 
   const fetchOpenings = async () => {
-    try {
-      const response = await fetch(`${apiBaseUrl}/openings`);
-      const data = await response.json();
-      setOpenings(data.openings);
-      setIsLoading(false);
-    } catch (error) {
-      console.error('Error fetching openings:', error);
-      setIsLoading(false);
-    }
+
+    setIsLoading(true);
+
+     try
+     {
+        const response = await fetch(`${apiBaseUrl}/openings`);
+        const data = await response.json();
+        setOpenings(data.openings);
+        setIsLoading(false);
+      } 
+      catch (error) 
+      {
+        console.error('Error fetching openings:', error);
+        setIsLoading(false);
+      }
   };
 
   const handleOpeningChange = (event: React.ChangeEvent<HTMLSelectElement>) => {

@@ -38,23 +38,24 @@
 </head>
 <body>
     <h1 style="text-align: center;">Matched Employees</h1>
-
-        <div class="card-container">
-            @if (count($matched_employees) > 0)
-                @foreach ($matched_employees as $employee)
-                    <div class="card">
-                        <h3>{{ $employee['first_name'] }} {{ $employee['last_name'] }}</h3>
-                        <p><strong>ID:</strong> {{ $employee['employee_id'] }}</p>
-                        <p><strong>Email:</strong> {{ $employee['email'] }}</p>
-                        <p><strong>Phone:</strong> {{ $employee['phone'] }}</p>
-                        <p><strong>Address:</strong> {{ $employee['address'] }}</p>
-                        <p><strong>Job Title:</strong> {{ $employee['job_title']['name'] }}</p> <!-- Assuming you have 'job_title_name' key in the JSON response -->
-                    </div>
-                @endforeach
-            @else
-                <h1 style="text-align: center;">No matched employees found.</h1>
-            @endif
-        </div>
+    <h2 style="text-align: center;">Job Opening: {{ $opening }}</h2>
+    
+    <div class="card-container">
+        @if (count($matched_employees) > 0)
+            @foreach ($matched_employees as $employee)
+                <div class="card">
+                    <h3>{{ $employee['first_name'] }} {{ $employee['last_name'] }}</h3>
+                    <p><strong>ID:</strong> {{ $employee['employee_id'] }}</p>
+                    <p><strong>Email:</strong> {{ $employee['email'] }}</p>
+                    <p><strong>Phone:</strong> {{ $employee['phone'] }}</p>
+                    <p><strong>Address:</strong> {{ $employee['address'] }}</p>
+                    <p><strong>Job Title:</strong> {{ $employee['job_title']['name'] }}</p> <!-- Assuming you have 'job_title_name' key in the JSON response -->
+                </div>
+            @endforeach
+        @else
+            <h1 style="text-align: center;">No matched employees found.</h1>
+        @endif
+    </div>
     
 
 </body>
