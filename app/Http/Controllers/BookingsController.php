@@ -9,11 +9,18 @@ use App\Models\Ticket;
 use App\Models\Flight;
 use App\Models\Seat;
 use App\Models\Passenger;
+use App\Models\FlightStatus;
+use App\Models\City;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Mail\Message;
+
+use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 
 
 class BookingsController extends Controller
@@ -201,7 +208,7 @@ class BookingsController extends Controller
                     $passenger->passenger_id = $passenger->generatePassengerId();
 
                     $booking->passengers()->save($passenger);
-                    $addedPassengers[] = $passenger->toArray(); // Convert passenger object to an array and store it
+                    $addedPassengers[] = $passenger; // Convert passenger object to an array and store it
 
                     // Update the seat's availability
                     
@@ -238,9 +245,68 @@ class BookingsController extends Controller
                     'flight_status_id' => $flightStatusId,
                     'flight_id' => $booking->flight_id,
                     ]);
+                
+            
+                // Ticket data to be passed to the PDF template
+                $ticketData = [
+                    'ticketNumber' => $ticket->ticket_number,
+                    'ticketPrice' =>$ticket->ticket_price,
+                    'bookingReference' => $ticket->booking_reference,
+                    'bookingEmail' => $booking->email, 
+                    'boardingPass' => $ticket->boarding_pass,
+                    'flightStatus' => FlightStatus::find($ticket->flight_status_id)->name,
+                    'flight' => Flight::find($ticket->flight_id)->flight_number,
+                    'destination' => City::find(Flight::find($ticket->flight_id)->arrival_city_id)->name,
+                    'flightType' => Flight::find($ticket->flight_id)->is_international == 1 ? 'International' : 'Domestic',
+                    "passengers" => $addedPassengers,
+                ];
+            
+                // // Load the blade template view that is used to organize and style the ticket data
+                // $pdf = FacadePdf::loadView('ticket.pdf_template', $ticketData);
                             
+                // // Send an email with the PDF attachment
+                // Mail::send([], [], function (Message $message) use ($pdf, $ticketData) {
+                //     $message->to($ticketData['bookingEmail'])
+                //         ->subject('Your Ticket Information')
+                //         ->html(
+                //             "<html>
+                //                 <head>
+                //                     <style>
+                //                         /* Center-align the content */
+                //                         body {
+                //                             text-align: center;
+                //                         }
+                //                         .container {
+                //                             display: inline-block;
+                //                             text-align: center;
+                //                         }
+                //                     </style>
+                //                 </head>
+                //                 <body>
+                //                     <div class='container'>
+                //                         <h2>Your Ticket Information</h2>
+                //                         <p>Hello,</p>
+                //                         <p>Thank you for booking your ticket with us. Attached is your ticket information.</p>
+                //                         <p><strong>Ticket Number:</strong> {$ticketData['ticketNumber']}</p>
+                //                         <p><strong>Ticket Price:</strong> {$ticketData['ticketPrice']}</p>
+                //                         <p><strong>Booking Reference:</strong> {$ticketData['bookingReference']}</p>
+                //                         <p><strong>Flight:</strong> {$ticketData['flight']}</p>
+                //                         <p><strong>Destination:</strong> {$ticketData['destination']}</p>
+                //                         <p><strong>Flight Type:</strong> {$ticketData['flightType']}</p>
+                //                         <p>Thank you for choosing our services!</p>
+                                        
+                //                     </div>
+                //                 </body>
+                //             </html>"
+                //         )
+                //         ->attachData($pdf->output(), 'ticket.pdf', [
+                //             'mime' => 'application/pdf',
+                //         ]);
+                // });
+
+
                 // Return the created booking and ticket details
-                return response()->json(['booking' => $booking, 'ticket' => $ticket, 'passengers' => $addedPassengers, 'status' => 1]);
+                return response()->json(['success' => 'Booking created successfully. Ticket data sent to your email.', 'booking' => $booking, 'ticket' => $ticketData, 'passengers' => $addedPassengers, 'status' => 1]);
 
         } 
         catch (\Exception $e) 

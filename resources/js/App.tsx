@@ -10,6 +10,8 @@ import DefaultComponent from './components/Default/DefaultComponent';
 
 import { AuthProvider } from './context/AuthContext';
 
+import Data from './Data'
+
 const App = () => {
   
   return (
@@ -17,7 +19,7 @@ const App = () => {
       <Router>        
         <Routes>    
 
-          <Route path="*" element={<DefaultComponent />} />
+          <Route path="*" element={<Data />} />
           <Route path="/signin" element={<SignInComponent />} />
           <Route path="/signup" element={<SignUpComponent />} />
           <Route path="/admin/*" element={<ProtectedRoute element={<AdminComponent />} />} />

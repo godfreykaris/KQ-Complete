@@ -133,7 +133,7 @@ const SignUpComponent = () => {
         },
         body: JSON.stringify({
           name: formData.name,
-          phone: formData.phone,
+          phone: formData.countryCode + formData.phone,
           email: formData.email,
           password: formData.password,
           password_confirmation: formData.password_confirmation,
