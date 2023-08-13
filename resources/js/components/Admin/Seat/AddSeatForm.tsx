@@ -311,7 +311,7 @@ const AddSeatForm = () => {
         {
           setIsLoading(false); // Start loading data
           setResponseStatus(0); // Error
-          setResponseMessage(`Error: ${data.error}`);
+          setResponseMessage(`Error: ${response.statusText}`);
         }
     } 
     catch (error) 

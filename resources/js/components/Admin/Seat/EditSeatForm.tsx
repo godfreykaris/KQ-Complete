@@ -150,7 +150,7 @@ const EditSeatForm: React.FC = () => {
       } 
       else {
         setResponseStatus(0); // Error
-        setResponseMessage(`Error: ${data.error}`);
+        setResponseMessage(`Error: ${response.statusText}`);
       }
     } catch (error) {
       setResponseStatus(0); // Error

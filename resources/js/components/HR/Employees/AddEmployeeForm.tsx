@@ -141,18 +141,24 @@ const AddEmployeeForm: React.FC = () => {
 
       const data = await response.json();
 
-      if (response.ok) {
-        if (data.status) {
+      if (response.ok) 
+      {
+        if (data.status) 
+        {
           setResponseStatus(1); // Success
           setResponseMessage(`Success: ${data.success}`);
           // Redirect to the employees list page after successful creation
-        } else {
+        } 
+        else 
+        {
           setResponseStatus(0); // Error
           setResponseMessage(`Error: ${data.error}`);
         }
-      } else {
+      } 
+      else 
+      {
         setResponseStatus(0); // Error
-        setResponseMessage(`Error: ${data.error}`);
+        setResponseMessage(`Error: ${response.statusText}`);
       }
 
       setIsLoading(false);
