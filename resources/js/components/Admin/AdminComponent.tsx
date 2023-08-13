@@ -35,6 +35,7 @@ import CAFormViewComponent from './Cities&Airlines/CAFormViewComponent';
 import CAFormDeleteComponent from './Cities&Airlines/CAFormDeleteComponent';
 
 import useLogout from '../Auth/useLogOut';
+import AdminLandingPage from './AdminLandingPage';
 
 const AdminComponent = () => {
 
@@ -50,7 +51,10 @@ const AdminComponent = () => {
               <Navbar.Toggle aria-controls="basic-navbar-nav" style={{ color: '#FFFFFF' }} />
               <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="me-auto justify-content-center">
-                  <NavDropdown title="Flights" id="basic-nav-dropdown" className="menu-item-text">                    
+  
+                  <Nav.Link as={Link} to="/admin" className="menu-item-text">Home</Nav.Link>
+
+                  <NavDropdown title="Flights" id="basic-nav-dropdown"  className="custom-dropdown">                    
                     <NavDropdown.Item as={Link} to="manage_flights/add" className="menu-item-text">
                       Add Flight
                     </NavDropdown.Item>                                       
@@ -59,7 +63,7 @@ const AdminComponent = () => {
                     </NavDropdown.Item>
                     {/* Add other menu items as needed */}
                   </NavDropdown>
-                  <NavDropdown title="Planes" id="basic-nav-dropdown" className="menu-item-text">                    
+                  <NavDropdown title="Planes" id="basic-nav-dropdown" className="custom-dropdown">                    
                     <NavDropdown.Item as={Link} to="planes/add" className="menu-item-text">
                       Add Plane
                     </NavDropdown.Item>
@@ -74,7 +78,7 @@ const AdminComponent = () => {
                     </NavDropdown.Item>
                     {/* Add other menu items as needed */}
                   </NavDropdown>
-                  <NavDropdown title="Seats" id="basic-nav-dropdown" className="menu-item-text">                    
+                  <NavDropdown title="Seats" id="basic-nav-dropdown" className="custom-dropdown">                    
                     <NavDropdown.Item as={Link} to="plane_seats/add" className="menu-item-text">
                       Add Seat
                     </NavDropdown.Item>
@@ -84,7 +88,7 @@ const AdminComponent = () => {
                     </NavDropdown.Item>
                     {/* Add other menu items as needed */}
                   </NavDropdown>
-                  <NavDropdown title="Cities & Airlines" id="basic-nav-dropdown" className="menu-item-text">                    
+                  <NavDropdown title="Cities & Airlines" id="basic-nav-dropdown" className="custom-dropdown">                    
                     <NavDropdown.Item as={Link} to="cities_airlines/add/city" className="menu-item-text">
                       Add City
                     </NavDropdown.Item>
@@ -102,7 +106,7 @@ const AdminComponent = () => {
                     </NavDropdown.Item>
                     {/* Add other menu items as needed */}
                   </NavDropdown>
-                  <NavDropdown title="Other Data" id="basic-nav-dropdown" className="menu-item-text">                    
+                  <NavDropdown title="Other Data" id="basic-nav-dropdown" className="custom-dropdown">                    
                     <NavDropdown.Item as={Link} to="other/add" className="menu-item-text">
                       Add Data
                     </NavDropdown.Item>
@@ -119,6 +123,7 @@ const AdminComponent = () => {
                   </NavDropdown>
                   
                   <Nav.Link onClick={handleLogout} className="menu-item-text">SignOut</Nav.Link>
+
                 </Nav>
               </Navbar.Collapse>
             </Navbar>
@@ -127,6 +132,9 @@ const AdminComponent = () => {
         <div className="container mt-4">
           <div className="row justify-content-center">
               <Routes>
+                
+                <Route path="/" element={<AdminLandingPage />} />
+
                 <Route path="other/add" element={<BaseFormAddOtherComponent />} />
                 <Route path="other/edit" element={<BaseFormEditComponent />} />
                 <Route path="other/edit/:selectedEntity/:id/:name" element={<EditFormComponent />} />

@@ -66,7 +66,12 @@ const SignInComponent = () => {
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     setIsLoading(true);
+
+    setResponseMessage("");
+
+
     try {
       const response = await fetch(`${apiBaseUrl}/users/login`, {
         method: 'POST',
