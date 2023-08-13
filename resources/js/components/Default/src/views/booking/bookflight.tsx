@@ -60,7 +60,6 @@ interface location{
 
 
 
-
 export default function BookFlight() {
 
   const [tripType, setTripType] = useState("");
@@ -412,7 +411,7 @@ export default function BookFlight() {
           _id: 0         
         });
 
-        //update passenger adata using context function
+        //update passenger data using context function
         updatedPassengers.forEach((updatedPassenger, index: number) => {
           updatePassenger(index, updatedPassenger)
         })
