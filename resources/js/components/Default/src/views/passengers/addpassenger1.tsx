@@ -1,51 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { usePassengerContext, PassengerContextType } from '../../context/passengers/passengercontext';
-<<<<<<< HEAD
-import { useSeatContext, SeatContextType  } from '../../context/seats/sendseatdata';
-=======
 import { useSeatContext, SeatContextType } from '../../context/seats/sendseatdata';
->>>>>>> kqcomplete/main
 import { Container, Row, Col, Form, Button, Alert, Spinner, Table, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import MenuBar1 from '../../components/menubars/menubar1';
 import MenuBar2 from '../../components/menubars/menubar2';
 
 interface seat{
   _id: number;
-<<<<<<< HEAD
-  number: string;
-=======
   number: number;
->>>>>>> kqcomplete/main
   class: string;
   location: string;
   availability: boolean;
   price: string;
 }
 
-<<<<<<< HEAD
-export default function AddPassenger1() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { seat, updateSeat }: SeatContextType  = useSeatContext();
-
-  // Passenger Form State
-  const [formData, setFormData] = useState({
-    name: '',
-    passport: '',
-    idNumber: '',
-    birthDate: '',
-    index:'',
-  });
-
-  const formDataRef = useRef({
-    name: '',
-    passport: '',
-    idNumber: '',
-    birthDate: '',
-    index:'',
-  });
-=======
 interface passenger{
   name: string;
   passport: number;
@@ -74,7 +43,6 @@ export default function AddPassenger1() {
   // Passenger Form State
   const [formData, setFormData] = useState<formDataWithIndex>(intitPassenger);
 
->>>>>>> kqcomplete/main
 
   const [nameError, setNameError] = useState('');
   const [displaySeatTable, setDisplaySeatTable] = useState(false); // State to show/hide seat selection table
@@ -107,42 +75,24 @@ export default function AddPassenger1() {
   }, [location.state?.passenger]);
 
   // Passengers Context
-<<<<<<< HEAD
-  const { passengers, addPassenger, updatePassenger }: PassengerContextType = usePassengerContext();
-
-  // Seat Selection State
-  const [availableSeats, setAvailableSeats]: seat = useState<seat[]>([]);
-  const [error, setError] = useState('');
-  const [selectedSeatNumber, setSelectedSeatNumber] = useState('');
-=======
   const { passengers, addPassenger, updatePassenger } = usePassengerContext() as PassengerContextType;
 
   // Seat Selection State
   const [availableSeats, setAvailableSeats] = useState<seat[] | []>([]);
   const [error, setError] = useState("");
   const [selectedSeatId, setSelectedSeatId] = useState<number>(0);
->>>>>>> kqcomplete/main
 
   useEffect(() => {
     const fetchData = async () => {
-      try 
-      {
+      try {
         const response = await fetch('/src/components/testdata/seatdata.json');
-        if (!response.ok) 
-        {
+        if (!response.ok) {
           throw new Error('Network response was not ok.');
         }
         const data = await response.json();
         setAvailableSeats(data.seats);
-<<<<<<< HEAD
-      } 
-      catch (error) 
-      {
-        setError('Error fetching data: ' + error);
-=======
       } catch (error: any) {
         setError('Error fetching data: ' + error.message);
->>>>>>> kqcomplete/main
       }
     };
 
@@ -151,24 +101,14 @@ export default function AddPassenger1() {
 
 
   //seat selection from the table
-<<<<<<< HEAD
-  const handleSubmit = (index: string) => {
-    const selectedSeat = availableSeats[Number(index)];
-    setSelectedSeatNumber(selectedSeat.number);
-=======
   const handleSeatSelection = (index: number) => {
     const selectedSeat = availableSeats[index];
     setSelectedSeatId(selectedSeat.number);
->>>>>>> kqcomplete/main
     updateSeat(selectedSeat);
     setDisplaySeatTable(false); // Hide the seat selection table after seat selection
   };
 
-<<<<<<< HEAD
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-=======
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
->>>>>>> kqcomplete/main
     const { name, value } = event.target;
 
     // Validate for the 'Name' field to contain only alphabetic characters
