@@ -1,20 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { usePassengerContext, PassengerContextType } from '../../context/passengers/passengercontext';
+<<<<<<< HEAD
 import { useSeatContext, SeatContextType  } from '../../context/seats/sendseatdata';
+=======
+import { useSeatContext, SeatContextType } from '../../context/seats/sendseatdata';
+>>>>>>> kqcomplete/main
 import { Container, Row, Col, Form, Button, Alert, Spinner, Table, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import MenuBar1 from '../../components/menubars/menubar1';
 import MenuBar2 from '../../components/menubars/menubar2';
 
 interface seat{
   _id: number;
+<<<<<<< HEAD
   number: string;
+=======
+  number: number;
+>>>>>>> kqcomplete/main
   class: string;
   location: string;
   availability: boolean;
   price: string;
 }
 
+<<<<<<< HEAD
 export default function AddPassenger1() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,9 +45,41 @@ export default function AddPassenger1() {
     birthDate: '',
     index:'',
   });
+=======
+interface passenger{
+  name: string;
+  passport: number;
+  idNumber: number;
+  birthDate: string;
+  seat: seat | {};
+}
+
+interface formDataWithIndex extends passenger{
+  index?: number;
+}
+
+const intitPassenger: passenger = {
+  name: '',
+  passport: 0,
+  idNumber: 0,
+  birthDate: '',
+  seat: {},
+}
+
+export default function AddPassenger1() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { seat, updateSeat } = useSeatContext() as SeatContextType;
+
+  // Passenger Form State
+  const [formData, setFormData] = useState<formDataWithIndex>(intitPassenger);
+
+>>>>>>> kqcomplete/main
 
   const [nameError, setNameError] = useState('');
   const [displaySeatTable, setDisplaySeatTable] = useState(false); // State to show/hide seat selection table
+
+  const [index, setIndex] = useState(null);
 
   useEffect(() => {
     // Check if there is state data i.e. passenger data from the bookflight component
@@ -46,30 +87,41 @@ export default function AddPassenger1() {
       // Update form fields with the data
       const { name, passport, idNumber, birthDate } = location.state.passenger;
       const index = location.state?.index;
-      setFormData({
-        name,
-        passport,
-        idNumber,
-        birthDate,
-        index,
-      });
-      formDataRef.current = {
-        name,
-        passport,
-        idNumber,
-        birthDate,
-        index,
-      };
+
+      // Create a new formData object
+    const updatedFormData: formDataWithIndex = {
+      ...formData,
+      name,
+      passport,
+      idNumber,
+      birthDate,
+      ...(index !== undefined ? { index: index } : {}), // Only include index if it's defined
+    };
+
+      setFormData(updatedFormData);
+      if (index !== undefined) {
+        setIndex(index);
+      }
+     
     }
   }, [location.state?.passenger]);
 
   // Passengers Context
+<<<<<<< HEAD
   const { passengers, addPassenger, updatePassenger }: PassengerContextType = usePassengerContext();
 
   // Seat Selection State
   const [availableSeats, setAvailableSeats]: seat = useState<seat[]>([]);
   const [error, setError] = useState('');
   const [selectedSeatNumber, setSelectedSeatNumber] = useState('');
+=======
+  const { passengers, addPassenger, updatePassenger } = usePassengerContext() as PassengerContextType;
+
+  // Seat Selection State
+  const [availableSeats, setAvailableSeats] = useState<seat[] | []>([]);
+  const [error, setError] = useState("");
+  const [selectedSeatId, setSelectedSeatId] = useState<number>(0);
+>>>>>>> kqcomplete/main
 
   useEffect(() => {
     const fetchData = async () => {
@@ -82,10 +134,15 @@ export default function AddPassenger1() {
         }
         const data = await response.json();
         setAvailableSeats(data.seats);
+<<<<<<< HEAD
       } 
       catch (error) 
       {
         setError('Error fetching data: ' + error);
+=======
+      } catch (error: any) {
+        setError('Error fetching data: ' + error.message);
+>>>>>>> kqcomplete/main
       }
     };
 
@@ -94,14 +151,24 @@ export default function AddPassenger1() {
 
 
   //seat selection from the table
+<<<<<<< HEAD
   const handleSubmit = (index: string) => {
     const selectedSeat = availableSeats[Number(index)];
     setSelectedSeatNumber(selectedSeat.number);
+=======
+  const handleSeatSelection = (index: number) => {
+    const selectedSeat = availableSeats[index];
+    setSelectedSeatId(selectedSeat.number);
+>>>>>>> kqcomplete/main
     updateSeat(selectedSeat);
     setDisplaySeatTable(false); // Hide the seat selection table after seat selection
   };
 
+<<<<<<< HEAD
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+=======
+  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+>>>>>>> kqcomplete/main
     const { name, value } = event.target;
 
     // Validate for the 'Name' field to contain only alphabetic characters
@@ -120,10 +187,16 @@ export default function AddPassenger1() {
   const handleButtonClick = () => {
     // Add your seat selection logic here
     setDisplaySeatTable(true); // Show the seat selection table
+
+    //scroll to the table
+    const tableSection = document.getElementById("seatTable");
+    if(tableSection){
+      tableSection.scrollIntoView({behavior: "smooth"});
+    }
   };
 
   //edit passenger form submission
-  const handleFormSubmit = (event) => {
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     // Validate form data before submitting
@@ -136,36 +209,24 @@ export default function AddPassenger1() {
       return;
     }
 
-    // Handle submit for both the edit and the addition
-    const passengerIndex = passengers.findIndex((p) => p.index === formData.index);
+    //Handle submit for both the edit and the addition
+    //const passengerIndex = passengers.findIndex((p) => index === formData.index);
 
-    if (passengerIndex !== -1) {
+    if (index !== null) {
       // Update the existing passenger in the array
-      updatePassenger(passengerIndex, formData);
+      updatePassenger(index, formData);
     } else {
       addPassenger(formData);
     }
   
     // Navigate to bookflight with the formdata
-    navigate(-1, { state: { seat } });
+    navigate('goBack', { state: { seat } });
 
-    // Reset form data
-    setFormData({
-      name: '',
-      passport: '',
-      idNumber: '',
-      birthDate: '',
-    });
-    formDataRef.current = {
-      name: '',
-      passport: '',
-      idNumber: '',
-      birthDate: '',
-    };
+    
   };
 
 
-  const renderTooltip = (message) => (
+  const renderTooltip = (message: string) => (
     <Tooltip id='tooltip'>{message}</Tooltip>
   )
 
@@ -264,7 +325,7 @@ export default function AddPassenger1() {
           {error ? (
             <Alert variant="danger">{error}</Alert>
           ) : availableSeats.length > 0 ? (
-            <Table striped bordered hover>
+            <Table striped bordered hover id='seatTable'>
               <thead>
                 <tr>
                   <th>Seat Number</th>
@@ -275,7 +336,7 @@ export default function AddPassenger1() {
                 </tr>
               </thead>
               <tbody>
-                {availableSeats.map((availableSeat, index) => (
+                {availableSeats.map((availableSeat: seat, index: number) => (
                   <tr key={index}>
                     <td>{availableSeat.number}</td>
                     <td>{availableSeat.location}</td>
@@ -283,10 +344,10 @@ export default function AddPassenger1() {
                     <td>{availableSeat.price}</td>
                     <td>
                       <Button
-                        onClick={() => handleSubmit(index)}
+                        onClick={() => handleSeatSelection(index)}
                         variant="primary"
                         type="button"
-                        disabled={availableSeat.availability === 'BOOKED'}
+                        disabled={availableSeat.availability === false}
                       >
                         Select
                       </Button>
@@ -305,9 +366,9 @@ export default function AddPassenger1() {
       )}
 
       {/* Show the success alert when a seat is selected */}
-      {selectedSeatNumber && (
+      {selectedSeatId && (
         <Alert variant="success" className="mt-3">
-          Seat {selectedSeatNumber} has been selected successfully!
+          Seat {selectedSeatId} has been selected successfully!
         </Alert>
       )}
     </div>

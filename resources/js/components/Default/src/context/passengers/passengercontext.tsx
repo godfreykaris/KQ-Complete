@@ -9,7 +9,7 @@ interface seat{
   price: string;
 }
 
-interface passenger{
+interface passenger{  
   name: string;
   passport: number;
   idNumber: number;
