@@ -288,7 +288,7 @@ class BookingsController extends Controller
                 //                         <p>Hello,</p>
                 //                         <p>Thank you for booking your ticket with us. Attached is your ticket information.</p>
                 //                         <p><strong>Ticket Number:</strong> {$ticketData['ticketNumber']}</p>
-                //                         <p><strong>Ticket Price:</strong> {$ticketData['ticketPrice']}</p>
+                //                         <p><strong>Ticket Price:</strong> {$ticketData['ticketPrice']} USD</p>
                 //                         <p><strong>Booking Reference:</strong> {$ticketData['bookingReference']}</p>
                 //                         <p><strong>Flight:</strong> {$ticketData['flight']}</p>
                 //                         <p><strong>Destination:</strong> {$ticketData['destination']}</p>
