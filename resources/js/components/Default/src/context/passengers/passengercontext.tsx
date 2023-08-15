@@ -58,8 +58,16 @@ export default function PassengerProvider ({ children }: passengerProviderProps)
   );
 };
 
-export function usePassengerContext() {
-    return  useContext(PassengerContext);
+export function usePassengerContext(): PassengerContextType {
+
+    const context = useContext(PassengerContext);
+
+    if (!context) 
+    {
+        throw new Error("usePassengerContext must be used within a PassengerProvider");
+    }
+
+    return  context;
 }
 
 export type {PassengerContextType};

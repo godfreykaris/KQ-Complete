@@ -1,15 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { usePassengerContext } from '../../context/passengers/passengercontext';
-import { useSeatContext } from '../../context/seats/sendseatdata';
+import { usePassengerContext, PassengerContextType } from '../../context/passengers/passengercontext';
+import { useSeatContext, SeatContextType  } from '../../context/seats/sendseatdata';
 import { Container, Row, Col, Form, Button, Alert, Spinner, Table, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import MenuBar1 from '../../components/menubars/menubar1';
 import MenuBar2 from '../../components/menubars/menubar2';
 
+interface seat{
+  _id: number;
+  number: string;
+  class: string;
+  location: string;
+  availability: boolean;
+  price: string;
+}
+
 export default function AddPassenger1() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { seat, updateSeat } = useSeatContext();
+  const { seat, updateSeat }: SeatContextType  = useSeatContext();
 
   // Passenger Form State
   const [formData, setFormData] = useState({
@@ -17,6 +26,7 @@ export default function AddPassenger1() {
     passport: '',
     idNumber: '',
     birthDate: '',
+    index:'',
   });
 
   const formDataRef = useRef({
@@ -24,6 +34,7 @@ export default function AddPassenger1() {
     passport: '',
     idNumber: '',
     birthDate: '',
+    index:'',
   });
 
   const [nameError, setNameError] = useState('');
@@ -53,24 +64,28 @@ export default function AddPassenger1() {
   }, [location.state?.passenger]);
 
   // Passengers Context
-  const { passengers, addPassenger, updatePassenger } = usePassengerContext();
+  const { passengers, addPassenger, updatePassenger }: PassengerContextType = usePassengerContext();
 
   // Seat Selection State
-  const [availableSeats, setAvailableSeats] = useState([]);
-  const [error, setError] = useState(null);
+  const [availableSeats, setAvailableSeats]: seat = useState<seat[]>([]);
+  const [error, setError] = useState('');
   const [selectedSeatNumber, setSelectedSeatNumber] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
+      try 
+      {
         const response = await fetch('/src/components/testdata/seatdata.json');
-        if (!response.ok) {
+        if (!response.ok) 
+        {
           throw new Error('Network response was not ok.');
         }
         const data = await response.json();
         setAvailableSeats(data.seats);
-      } catch (error) {
-        setError('Error fetching data: ' + error.message);
+      } 
+      catch (error) 
+      {
+        setError('Error fetching data: ' + error);
       }
     };
 
@@ -79,14 +94,14 @@ export default function AddPassenger1() {
 
 
   //seat selection from the table
-  const handleSubmit = (index) => {
-    const selectedSeat = availableSeats[index];
+  const handleSubmit = (index: string) => {
+    const selectedSeat = availableSeats[Number(index)];
     setSelectedSeatNumber(selectedSeat.number);
     updateSeat(selectedSeat);
     setDisplaySeatTable(false); // Hide the seat selection table after seat selection
   };
 
-  const handleChange = (event) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
 
     // Validate for the 'Name' field to contain only alphabetic characters
@@ -190,7 +205,7 @@ export default function AddPassenger1() {
                     name="passport"
                     value={formData.passport}
                     onChange={handleChange}
-                    maxLength="8"
+                    maxLength={8}
                     required
                   />
                 </Form.Group>
@@ -202,7 +217,7 @@ export default function AddPassenger1() {
                     name="idNumber"
                     value={formData.idNumber}
                     onChange={handleChange}
-                    maxLength="8"
+                    maxLength={8}
                     required
                   />
                 </Form.Group>

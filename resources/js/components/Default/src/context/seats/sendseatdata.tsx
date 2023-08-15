@@ -37,8 +37,14 @@ export default function SeatProvider({children} : seatProviderProps) {
   )
 }
 
-export function useSeatContext(){
-    return useContext(SeatContext);
+export function useSeatContext(): SeatContextType {
+  const context = useContext(SeatContext);
+  
+  if (!context) {
+      throw new Error("useSeatContext must be used within a SeatProvider");
+  }
+
+  return context;
 }
 
 export type {SeatContextType};
