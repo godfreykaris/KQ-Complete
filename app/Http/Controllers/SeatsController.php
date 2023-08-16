@@ -63,9 +63,11 @@ class SeatsController extends Controller
         try
         {
             if($itemName === "plane") 
-                $seats = Seat::where('plane_id', $itemId)->get();
+                $seats = Seat::with(['plane', 'flight', 'location', 'flightClass'])
+                        ->where('plane_id', $itemId)->get();
             elseif($itemName === "flight") 
-                $seats = Seat::where('flight_id', $itemId)->get();
+                $seats = Seat::with(['plane', 'flight', 'location', 'flightClass'])
+                        ->where('flight_id', $itemId)->get();
             else
                 return response()->json(['error' => "Invalid item name", 'status' => 0]);
 
