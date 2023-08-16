@@ -9,11 +9,21 @@ import MenuBar2 from '../../components/menubars/menubar2';
 
 import apiBaseUrl from '../../../../../config';
 
+interface flight_class{
+  id: number;
+  name: string;
+}
+
+interface location{
+  id: number;
+  name: string;
+}
+
 interface seat{
   _id: number;
   seat_number: number;
-  flight_class: string;
-  location: string;
+  flight_class: flight_class;
+  location: location;
   is_available: boolean;
   price: string;
 }
@@ -23,7 +33,14 @@ interface passenger{
   passport: number;
   idNumber: number;
   birthDate: string;
-  seat: seat | {};
+  seat: seat | {
+    seat_number: 0,
+    flight_class: {id: 0, name: ''},
+    location: {id: 0, name: ''},
+    is_available: false,
+    price: '',
+    _id: 0
+  };
 }
 
 const intitPassenger: passenger = {
@@ -31,7 +48,14 @@ const intitPassenger: passenger = {
   passport: 0,
   idNumber: 0,
   birthDate: '',
-  seat: {},
+  seat: {
+    seat_number: 0,
+    flight_class: {id: 0, name: ''},
+    location: {id: 0, name: ''},
+    is_available: false,
+    price: '',
+    _id: 0
+  },
 }
 
 export default function AddPassenger1() {
@@ -47,7 +71,13 @@ export default function AddPassenger1() {
   const [displaySeatTable, setDisplaySeatTable] = useState(false); // State to show/hide seat selection table
 
   const [index, setIndex] = useState(null);
-  const [flightId, setFlightId] = useState<number>();
+
+  // Passengers Context
+  const { flightId, passengers, addPassenger, updatePassenger } = usePassengerContext() as PassengerContextType;
+
+
+
+  console.log(flightId);
 
   useEffect(() => {
     // Check if there is state data i.e. passenger data from the bookflight component
@@ -55,7 +85,6 @@ export default function AddPassenger1() {
       // Update form fields with the data
       const { name, passport, idNumber, birthDate } = location.state.passenger;
       const index = location.state?.index;
-      const flight = location.state?.flightId;
 
       // Create a new formData object
     const updatedFormData: passenger = {
@@ -71,16 +100,11 @@ export default function AddPassenger1() {
 
       if (index !== undefined) {
         setIndex(index);
-      }
-
-      console.log(index);
-      setFlightId(flight);     
+      }   
     }
   }, [location.state?.passenger]);
 
-  // Passengers Context
-  const { passengers, addPassenger, updatePassenger } = usePassengerContext() as PassengerContextType;
-
+  
   // Seat Selection State
   const [availableSeats, setAvailableSeats] = useState<seat[] | []>([]);
   const [error, setError] = useState("");
@@ -89,7 +113,7 @@ export default function AddPassenger1() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${apiBaseUrl}/seats/flight/${1}`);
+        const response = await fetch(`${apiBaseUrl}/seats/flight/${flightId}`);
         if (!response.ok) {
           throw new Error('Network response was not ok.');
         }
@@ -109,6 +133,21 @@ export default function AddPassenger1() {
   const handleSeatSelection = (index: number) => {
     const selectedSeat = availableSeats[index];
     setSelectedSeatId(selectedSeat.seat_number);
+
+    const selectedSeatObject: seat = {
+      _id: selectedSeat._id,
+      seat_number: selectedSeat.seat_number,
+      flight_class: selectedSeat.flight_class,
+      location: selectedSeat.location,
+      is_available: selectedSeat.is_available,
+      price: selectedSeat.price,
+    };
+    
+    setFormData((prevData) => ({
+      ...prevData,
+      seat: selectedSeatObject,
+    }))
+
     updateSeat(selectedSeat);
     setDisplaySeatTable(false); // Hide the seat selection table after seat selection
   };
@@ -165,10 +204,8 @@ export default function AddPassenger1() {
       addPassenger(formData);
     }
   
-    // Navigate to bookflight with the formdata
-    navigate("-1", { state: { seat } });
+    navigate(-1);
 
-    
   };
 
 
@@ -286,16 +323,16 @@ export default function AddPassenger1() {
                 {availableSeats.map((availableSeat: seat, index: number) => (
                   <tr key={index}>
                     <td>{availableSeat.seat_number}</td>
-                    <td>{availableSeat.location}</td>
+                    <td>{availableSeat.location.name}</td>
                     <td>{availableSeat.is_available}</td>
                     <td>{availableSeat.price}</td>
-                    <td>{availableSeat.flight_class}</td>
+                    <td>{availableSeat.flight_class.name}</td>
                     <td>
                       <Button
                         onClick={() => handleSeatSelection(index)}
                         variant="primary"
                         type="button"
-                        disabled={availableSeat.is_available === false}
+                        disabled={availableSeat.is_available == false}
                       >
                         Select
                       </Button>

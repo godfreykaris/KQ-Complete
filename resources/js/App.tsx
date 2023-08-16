@@ -16,8 +16,7 @@ const App = () => {
   return (
     <AuthProvider>
       <Router>        
-        <Routes>    
-          <Route path="/" element={<Data />} />
+        <Routes>         
           <Route path="*" element={<DefaultComponent />} />
           <Route path="/signin" element={<SignInComponent />} />
           <Route path="/signup" element={<SignUpComponent />} />
