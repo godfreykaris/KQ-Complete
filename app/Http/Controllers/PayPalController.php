@@ -29,17 +29,17 @@ class PayPalController extends Controller
         $this->apiContext->setConfig($paypalConfig['settings']);
     }
 
-    public function createPayment(Request $request)
+    public function createPayment($amount1)
     {
-        $this->validate($request, [
-            'amount' => 'required|numeric|min:0',
-            // Add other validation rules as needed
-        ]);
+        // $this->validate($request, [
+        //     'amount' => 'required|numeric|min:0',
+        //     // Add other validation rules as needed
+        // ]);
 
         
         $amount = new Amount();
         $amount->setCurrency('USD')
-               ->setTotal($request->amount); // Use the validated amount for the payment
+               ->setTotal($amount1); // Use the validated amount for the payment
 
         $transaction = new Transaction();
         $transaction->setAmount($amount);

@@ -57,12 +57,17 @@ class SeatsController extends Controller
         }
     }
 
-    // Get all seats for a particular plane
-    public function index(Request $request, $planeId)
+    // Get all seats for a particular plane or flight
+    public function index(Request $request, $itemName, $itemId)
     {
         try
         {
-            $seats = Seat::where('plane_id', $planeId)->get();
+            if($itemName === "plane") 
+                $seats = Seat::where('plane_id', $itemId)->get();
+            elseif($itemName === "flight") 
+                $seats = Seat::where('flight_id', $itemId)->get();
+            else
+                return response()->json(['error' => "Invalid item name", 'status' => 0]);
 
             return response()->json(['seats' => $seats, 'status' => 1]);
         }
