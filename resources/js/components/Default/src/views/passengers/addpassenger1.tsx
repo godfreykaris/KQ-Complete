@@ -11,10 +11,10 @@ import apiBaseUrl from '../../../../../config';
 
 interface seat{
   _id: number;
-  number: number;
-  class: string;
+  seat_number: number;
+  flight_class: string;
   location: string;
-  availability: boolean;
+  is_available: boolean;
   price: string;
 }
 
@@ -47,7 +47,7 @@ export default function AddPassenger1() {
   const [displaySeatTable, setDisplaySeatTable] = useState(false); // State to show/hide seat selection table
 
   const [index, setIndex] = useState(null);
-  const [flightId, setFlightId] = useState("");
+  const [flightId, setFlightId] = useState<number>();
 
   useEffect(() => {
     // Check if there is state data i.e. passenger data from the bookflight component
@@ -73,6 +73,7 @@ export default function AddPassenger1() {
         setIndex(index);
       }
 
+      console.log(index);
       setFlightId(flight);     
     }
   }, [location.state?.passenger]);
@@ -88,11 +89,12 @@ export default function AddPassenger1() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${apiBaseUrl}/seats/flight/${flightId}`);
+        const response = await fetch(`${apiBaseUrl}/seats/flight/${1}`);
         if (!response.ok) {
           throw new Error('Network response was not ok.');
         }
         const data = await response.json();
+        //alert(JSON.stringify(data));
         setAvailableSeats(data.seats);
       } catch (error: any) {
         setError('Error fetching data: ' + error.message);
@@ -106,7 +108,7 @@ export default function AddPassenger1() {
   //seat selection from the table
   const handleSeatSelection = (index: number) => {
     const selectedSeat = availableSeats[index];
-    setSelectedSeatId(selectedSeat.number);
+    setSelectedSeatId(selectedSeat.seat_number);
     updateSeat(selectedSeat);
     setDisplaySeatTable(false); // Hide the seat selection table after seat selection
   };
@@ -129,8 +131,9 @@ export default function AddPassenger1() {
 
   const handleButtonClick = () => {
     // Add your seat selection logic here
-    setDisplaySeatTable(true); // Show the seat selection table   
+    setDisplaySeatTable(true); // Show the seat selection table
 
+    console.log(flightId);
     //scroll to the table
     const tableSection = document.getElementById("seatTable");
     if(tableSection){
@@ -163,7 +166,7 @@ export default function AddPassenger1() {
     }
   
     // Navigate to bookflight with the formdata
-    navigate('-1', { state: { seat } });
+    navigate("-1", { state: { seat } });
 
     
   };
@@ -275,22 +278,24 @@ export default function AddPassenger1() {
                   <th>Seat Location</th>
                   <th>Availability</th>
                   <th>Seat Price</th>
+                  <th>Seat Class</th>
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {availableSeats.map((availableSeat: seat, index: number) => (
                   <tr key={index}>
-                    <td>{availableSeat.number}</td>
+                    <td>{availableSeat.seat_number}</td>
                     <td>{availableSeat.location}</td>
-                    <td>{availableSeat.availability}</td>
+                    <td>{availableSeat.is_available}</td>
                     <td>{availableSeat.price}</td>
+                    <td>{availableSeat.flight_class}</td>
                     <td>
                       <Button
                         onClick={() => handleSeatSelection(index)}
                         variant="primary"
                         type="button"
-                        disabled={availableSeat.availability === false}
+                        disabled={availableSeat.is_available === false}
                       >
                         Select
                       </Button>

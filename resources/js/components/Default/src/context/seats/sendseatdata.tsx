@@ -2,10 +2,10 @@ import React, {createContext, useState, useContext} from "react";
 
 interface seat{
   _id: number;
-  number: number;
-  class: string;
+  seat_number: number;
+  flight_class: string;
   location: string;
-  availability: boolean;
+  is_available: boolean;
   price: string;
 }
 

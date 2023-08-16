@@ -177,11 +177,11 @@ export default function BookFlight() {
 
   const handleRowClick = () => {
     setIsButtonClicked(true);
+    console.log(flightId);
   };
 
   const handleNavigateToViewPlane = () => {
     setIsButtonClicked(false);
-    navigate('/seatmap');
   };
 
   const handleTripType = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
