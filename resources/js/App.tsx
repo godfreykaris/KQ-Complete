@@ -9,6 +9,7 @@ import HRMComponent from './components/HR/HRMComponent';
 import DefaultComponent from './components/Default/DefaultComponent';
 
 import { AuthProvider } from './context/AuthContext';
+import Data from './Data';
 
 const App = () => {
   
@@ -16,7 +17,7 @@ const App = () => {
     <AuthProvider>
       <Router>        
         <Routes>    
-
+          <Route path="/" element={<Data />} />
           <Route path="*" element={<DefaultComponent />} />
           <Route path="/signin" element={<SignInComponent />} />
           <Route path="/signup" element={<SignUpComponent />} />
