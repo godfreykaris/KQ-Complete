@@ -132,7 +132,7 @@ export default function BookFlight() {
 
   //to edit passenger when the edit button is clicked
   const handleEditPassenger = (passenger: passenger, index: number) => {   
-    navigate2('/addpassenger1', {state: {passenger, index}});
+    navigate2('/addpassenger1', {state: {passenger, index, flightId}});
   };
 
   const [emailError, setEmailError] = useState("");
@@ -226,7 +226,6 @@ export default function BookFlight() {
     fetch(`${apiBaseUrl}/flights/byDepartureCityId/${selectedFrom}`)
       .then((response) => response.json())
       .then((data: { flights: flight[] }) => {
-        alert(JSON.stringify(data));
         setFlightTableData(data.flights);
         }) 
      

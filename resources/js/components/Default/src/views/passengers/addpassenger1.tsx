@@ -6,6 +6,9 @@ import { Container, Row, Col, Form, Button, Alert, Spinner, Table, OverlayTrigge
 import MenuBar1 from '../../components/menubars/menubar1';
 import MenuBar2 from '../../components/menubars/menubar2';
 
+
+import apiBaseUrl from '../../../../../config';
+
 interface seat{
   _id: number;
   number: number;
@@ -23,10 +26,6 @@ interface passenger{
   seat: seat | {};
 }
 
-interface formDataWithIndex extends passenger{
-  index?: number;
-}
-
 const intitPassenger: passenger = {
   name: '',
   passport: 0,
@@ -41,13 +40,14 @@ export default function AddPassenger1() {
   const { seat, updateSeat } = useSeatContext() as SeatContextType;
 
   // Passenger Form State
-  const [formData, setFormData] = useState<formDataWithIndex>(intitPassenger);
+  const [formData, setFormData] = useState<passenger>(intitPassenger);
 
 
   const [nameError, setNameError] = useState('');
   const [displaySeatTable, setDisplaySeatTable] = useState(false); // State to show/hide seat selection table
 
   const [index, setIndex] = useState(null);
+  const [flightId, setFlightId] = useState("");
 
   useEffect(() => {
     // Check if there is state data i.e. passenger data from the bookflight component
@@ -55,9 +55,10 @@ export default function AddPassenger1() {
       // Update form fields with the data
       const { name, passport, idNumber, birthDate } = location.state.passenger;
       const index = location.state?.index;
+      const flight = location.state?.flightId;
 
       // Create a new formData object
-    const updatedFormData: formDataWithIndex = {
+    const updatedFormData: passenger = {
       ...formData,
       name,
       passport,
@@ -67,10 +68,12 @@ export default function AddPassenger1() {
     };
 
       setFormData(updatedFormData);
+
       if (index !== undefined) {
         setIndex(index);
       }
-     
+
+      setFlightId(flight);     
     }
   }, [location.state?.passenger]);
 
@@ -85,7 +88,7 @@ export default function AddPassenger1() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/src/components/testdata/seatdata.json');
+        const response = await fetch(`${apiBaseUrl}/seats/flight/${flightId}`);
         if (!response.ok) {
           throw new Error('Network response was not ok.');
         }
@@ -126,7 +129,7 @@ export default function AddPassenger1() {
 
   const handleButtonClick = () => {
     // Add your seat selection logic here
-    setDisplaySeatTable(true); // Show the seat selection table
+    setDisplaySeatTable(true); // Show the seat selection table   
 
     //scroll to the table
     const tableSection = document.getElementById("seatTable");
@@ -160,7 +163,7 @@ export default function AddPassenger1() {
     }
   
     // Navigate to bookflight with the formdata
-    navigate('goBack', { state: { seat } });
+    navigate('-1', { state: { seat } });
 
     
   };
