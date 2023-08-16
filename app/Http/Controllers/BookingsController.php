@@ -22,6 +22,8 @@ use Illuminate\Mail\Message;
 
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 
+use App\Http\Controllers\PayPalController;
+
 
 class BookingsController extends Controller
 {
@@ -108,11 +110,16 @@ class BookingsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, PayPalController $paypalController)
     {       
 
         try 
         {
+            $paymentResponse = $paypalController->createPayment([
+                    'amount' => 1,
+                    // Add other payment-related data here
+                ]);
+
                 // Validate the request data
                 $bookingData = $request->validate([
                     'flight_id' => 'required|exists:flights,id',

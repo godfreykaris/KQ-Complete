@@ -145,7 +145,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/seats/delete/{seatId}', [SeatsController::class, 'delete'])->name('seats.delete');
 });
 
-Route::get('/seats/{planeId}', [SeatsController::class, 'index'])->name('seats.plane_seats');
+Route::get('/seats/{itemName}/{itemId}', [SeatsController::class, 'index'])->name('seats.item_seats');
 Route::get('/seats/{seatNumber}/{planeId}', [SeatsController::class, 'show'])->name('seats.show');
 
 Route::middleware('auth:api')->group(function () {
