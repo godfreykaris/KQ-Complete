@@ -65,7 +65,7 @@ const ViewSeats: React.FC = () => {
 
     try 
     {
-      const response = await fetch(`${apiBaseUrl}/seats/${planeId}`);
+      const response = await fetch(`${apiBaseUrl}/seats/plane/${planeId}`);
       const data = await response.json();
       setSeats(data.seats);
       setIsLoading(false);
