@@ -1,11 +1,21 @@
 import React, { createContext, useState, useContext } from 'react';
 
+interface flight_class{
+  id: number;
+  name: string;
+}
+
+interface location{
+  id: number;
+  name: string;
+}
+
 interface seat{
   _id: number;
-  number: number;
-  class: string;
-  location: string;
-  availability: boolean;
+  seat_number: number;
+  flight_class: flight_class | {id: 0, name: ''};
+  location: location;
+  is_available: boolean;
   price: string;
 }
 
@@ -14,52 +24,74 @@ interface passenger{
   passport: number;
   idNumber: number;
   birthDate: string;
-  seat: seat | {};
+  seat: seat | {
+    seat_number: 0,
+    flight_class: {id: 0, name: ''},
+    location: {id: 0, name: ''},
+    is_available: false,
+    price: '',
+    _id: 0
+  };
 }
 
-interface PassengerContextType{
+interface PassengerContextType {
+  flightId: number | 0;
   passengers: passenger[];
   addPassenger: (passengerData: passenger) => void;
   updatePassenger: (index: number, passengerData: passenger) => void;
   removePassenger: (index: number) => void;
+  newFlightId: (flightId: number) => void;
 }
 
-interface passengerProviderProps{
+interface passengerProviderProps {
   children: React.ReactNode;
 }
 
 const PassengerContext = createContext<PassengerContextType | undefined>(undefined);
 
-export default function PassengerProvider ({ children }: passengerProviderProps) {
+export default function PassengerProvider({ children }: passengerProviderProps) {
   const [passengers, setPassengers] = useState<passenger[]>([]);
+  const [flightId, setFlightId] = useState<number | 0>(0); // Fix the variable name here
 
   const addPassenger = (passengerData: passenger) => {
     const newPassenger = {
-        ...passengerData,
-        index: passengers.length,
-    };    
-    setPassengers([...passengers, newPassenger]);    
+      ...passengerData,
+      seat: {
+        seat_number: 0,
+        flight_class: {id: 0, name: ''},
+        location: {id: 0, name: ''},
+        is_available: false,
+        price: '',
+        _id: 0
+      },
+      index: passengers.length,
+    };
+    setPassengers([...passengers, newPassenger]);
   };
 
   const updatePassenger = (index: number, passengerData: passenger) => {
-    setPassengers((prevPassengers) => 
-        prevPassengers.map((passenger, i) => (i === index ? {...passenger, ...passengerData} : passenger))
-    )
-  }
+    setPassengers((prevPassengers) =>
+      prevPassengers.map((passenger, i) => (i === index ? { ...passenger, ...passengerData } : passenger))
+    );
+  };
 
   const removePassenger = (index: number) => {
-    setPassengers((prevPassengers) => prevPassengers.filter((_, i) => i !== index))
+    setPassengers((prevPassengers) => prevPassengers.filter((_, i) => i !== index));
+  };
+
+  const newFlightId = (flightId: number) => {
+    setFlightId(flightId);
   };
 
   return (
-    <PassengerContext.Provider value={{ passengers, addPassenger, removePassenger, updatePassenger }}>
+    <PassengerContext.Provider value={{ flightId, passengers, addPassenger, removePassenger, updatePassenger, newFlightId }}>
       {children}
     </PassengerContext.Provider>
   );
-};
-
-export function usePassengerContext() {
-    return  useContext(PassengerContext);
 }
 
-export type {PassengerContextType};
+export function usePassengerContext() {
+  return useContext(PassengerContext);
+}
+
+export type { PassengerContextType };

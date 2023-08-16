@@ -10,16 +10,24 @@ import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
 import { useSeatContext, SeatContextType } from "../../context/seats/sendseatdata";
 import Seat from "../seats/viewseat.js";
-import SeatMap from "../seats/seatmap.js";
 
 import apiBaseUrl from '../../../../../config';
+interface flight_class{
+  id: number;
+  name: string;
+}
+
+interface location{
+  id: number;
+  name: string;
+}
 
 interface seat{
   _id: number;
-  number: number;
-  class: string;
-  location: string;
-  availability: boolean;
+  seat_number: number;
+  flight_class: flight_class | {id: 0, name: ''}; 
+  location: location | {id: 0, name: ''};
+  is_available: boolean;
   price: string;
 }
 
@@ -28,7 +36,14 @@ interface passenger{
   passport: number;
   idNumber: number;
   birthDate: string;
-  seat: seat | {};
+  seat: seat | {
+    seat_number: 0,
+    flight_class: {id: 0, name: ''},
+    location: {id: 0, name: ''},
+    is_available: false,
+    price: '',
+    _id: 0
+  };
 }
 
 interface status{
@@ -43,8 +58,8 @@ interface flight{
   id: number;
   flight_status: status;
   flight_number: number;
-  departure_city: location;
-  arrival_city: location;
+  departure_city: locations;
+  arrival_city: locations;
   airline: airline;
   duration: string;
   departure_time:  string;
@@ -52,7 +67,7 @@ interface flight{
 
 }
 
-interface location{
+interface locations{
   name: string;
   country: string;
   id: number;
@@ -71,8 +86,6 @@ export default function BookFlight() {
   const [selectedFrom, setSelectedFrom] = useState("");
   const [selectedTo, setSelectedTo] = useState("");
   const [filteredLocations, setFilteredLocations] = useState([]);
-
-  const [flightId, setFlightId] = useState<number>(0);
 
   const [loading, setLoading] = useState(false);
 
@@ -117,7 +130,7 @@ export default function BookFlight() {
 
 
   // Access the "passengers" array from the context using the usePassengerContext hook
-  const {passengers, removePassenger, updatePassenger} = usePassengerContext() as PassengerContextType;
+  const {flightId, passengers, removePassenger, updatePassenger, newFlightId} = usePassengerContext() as PassengerContextType;
 
   //access seats from seat context
   const {seat, updateSeat} = useSeatContext() as SeatContextType;
@@ -175,14 +188,10 @@ export default function BookFlight() {
   const [isButtonClicked, setIsButtonClicked] = useState(false);
   const navigate = useNavigate();
 
-  const handleRowClick = () => {
-    setIsButtonClicked(true);
-  };
 
-  const handleNavigateToViewPlane = () => {
-    setIsButtonClicked(false);
-    navigate('/seatmap');
-  };
+  // const handleNavigateToViewPlane = () => {
+  //   setIsButtonClicked(false);
+  // };
 
   const handleTripType = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setTripType(e.target.value);
@@ -191,10 +200,10 @@ export default function BookFlight() {
   // Handle Add passenger click
   const handleAddPassengerClick = () => {
     updateSeat({
-      number: 0,
-      class: '',
-      location: '',
-      availability: false,
+      seat_number: 0,
+      flight_class: {id: 0, name: ''},
+      location: {id: 0, name: ''},
+      is_available: false,
       price: '',
       _id: 0
     });
@@ -226,7 +235,6 @@ export default function BookFlight() {
     fetch(`${apiBaseUrl}/flights/byDepartureCityId/${selectedFrom}`)
       .then((response) => response.json())
       .then((data: { flights: flight[] }) => {
-        alert(JSON.stringify(data));
         setFlightTableData(data.flights);
         }) 
      
@@ -293,7 +301,7 @@ export default function BookFlight() {
       .then((data) => {
         setLocations(data.cities); 
       })
-      .catch((error) => {        
+      .catch((_error) => {        
         throw new Error("Error fetching data: ");
       });
   }, []);
@@ -303,7 +311,7 @@ export default function BookFlight() {
   const handleFromChange = (selectedOption: string) => {
     setSelectedFrom(selectedOption);
     const filteredLocations = locations.filter(
-      (location: location) => location.name !== selectedOption
+      (location: locations) => location.name !== selectedOption
     );
     setSelectedTo("");
     setFilteredLocations(filteredLocations);
@@ -389,26 +397,34 @@ export default function BookFlight() {
    const handleFlightSelection = (flight: flight) => {
     if(selectedFlight === null){
       setSelectedFlight(flight);
-      setFlightId(flight.id);
+      setIsButtonClicked(true);
+      newFlightId(flight.id);
     }else {
       const confirmUpdate = window.confirm("Changing the flight will clear seats for all passengers. Do you want to continue");
       if(confirmUpdate){
         setSelectedFlight(flight);
 
         //clear seat data for every passenger
-        const updatedPassengers = passengers.map((passenger: passenger) => ({
+        const updatedPassengers = passengers.map((passenger) => ({
           ...passenger,
-          seat: {}
+          seat: {
+            seat_number: 0,
+            flight_class: {id: 0, name: ''},
+            location: {id: 0, name: ''},
+            is_available: false,
+            price: '',
+            _id: 0
+          }
         }));
 
         //update seat data using the context function
         updateSeat({
-          number: 0,
-          class: '',
-          location: '',
-          availability: false,
+          seat_number: 0,
+          flight_class: {id: 0, name: ''},
+          location: {id: 0, name: ''},
+          is_available: false,
           price: '',
-          _id: 0         
+          _id: 0        
         });
 
         //update passenger data using context function
@@ -611,8 +627,6 @@ export default function BookFlight() {
 
               <br/>
 
-              {isButtonClicked && <SeatMap planeId={undefined} onSeatSelected={undefined}/>}
-              <br/>
               <div className="d-flex justify-content-between align-items-center">
                
                 <OverlayTrigger
@@ -679,8 +693,9 @@ export default function BookFlight() {
                       <tbody>
                         {flightTableData.map((item: flight, index: number) => (
                           <tr
-                            key={index}
                             className={selectedFlight === item ? "selected-row" : ""}
+                            style={{cursor: "pointer"}}
+                            key={index}
                             onClick={() => handleFlightSelection(item)}
                           >
                             <td>{item.flight_status.name}</td>
@@ -692,11 +707,7 @@ export default function BookFlight() {
                             <td>{item.departure_time}</td>
                             <td>{item.return_time}</td>
                             <td>
-                              <Button
-                                onClick={() => {
-                                  handleRowClick();
-                                  handleNavigateToViewPlane();
-                                }}
+                              <Button                      
                                 variant="primary"
                                 type="button"
                                 disabled={selectedFlight !== item} // Disable if not selected
