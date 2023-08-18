@@ -24,6 +24,7 @@ use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\AccountBasedBookingInquiriesController;
 use App\Http\Controllers\AirlineController;
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +37,8 @@ use App\Http\Controllers\AirlineController;
 |
 */
 
+Route::get('stripe', [PaymentController::class, 'stripe']);
+Route::post('stripe', [PaymentController::class, 'stripePost'])->name('stripe.post');
 
 Route::post('/users/login', [UsersController::class, 'login'])->name('users.login');
 Route::post('/users/register', [UsersController::class, 'register'])->name('user_register.store');
