@@ -32,12 +32,13 @@ interface passenger{
     price: '',
     _id: 0
   };
+  index: number | null;
 }
 
 interface PassengerContextType {
   flightId: number | 0;
   passengers: passenger[];
-  addPassenger: (passengerData: passenger) => void;
+  addPassenger: (index: number, passengerData: passenger) => void;
   updatePassenger: (index: number, passengerData: passenger) => void;
   removePassenger: (index: number) => void;
   newFlightId: (flightId: number) => void;
@@ -53,18 +54,11 @@ export default function PassengerProvider({ children }: passengerProviderProps) 
   const [passengers, setPassengers] = useState<passenger[]>([]);
   const [flightId, setFlightId] = useState<number | 0>(0); // Fix the variable name here
 
-  const addPassenger = (passengerData: passenger) => {
+  const addPassenger = (index: number, passengerData: passenger) => {
     const newPassenger = {
       ...passengerData,
-      seat: {
-        seat_number: 0,
-        flight_class: {id: 0, name: ''},
-        location: {id: 0, name: ''},
-        is_available: false,
-        price: '',
-        _id: 0
-      },
-      index: passengers.length,
+      seat: passengerData.seat,
+      index: index,
     };
     setPassengers([...passengers, newPassenger]);
   };

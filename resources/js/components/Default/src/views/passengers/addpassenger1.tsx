@@ -33,7 +33,7 @@ interface passenger{
   passport: number;
   idNumber: number;
   birthDate: string;
-  seat: seat | {
+  seat: Readonly<seat> | {
     seat_number: 0,
     flight_class: {id: 0, name: ''},
     location: {id: 0, name: ''},
@@ -41,6 +41,7 @@ interface passenger{
     price: '',
     _id: 0
   };
+  index: number | null;
 }
 
 const intitPassenger: passenger = {
@@ -56,16 +57,19 @@ const intitPassenger: passenger = {
     price: '',
     _id: 0
   },
+  index: null,
 }
 
 export default function AddPassenger1() {
+
   const location = useLocation();
   const navigate = useNavigate();
-  const { seat, updateSeat } = useSeatContext() as SeatContextType;
+
+  //seat context props
+  const { updateSeat } = useSeatContext() as SeatContextType;
 
   // Passenger Form State
   const [formData, setFormData] = useState<passenger>(intitPassenger);
-
 
   const [nameError, setNameError] = useState('');
   const [displaySeatTable, setDisplaySeatTable] = useState(false); // State to show/hide seat selection table
@@ -74,10 +78,13 @@ export default function AddPassenger1() {
 
   // Passengers Context
   const { flightId, passengers, addPassenger, updatePassenger } = usePassengerContext() as PassengerContextType;
+  const [passengerIndex, setPassengerIndex] = useState<number | null>(null);
 
+  // Seat Selection State
+  const [availableSeats, setAvailableSeats] = useState<seat[] | []>([]);
+  const [error, setError] = useState("");
+  const [selectedSeatId, setSelectedSeatId] = useState<number>(0);
 
-
-  console.log(flightId);
 
   useEffect(() => {
     // Check if there is state data i.e. passenger data from the bookflight component
@@ -102,13 +109,8 @@ export default function AddPassenger1() {
         setIndex(index);
       }   
     }
-  }, [location.state?.passenger]);
-
+  }, [location.state?.passenger]);  
   
-  // Seat Selection State
-  const [availableSeats, setAvailableSeats] = useState<seat[] | []>([]);
-  const [error, setError] = useState("");
-  const [selectedSeatId, setSelectedSeatId] = useState<number>(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -142,16 +144,27 @@ export default function AddPassenger1() {
       is_available: selectedSeat.is_available,
       price: selectedSeat.price,
     };
-    
+
     setFormData((prevData) => ({
       ...prevData,
       seat: selectedSeatObject,
     }))
 
-    updateSeat(selectedSeat);
+    // Update the passenger's seat using the selectedPassengerIndex
+    const updatedPassengers = [...passengers];    
+
+    // Update the passenger in the context
+    if(passengerIndex !== null){
+      updatedPassengers[passengerIndex].seat = selectedSeatObject;
+      updatePassenger(passengerIndex, updatedPassengers[passengerIndex]);
+    }      
+
+    updateSeat(index, selectedSeat);
+
     setDisplaySeatTable(false); // Hide the seat selection table after seat selection
   };
 
+  //input validation
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     const { name, value } = event.target;
 
@@ -168,19 +181,22 @@ export default function AddPassenger1() {
     }));
   };
 
+  //handle Select Seat
   const handleButtonClick = () => {
     // Add your seat selection logic here
     setDisplaySeatTable(true); // Show the seat selection table
 
-    console.log(flightId);
     //scroll to the table
     const tableSection = document.getElementById("seatTable");
     if(tableSection){
       tableSection.scrollIntoView({behavior: "smooth"});
     }
+    //set selected passenger index
+
+    setPassengerIndex(index);
   };
 
-  //edit passenger form submission
+  //edit or add passenger form submission
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -194,14 +210,14 @@ export default function AddPassenger1() {
       return;
     }
 
-    //Handle submit for both the edit and the addition
-    //const passengerIndex = passengers.findIndex((p) => index === formData.index);
+    const passengerToUpdate = {...formData};
 
     if (index !== null) {
       // Update the existing passenger in the array
-      updatePassenger(index, formData);
+      updatePassenger(index, passengerToUpdate);
     } else {
-      addPassenger(formData);
+      passengerToUpdate.index = passengers.length + 1;
+      addPassenger(passengerToUpdate.index, passengerToUpdate);
     }
   
     navigate(-1);
@@ -283,17 +299,22 @@ export default function AddPassenger1() {
 
                 <hr />
 
-                <OverlayTrigger
-                  placement='top'
-                  overlay={renderTooltip("Select a Seat before adding a passenger")}
-                >
-                  <span>
-                    <Button type="submit" variant="primary" disabled={Object.keys(seat).length === 0}>
+                {formData.seat.seat_number === 0 ? (
+                  <OverlayTrigger
+                    placement='top'
+                    overlay={renderTooltip("Select a Seat before adding a passenger")}
+                  >
+                    <span>
+                      <Button type="submit" variant="primary" disabled={formData.seat.seat_number === 0}>
+                        Add
+                      </Button>
+                    </span>
+                  </OverlayTrigger>
+                  ) : (
+                    <Button type="submit" variant="primary">
                       Add
                     </Button>
-                  </span>
-                
-                </OverlayTrigger>
+                  )}
 
                 
               </Form>
