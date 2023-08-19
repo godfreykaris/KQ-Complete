@@ -5,52 +5,68 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 
     <style type="text/css">
-        /* Custom CSS to center the panel */
-        body, html {
-            height: 100%;
-        }
+        
         .container {
             display: flex;
             align-items: center;
             justify-content: center;
             height: 100vh;
         }
-        /* Other styles from your original code */
+        .credit-card-box {
+            padding: 20px;
+        }
+        /* Style the panel title */
         .panel-title {
             font-weight: bold;
+            margin-top: 5px;
+
         }
-        .display-table {
-            display: table;
+        /* Style the success and error messages */
+        .alert {
+            text-align: center;
+            margin-top: 20px;
         }
-        .display-tr {
-            display: table-row;
+        /* Style the form inputs */
+        .form-group.required label {
+            font-weight: bold;
         }
-        .display-td {
-            display: table-cell;
-            vertical-align: middle;
-            width: 61%;
+        /* Center the form submit button */
+        .btn-block {
+            text-align: center;
         }
+        /* Add some space below the form */
+        .panel-body {
+            margin-bottom: 20px;
+        }
+
+        img {
+            max-width: 200px;
+            height: auto; /* Maintain aspect ratio */
+        }
+        
     </style>
 </head>
 <body>
   
 <div class="container">
     <div class="row">
-        <div class="col-md-9">
+        <div class="col-lg-12">
             <div class="panel panel-default credit-card-box">
-                <div class="panel-heading">
+                <div class="panel-heading text-center">
                     <div class="row">
-                        <div class="col-xs-8">
-                            <h3 class="panel-title">Payment Details</h3>
+                        <div class="col-lg-12">
+                            <img class="mx-auto d-block" src="{{ asset('images/stripe.jfif') }}"  alt="Stripe Logo Image">
                         </div>
-                        <div class="col-xs-4 text-right">
-                            <img class="img-responsive" src="http://i76.imgup.net/accepted_c22e0.png">
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h3 class="panel-title">Payment Details</h3>
                         </div>
                     </div>
                 </div>
                 <div class="panel-body">
                     @if (Session::has('error') || Session::has('success'))
-                        <div class="alert text-center {{ Session::has('success') ? 'alert-success' : 'alert-danger' }}">
+                        <div class="alert {{ Session::has('success') ? 'alert-success' : 'alert-danger' }}">
                             <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
                             <p>{{ Session::get('success') ?: Session::get('error') }}</p>
                         </div>
@@ -68,27 +84,27 @@
 
                         <div class='form-group required'>
                             <label class='control-label'>Name on Card</label>
-                            <input class='form-control' size='4' type='text'>
+                            <input class='form-control' id='nameOnCard' size='4' type='text' placeholder="John">
                         </div>
 
                         <div class='form-group card required'>
                             <label class='control-label'>Card Number</label>
-                            <input autocomplete='off' class='form-control card-number' size='20' type='text'>
+                            <input autocomplete='off' class='form-control card-number' id='cardNumber' size='20' type='text' placeholder="4242424242424242">
                         </div>
 
                         <div class='form-group'>
                             <div class='row'>
-                                <div class='col-xs-4 col-md-4'>
+                                <div class='col-sm-12 col-md-4'>
                                     <label class='control-label'>CVC</label>
-                                    <input autocomplete='off' class='form-control card-cvc' placeholder='ex. 311' size='4' type='text'>
+                                    <input autocomplete='off' class='form-control card-cvc' id='cvc' placeholder='ex. 311' size='4' type='text' placeholder="123">
                                 </div>
-                                <div class='col-xs-4 col-md-4'>
+                                <div class='col-sm-12 col-md-4'>
                                     <label class='control-label'>Expiration Month</label>
-                                    <input class='form-control card-expiry-month' placeholder='MM' size='2' type='text'>
+                                    <input class='form-control card-expiry-month' id='expiryMonth' placeholder='MM' size='2' type='text' placeholder="09">
                                 </div>
-                                <div class='col-xs-4 col-md-4'>
+                                <div class='col-sm-12 col-md-4'>
                                     <label class='control-label'>Expiration Year</label>
-                                    <input class='form-control card-expiry-year' placeholder='YYYY' size='4' type='text'>
+                                    <input class='form-control card-expiry-year' id='expiryYear' placeholder='YYYY' size='4' type='text' placeholder="2024">
                                 </div>
                             </div>
                         </div>
@@ -100,8 +116,8 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-xs-12">
-                                <button class="btn btn-primary btn-lg btn-block" type="submit">Pay Now ($100)</button>
+                            <div class="col-sm-12 btn-block">
+                                <button class="btn btn-primary btn-lg" type="submit">Pay Now (${{ Session::get('ticketPrice') }})</button>
                             </div>
                         </div>
                     </form>
@@ -166,5 +182,16 @@ $(function() {
         }
     }
 });
+
+/* -------- For testing only --------------- */
+// JavaScript to set initial values of form fields
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("nameOnCard").value = "John";
+    document.getElementById("cardNumber").value = "4242424242424242";
+    document.getElementById("cvc").value = "123";
+    document.getElementById("expiryMonth").value = "09";
+    document.getElementById("expiryYear").value = "2024";
+});
+/* ------------------------------------------- */
 </script>
 </html>

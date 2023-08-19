@@ -37,8 +37,6 @@ use App\Http\Controllers\PaymentController;
 |
 */
 
-Route::get('stripe', [PaymentController::class, 'stripe']);
-Route::post('stripe', [PaymentController::class, 'stripePost'])->name('stripe.post');
 
 Route::post('/users/login', [UsersController::class, 'login'])->name('users.login');
 Route::post('/users/register', [UsersController::class, 'register'])->name('user_register.store');
@@ -200,6 +198,17 @@ Route::get('/openings/{openingId}', [OpeningController::class, 'show'])->name('o
 Route::post('/bookings', [BookingsController::class, 'store'])->name('bookings.store');
 Route::put('/bookings/{bookingReference}', [BookingsController::class, 'update'])->name('bookings.update');
 Route::delete('/bookings/{bookingReference}', [BookingsController::class, 'destroy'])->name('bookings.destroy');
+
+Route::get('/stripe-payment', function () {
+        return view('stripe.stripe');
+    })->name('stripe.payment');
+
+Route::post('stripe', [PaymentController::class, 'stripePost'])->name('stripe.post');
+Route::get('/afterPayment', [BookingsController::class, 'createBookingAfterPayment'])->name('bookings.createAfterPayment');
+
+Route::get('/booking-creation-success', function () {
+    return view('booking.booking_status');
+})->name('booking.status');
 
 Route::post('/booking_inquiry/guest', [GuestBookingInquiryController::class, 'store'])->name('guest_booking_inquiry.store');
 Route::post('/booking_inquiry/registered_user', [AccountBasedBookingInquiriesController::class, 'store'])->name('account_based_booking_inquiry.store');

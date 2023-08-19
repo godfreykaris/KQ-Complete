@@ -18,7 +18,7 @@ require __DIR__.'/api.php';
 // Define a specific route for your React app (root route)
 Route::get('/', function () {
     return view('app');
-});
+})->name('app');
 
 // Catch-all route for other paths that should be handled by React Router
 Route::get('/{any}', function () {
