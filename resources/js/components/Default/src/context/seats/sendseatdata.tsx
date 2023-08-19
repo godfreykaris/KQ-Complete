@@ -20,15 +20,8 @@ interface seat{
 }
 
 interface SeatContextType{
-  seat: seat | {
-    seat_number: 0,
-    flight_class: {id: 0, name: ''},
-    location: {id: 0, name: ''},
-    is_available: false,
-    price: '',
-    _id: 0 
-  };
-  updateSeat: (newSeatData: seat) => void;
+  seats: seat[];
+  updateSeat: (index: number, newSeatData: seat) => void;
 }
 
 interface seatProviderProps{
@@ -38,31 +31,16 @@ interface seatProviderProps{
 const SeatContext = createContext<SeatContextType | undefined>(undefined);
 
 export default function SeatProvider({children} : seatProviderProps) {
-    const [seat, setSeat] = useState<seat | {
-      seat_number: 0,
-      flight_class: {id: 0, name: ''},
-      location: {id: 0, name: ''},
-      is_available: false,
-      price: '',
-      _id: 0}
-      >({
-        seat_number: 0,
-        flight_class: {id: 0, name: ''},
-        location: {id: 0, name: ''},
-        is_available: false,
-        price: '',
-        _id: 0
-      });
+    const [seats, setSeats] = useState<seat[]>([]);
 
-    const updateSeat = (newSeatData: seat) => {
-        setSeat((prevSeat) => ({
-            ...prevSeat,
-            ...newSeatData,
-        }))
+    const updateSeat = (index: number, newSeatData: seat) => {
+        setSeats((prevSeat) => 
+            prevSeat.map((seat, i) => (i === index ? {...seat, ...newSeatData} : seat))
+        );
     };
 
   return (
-    <SeatContext.Provider value={{seat, updateSeat}}>
+    <SeatContext.Provider value={{seats, updateSeat}}>
       {children}
     </SeatContext.Provider>
   )

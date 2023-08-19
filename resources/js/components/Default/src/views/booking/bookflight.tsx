@@ -12,6 +12,7 @@ import { useSeatContext, SeatContextType } from "../../context/seats/sendseatdat
 import Seat from "../seats/viewseat.js";
 
 import apiBaseUrl from '../../../../../config';
+
 interface flight_class{
   id: number;
   name: string;
@@ -64,7 +65,6 @@ interface flight{
   duration: string;
   departure_time:  string;
   return_time: string;
-
 }
 
 interface locations{
@@ -91,12 +91,27 @@ export default function BookFlight() {
 
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [emailError, setEmailError] = useState("");
+
   // State to manage the seat modal
   const [showSeatModal, setShowSeatModal] = useState(false);
 
   //data from the search flight component
   const location = useLocation();
   const {state} = location;
+
+  // Access the "passengers" array from the context using the usePassengerContext hook
+  const {flightId, passengers, removePassenger, updatePassenger, newFlightId} = usePassengerContext() as PassengerContextType;
+  const [selectedPassenger, setSelectedPassenger] = useState<passenger | undefined>(undefined);
+
+  //access seats from seat context
+  const {seats, updateSeat} = useSeatContext() as SeatContextType;
+
+  const navigate2 = useNavigate();
+
+  // Handle plane row select
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
+  const navigate = useNavigate();
 
   const {
     sfDepartureDate,
@@ -124,19 +139,7 @@ export default function BookFlight() {
         selectedTo: sfSelectedTo,
       }));
     }
-  }, [sfDepartureDate, sfReturnDate, sfSelectedFrom, sfSelectedTo]);
-
-  
-
-
-  // Access the "passengers" array from the context using the usePassengerContext hook
-  const {flightId, passengers, removePassenger, updatePassenger, newFlightId} = usePassengerContext() as PassengerContextType;
-
-  //access seats from seat context
-  const {seat, updateSeat} = useSeatContext() as SeatContextType;
-
-
-  const navigate2 = useNavigate();
+  }, [sfDepartureDate, sfReturnDate, sfSelectedFrom, sfSelectedTo]); 
 
   //to remove passenger when delete button is clicked
   const handleDeletePassenger = (index: number) => {
@@ -146,9 +149,7 @@ export default function BookFlight() {
   //to edit passenger when the edit button is clicked
   const handleEditPassenger = (passenger: passenger, index: number) => {   
     navigate2('/addpassenger1', {state: {passenger, index}});
-  };
-
-  const [emailError, setEmailError] = useState("");
+  };  
 
   // Format date imported from AddPassenger1
   const formatDate = (dateString: string) => {
@@ -181,17 +182,7 @@ export default function BookFlight() {
         [name]: value,
       }));
     }
-  };
-  
-
-  // Handle plane row select
-  const [isButtonClicked, setIsButtonClicked] = useState(false);
-  const navigate = useNavigate();
-
-
-  // const handleNavigateToViewPlane = () => {
-  //   setIsButtonClicked(false);
-  // };
+  };  
 
   const handleTripType = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setTripType(e.target.value);
@@ -199,14 +190,14 @@ export default function BookFlight() {
 
   // Handle Add passenger click
   const handleAddPassengerClick = () => {
-    updateSeat({
-      seat_number: 0,
-      flight_class: {id: 0, name: ''},
-      location: {id: 0, name: ''},
-      is_available: false,
-      price: '',
-      _id: 0
-    });
+    // updateSeat(-1, {
+    //   seat_number: 0,
+    //   flight_class: {id: 0, name: ''},
+    //   location: {id: 0, name: ''},
+    //   is_available: false,
+    //   price: '',
+    //   _id: 0
+    // });
     setIsButtonClicked(false);
   };
 
@@ -281,13 +272,12 @@ export default function BookFlight() {
       .then((data) => {
         setFlightTableData(data.flights); 
       })
-      .catch((error) => {        
+      .catch((_error) => {        
         throw new Error("Error fetching data: ");
       });
   } 
 
   //end of flight filters
-
   
   //locations
   useEffect(() => {
@@ -304,9 +294,7 @@ export default function BookFlight() {
       .catch((_error) => {        
         throw new Error("Error fetching data: ");
       });
-  }, []);
-  
-  
+  }, []); 
 
   const handleFromChange = (selectedOption: string) => {
     setSelectedFrom(selectedOption);
@@ -380,8 +368,9 @@ export default function BookFlight() {
   //the seat modal  
 
    // Function to open the seat modal
-   const handleViewSeat = () => {
+   const handleViewSeat = (passenger: passenger, index: number) => {
      setShowSeatModal(true);
+     setSelectedPassenger(passenger);
    };
  
    // Function to close the seat modal
@@ -397,40 +386,37 @@ export default function BookFlight() {
    const handleFlightSelection = (flight: flight) => {
     if(selectedFlight === null){
       setSelectedFlight(flight);
-      setIsButtonClicked(true);
       newFlightId(flight.id);
     }else {
       const confirmUpdate = window.confirm("Changing the flight will clear seats for all passengers. Do you want to continue");
       if(confirmUpdate){
         setSelectedFlight(flight);
 
-        //clear seat data for every passenger
+        // Clear seat data for every passenger
         const updatedPassengers = passengers.map((passenger) => ({
           ...passenger,
           seat: {
             seat_number: 0,
-            flight_class: {id: 0, name: ''},
-            location: {id: 0, name: ''},
+            flight_class: { id: 0, name: '' },
+            location: { id: 0, name: '' },
             is_available: false,
             price: '',
             _id: 0
           }
         }));
 
-        //update seat data using the context function
-        updateSeat({
-          seat_number: 0,
-          flight_class: {id: 0, name: ''},
-          location: {id: 0, name: ''},
-          is_available: false,
-          price: '',
-          _id: 0        
-        });
-
         //update passenger data using context function
         updatedPassengers.forEach((updatedPassenger, index: number) => {
-          updatePassenger(index, updatedPassenger)
-        })
+          updatePassenger(index, updatedPassenger);
+          updateSeat(index, {
+            seat_number: 0,
+            flight_class: { id: 0, name: '' },
+            location: { id: 0, name: '' },
+            is_available: false,
+            price: '',
+            _id: 0
+          });
+        });
       }
     }
     
@@ -582,7 +568,10 @@ export default function BookFlight() {
                         <td>{passenger.idNumber}</td>
                         <td>{formatDate(passenger.birthDate)}</td>
                         <td>
-                          <Button variant="primary" onClick={handleViewSeat}>
+                          <Button variant="primary" 
+                          onClick={() => {
+                          handleViewSeat(passenger, index);
+                      }}>
                             Seat
                           </Button>
                         </td>
@@ -622,7 +611,14 @@ export default function BookFlight() {
               <Seat
                 showSeatModal={showSeatModal}
                 handleCloseSeatModal={handleCloseSeatModal}
-                seatObject={seat}
+                seatObject={selectedPassenger ? selectedPassenger.seat : {
+                                                                          seat_number: 0,
+                                                                          flight_class: { id: 0, name: '' },
+                                                                          location: { id: 0, name: '' },
+                                                                          is_available: false,
+                                                                          price: '',
+                                                                          _id: 0}
+                }
               />
 
               <br/>

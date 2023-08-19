@@ -34,22 +34,6 @@ interface SeatProps{
 
   const Seat: React.FC<SeatProps> = ({showSeatModal, handleCloseSeatModal, seatObject}) => {
 
-  // //formating seat price to dollars
-  // const formatPriceToDollars = (price: string) => {
-  //   if (price === undefined || price === null) {
-  //     return ""; // Or any default value you want to display for an empty price
-  //   }
-
-  //   // Assuming the price is stored as a string with comma as thousand separator
-  //   // and using the Intl.NumberFormat API to format it as dollars
-  //   const formattedPrice = new Intl.NumberFormat("en-US", {
-  //     style: "currency",
-  //     currency: "USD",
-  //   }).format(Number(price.replace(/,/g, "")));
-
-  //   return formattedPrice;
-  // };
-
   return (
     <Modal show={showSeatModal} onHide={handleCloseSeatModal}>
       <Modal.Header>
