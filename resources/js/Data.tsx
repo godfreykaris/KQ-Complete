@@ -325,7 +325,17 @@ const Data: React.FC = () => {
           return response.text(); // Extract the response as text
         }
     })
-      .then(data => setData(data))
+      .then(data => {
+        // Check if the response contains a 'redirect' property
+        if (data.redirect) 
+        {
+          window.location.href = data.redirect; // Redirect to the provided URL
+        } 
+        else 
+        {
+          setData(data); // Process the response data if needed
+        }
+      })
       .catch(error => console.error(error));
 
     // Scroll to the top of the page to view the output
