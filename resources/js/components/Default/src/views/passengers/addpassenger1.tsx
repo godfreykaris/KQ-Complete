@@ -85,13 +85,19 @@ export default function AddPassenger1() {
   const [error, setError] = useState("");
   const [selectedSeatId, setSelectedSeatId] = useState<number>(0);
 
+  const [pageHead, setPageHead] = useState("Add Passenger|");
+
 
   useEffect(() => {
     // Check if there is state data i.e. passenger data from the bookflight component
     if (location.state?.passenger) {
       // Update form fields with the data
+      setPageHead("Edit Passenger|");
       const { name, passport, idNumber, birthDate } = location.state.passenger;
       const index = location.state?.index;
+
+      const bookingData = location.state.fomData;
+      const bookingDataFlight = location.state.flightData;
 
       // Create a new formData object
     const updatedFormData: passenger = {
@@ -240,7 +246,7 @@ export default function AddPassenger1() {
         <Container fluid>
           <Row>
             <h2 className="text-primary text-center">
-              <b>Add Passenger|</b>
+              <b>{pageHead}</b>
             </h2>
             <hr />
             <Col md={6} className="mx-auto">
@@ -293,28 +299,32 @@ export default function AddPassenger1() {
                   />
                 </Form.Group>
                 <hr/>
-                <Button type="button" variant="primary" onClick={handleButtonClick}>
-                  Select Seat
-                </Button>
+                <div className='d-flex justify-content-center'>
+                  <Button type="button" variant="primary" onClick={handleButtonClick}>
+                    Select Seat
+                  </Button>
+                </div>
 
                 <hr />
 
-                {formData.seat.seat_number === 0 ? (
-                  <OverlayTrigger
-                    placement='top'
-                    overlay={renderTooltip("Select a Seat before adding a passenger")}
-                  >
-                    <span>
-                      <Button type="submit" variant="primary" disabled={formData.seat.seat_number === 0}>
-                        Add
+                <div className='d-flex justify-content-center'>
+                  {formData.seat.seat_number === 0 ? (
+                    <OverlayTrigger
+                      placement='top'
+                      overlay={renderTooltip("Select a Seat before adding a passenger")}
+                    >
+                      <span>
+                        <Button type="submit" variant="primary" disabled={formData.seat.seat_number === 0}>
+                          Submit
+                        </Button>
+                      </span>
+                    </OverlayTrigger>
+                    ) : (
+                      <Button type="submit" variant="primary">
+                        Submit
                       </Button>
-                    </span>
-                  </OverlayTrigger>
-                  ) : (
-                    <Button type="submit" variant="primary">
-                      Add
-                    </Button>
-                  )}
+                    )}
+                </div>
 
                 
               </Form>

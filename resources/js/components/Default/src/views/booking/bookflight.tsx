@@ -9,6 +9,7 @@ import { usePassengerContext, PassengerContextType } from "../../context/passeng
 import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
 import { useSeatContext, SeatContextType } from "../../context/seats/sendseatdata";
+import { BookingContextType, useBookingContext } from '../../context/booking/bookflightcontext';
 import Seat from "../seats/viewseat.js";
 
 import apiBaseUrl from '../../../../../config';
@@ -73,14 +74,12 @@ interface locations{
   id: number;
 }
 
-
-
 export default function BookFlight() {
 
   const [tripType, setTripType] = useState("");
   const [departureDate, setDepartureDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
-  const [flightTableData, setFlightTableData] = useState<flight[]>([]);
+   const [flightTableData, setFlightTableData] = useState<flight[]>([]);
 
   const [locations, setLocations] = useState([]);
   const [selectedFrom, setSelectedFrom] = useState("");
@@ -104,8 +103,11 @@ export default function BookFlight() {
   const {flightId, passengers, removePassenger, updatePassenger, newFlightId} = usePassengerContext() as PassengerContextType;
   const [selectedPassenger, setSelectedPassenger] = useState<passenger | undefined>(undefined);
 
+  //to store variables
+  //const {formData, setFormData, flightTableData, setFlightTableData} = useBookingContext() as BookingContextType;
+
   //access seats from seat context
-  const {seats, updateSeat} = useSeatContext() as SeatContextType;
+  const {updateSeat} = useSeatContext() as SeatContextType;
 
   const navigate2 = useNavigate();
 
@@ -190,14 +192,6 @@ export default function BookFlight() {
 
   // Handle Add passenger click
   const handleAddPassengerClick = () => {
-    // updateSeat(-1, {
-    //   seat_number: 0,
-    //   flight_class: {id: 0, name: ''},
-    //   location: {id: 0, name: ''},
-    //   is_available: false,
-    //   price: '',
-    //   _id: 0
-    // });
     setIsButtonClicked(false);
   };
 
@@ -368,7 +362,7 @@ export default function BookFlight() {
   //the seat modal  
 
    // Function to open the seat modal
-   const handleViewSeat = (passenger: passenger, index: number) => {
+   const handleViewSeat = (passenger: passenger) => {
      setShowSeatModal(true);
      setSelectedPassenger(passenger);
    };
@@ -421,6 +415,9 @@ export default function BookFlight() {
     }
     
    };
+
+   //maintaining form state during navigation
+
 
    return (
     <div>
@@ -547,7 +544,20 @@ export default function BookFlight() {
               <hr/>
           
               {passengers.length > 0 ? (
-              <div style={{ maxHeight: '300px', overflowY: 'hidden' }}>
+              <div style={{ maxHeight: '300px', overflowY: 'auto', scrollbarWidth: 'none'}}>
+                <style>
+                  {`
+                  /* Hide the scrollbar for Webkit browsers (Chrome, Safari) */
+                    ::-webkit-scrollbar {
+                      width: 0.5em;
+                      height: 0.5em;
+                    }
+
+                    ::-webkit-scrollbar-thumb {
+                      background-color: transparent;
+                    }
+                  `}
+                </style>
                 <Table striped bordered hover>
                   <thead>
                     <tr>
@@ -570,7 +580,7 @@ export default function BookFlight() {
                         <td>
                           <Button variant="primary" 
                           onClick={() => {
-                          handleViewSeat(passenger, index);
+                          handleViewSeat(passenger);
                       }}>
                             Seat
                           </Button>
@@ -621,7 +631,7 @@ export default function BookFlight() {
                 }
               />
 
-              <br/>
+              <hr/>
 
               <div className="d-flex justify-content-between align-items-center">
                
@@ -643,7 +653,7 @@ export default function BookFlight() {
                             event.preventDefault(); // Prevent the default link behavior
                           } else {
                             handleAddPassengerClick();
-                            navigate("/addpassenger1");
+                            navigate('/addpassenger1');
                           }
                         }}
                         disabled={selectedFlight === null}
@@ -654,24 +664,20 @@ export default function BookFlight() {
                     </span>
                 </OverlayTrigger>
                 
-                
-
-                <hr/>
+                 <hr/>
 
                 <Button type="submit" variant="primary">
                   Book Now!
                 </Button>
               </div>
 
-              <br/>
-              <br/>
-              <br/>
+              <hr/>
 
               <p className="text-primary text-center"><b>These are The Available Flights</b></p>
-
+              <hr/>
               <Row className="mt-4">
                 <Col>
-                  <div className="table-responsive table-container">
+                  <div className="table-responsive table-container" style={{scrollbarWidth: 'none'}}>
                     <Table striped bordered hover>
                       <thead>
                         <tr>
