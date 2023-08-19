@@ -7,18 +7,11 @@ use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Charge;
 
+use Illuminate\Support\Facades\Log;
+
    
 class PaymentController extends Controller
 {
-    /**
-     * success response method.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function stripe()
-    {
-        return view('stripe.stripe');
-    }
   
     /**
      * success response method.
@@ -31,14 +24,16 @@ class PaymentController extends Controller
         {
             Stripe::setApiKey(env('STRIPE_SECRET'));
         
+            $ticketPrice = $request->session()->get('ticketPrice');
+
             Charge::create([
-                "amount" => 100 * 100,
+                "amount" => $ticketPrice * 100,
                 "currency" => "usd",
                 "source" => $request->stripeToken,
                 "description" => "Test payment from tutsmake.com." 
             ]);
 
-            session()->flash('success', 'Payment successful!');
+            return redirect()->route('bookings.createAfterPayment')->with('success', 'Payment successful!');
         }
         catch (\Stripe\Exception\CardException $e) 
         {
@@ -52,8 +47,11 @@ class PaymentController extends Controller
         } 
         catch (\Exception $e) 
         {
+            // For debugging
+            session()->flash('error', $e->getMessage());
+
             // Handle other unexpected errors
-            session()->flash('error', 'An unexpected error occurred.');
+            //session()->flash('error', 'An unexpected error occurred.');
         }
 
         
