@@ -30,7 +30,7 @@ import PrintTicket from "./views/booking/printticket";
 import { ContextProvider } from "./components/miscallenious/contextprovider";
 import SignInComponent from "../../Auth/SignInComponent.tsx"
 import SignUpComponent from "../../Auth/SignUpComponent.tsx"
-
+import { BookingProvider } from "./context/booking/bookflightcontext";
 
 
 const router = [
@@ -49,11 +49,13 @@ const router = [
       {
         path: "/bookflight",
         element: (
-            <SeatProvider>
-                <PassengerProvider>
-                    <BookFlight />
-                </PassengerProvider>             
-           </SeatProvider>
+            <BookingProvider>
+                <SeatProvider>
+                    <PassengerProvider>
+                        <BookFlight />
+                    </PassengerProvider>             
+                </SeatProvider>
+            </BookingProvider>
         )        
       },
       {
