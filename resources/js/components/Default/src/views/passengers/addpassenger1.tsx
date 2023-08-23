@@ -30,9 +30,9 @@ interface seat{
 
 interface passenger{
   name: string;
-  passport: number;
-  idNumber: number;
-  birthDate: string;
+  passport_number: number;
+  identification_number: number;
+  date_of_birth: string;
   seat: Readonly<seat> | {
     seat_number: 0,
     flight_class: {id: 0, name: ''},
@@ -46,9 +46,9 @@ interface passenger{
 
 const intitPassenger: passenger = {
   name: '',
-  passport: 0,
-  idNumber: 0,
-  birthDate: '',
+  passport_number: 0,
+  identification_number: 0,
+  date_of_birth: '',
   seat: {
     seat_number: 0,
     flight_class: {id: 0, name: ''},
@@ -93,7 +93,7 @@ export default function AddPassenger1() {
     if (location.state?.passenger) {
       // Update form fields with the data
       setPageHead("Edit Passenger|");
-      const { name, passport, idNumber, birthDate } = location.state.passenger;
+      const { name, passport_number, identification_number, date_of_birth } = location.state.passenger;
       const index = location.state?.index;
 
       const bookingData = location.state.fomData;
@@ -103,9 +103,9 @@ export default function AddPassenger1() {
     const updatedFormData: passenger = {
       ...formData,
       name,
-      passport,
-      idNumber,
-      birthDate,
+      passport_number,
+      identification_number,
+      date_of_birth,
       ...(index !== undefined ? { index: index } : {}), // Only include index if it's defined
     };
 
@@ -268,8 +268,8 @@ export default function AddPassenger1() {
                   <Form.Label>Passport Number:</Form.Label>
                   <Form.Control
                     type="text"
-                    name="passport"
-                    value={formData.passport}
+                    name="passport_number"
+                    value={formData.passport_number}
                     onChange={handleChange}
                     maxLength={8}
                     required
@@ -280,8 +280,8 @@ export default function AddPassenger1() {
                   <Form.Label>ID Number:</Form.Label>
                   <Form.Control
                     type="text"
-                    name="idNumber"
-                    value={formData.idNumber}
+                    name="identification_number"
+                    value={formData.identification_number}
                     onChange={handleChange}
                     maxLength={8}
                     required
@@ -292,8 +292,8 @@ export default function AddPassenger1() {
                   <Form.Label>Birth Date:</Form.Label>
                   <Form.Control
                     type="date"
-                    name="birthDate"
-                    value={formData.birthDate}
+                    name="date_of_birth"
+                    value={formData.date_of_birth}
                     onChange={handleChange}
                     required
                   />

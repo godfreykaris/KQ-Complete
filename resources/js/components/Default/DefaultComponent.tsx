@@ -15,9 +15,7 @@ import ChangePassenger from "./src/views/passengers/changepassenger";
 import EditBooking from "./src/views/booking/editbooking";
 import Deletebooking from "./src/views/booking/deletebooking";
 import ChangeBooking from "./src/views/booking/changebooking";
-import AddBookingInquiry from "./src/views/inquiries/addbookinginquiry";
-import ChangeBookingInquiry from "./src/views/inquiries/changebookinginquiry";
-import DeleteBookingInquiry from "./src/views/inquiries/deletebookinginquiry";
+import SendInquiry from "./src/views/inquiries/inquiries";
 import PassengerProvider from "./src/context/passengers/passengercontext";
 import SeatProvider from "./src/context/seats/sendseatdata";
 import Footer from "./src/components/homeelements/footer";
@@ -93,7 +91,18 @@ const router = [
   },
   {
       path: 'viewseat',
-      element: <Seat showSeatModal={undefined} handleCloseSeatModal={undefined} seatObject={undefined}/>
+      element: <Seat
+      showSeatModal={false}
+      handleCloseSeatModal={() => {}}
+      seatObject={{
+        seat_number: 0,
+        flight_class: { id: 0, name: '' },
+        location: { id: 0, name: '' },
+        is_available: false,
+        price: '',
+        _id: 0,
+      }}
+      />
   },
   {
       path: 'editpassenger',
@@ -120,16 +129,8 @@ const router = [
       element: <Deletebooking/>
   },
   {
-      path: 'addbookinginquiry',
-      element: <AddBookingInquiry/>
-  },
-  {
-      path: 'changebookinginquiry',
-      element: <ChangeBookingInquiry/>
-  },
-  {
-      path: 'deletebookinginquiry',
-      element: <DeleteBookingInquiry/>
+      path: 'inquiries',
+      element: <SendInquiry/>
   },
   {
       path: 'footer',
