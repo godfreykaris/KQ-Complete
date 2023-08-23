@@ -1,17 +1,48 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button, Table, Container, Row, Col, Spinner, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { useSearchFlightContext } from "../../context/flights/flightcontext";
+import { useSearchFlightContext, SearchFlightContextType } from "../../context/flights/flightcontext";
 import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
+
+import apiBaseUrl from "../../../../../config";
+
 import "./searchflight.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+interface status{
+  name: string;
+}
+interface airline{
+  name: string;
+}
+interface flight{
+  id: number;
+  flight_status: status;
+  flight_number: number;
+  departure_city: locations;
+  arrival_city: locations;
+  airline: airline;
+  duration: string;
+  departure_time:  string;
+  return_time: string;
+}
+
+interface locations{
+  name: string;
+  country: string;
+  id: number;
+}
+
 export default function SearchFlight() {
   const [filteredLocations, setFilteredLocations] = useState([]);
-  const [locations, setLocations] = useState([]);
-  const [tableData, setTableData] = useState([]);
-  const [errorAlert, setErrorAlert] = useState(false); // State to control the error alert
+  const [locations, setLocations] = useState([]);  
+
+  const [flightTableData, setFlightTableData] = useState<flight[] | []>([]);
+  
+  const [selectedFlight, setSelectedFlight] = useState<flight | null>(null);
+
+  const [errorMessage, setErrorMessage] = useState("");
 
   //context variables
   const {
@@ -23,95 +54,130 @@ export default function SearchFlight() {
     setDepartureDate,
     returnDate,
     setReturnDate,
-  } = useSearchFlightContext();
+  } = useSearchFlightContext() as SearchFlightContextType;
 
   const navigate = useNavigate();
 
-  const fetchData = (departureDate, returnDate, fromLocation, toLocation) => {
-    fetch("/src/components/testdata/planes.json")
-      .then((response) => response.json())
-      .then((data) => {
-        const filterData = data.flights.filter((item) => {
-          const itemDate = item.depdate.date;
-          const selectedDate = departureDate.split("-").reverse().join("/");
-
-          // Check if departureDate matches
-          const depDateMatch = departureDate === "" || itemDate === selectedDate;
-
-          // Check if returnDate matches
-          const retDateMatch = returnDate === "" || item.retdate.date === returnDate;
-
-          // Check if fromLocation matches
-          const fromLocationMatch = fromLocation === "" || item.from === fromLocation;
-
-          // Check if toLocation matches
-          const toLocationMatch = toLocation === "" || item.destination === toLocation;
-
-          return depDateMatch && retDateMatch && fromLocationMatch && toLocationMatch;
-        });
-
-        setTableData(filterData);
-        setErrorAlert(filterData.length === 0); // Show the error alert if no flights are found
-      })
-      .catch((error) => {
-        setErrorAlert(true); // Show the error alert if there's an error fetching data
-      });
-  };
-
   // Departure locations and destinations
   useEffect(() => {
-    if (
-      departureDate !== "" ||
-      returnDate !== "" ||
-      selectedFrom !== "" ||
-      selectedTo !== ""
-    ) {
-      fetchData(departureDate, returnDate, selectedFrom, selectedTo);
+    if (departureDate !== "" && selectedFrom !== "") {
+      fetchFlightsByDepartureDateAndCity();
+    } else if (departureDate !== "") {
+      fetchFlightsByDepartureDate();
+    } else if (selectedFrom !== "") {
+      fetchFlightsByCity();
+    } else {
+      fectchAllFlights();                       
     }
-  }, [departureDate, returnDate, selectedFrom, selectedTo]);
+  }, [departureDate, selectedFrom]);
 
-  useEffect(() => {
-    fetch("/src/components/testdata/destinations.json")
+
+  //flight filters
+  const fetchFlightsByCity = () => {    
+    fetch(`${apiBaseUrl}/flights/byDepartureCityId/${selectedFrom}`)
+      .then((response) => response.json())
+      .then((data: { flights: flight[] }) => {        
+        setFlightTableData(data.flights);
+        }) 
+     
+      .catch((error: any) => {
+        setErrorMessage("An error occurred");
+        console.log("Error fetching data: ", error);
+      });
+  };
+
+  const fetchFlightsByDepartureDate = () => {
+    fetch(`${apiBaseUrl}/flights/byDepartureDate/${departureDate}`)    
+      .then((response) => response.json())
+      .then((data: { flights: flight[] }) => {        
+        setFlightTableData(data.flights);
+        }) 
+     
+      .catch((error: any) => {
+        setErrorMessage("An error occurred");
+        console.log("Error fetching data: ", error);
+      });
+  };
+
+  const fetchFlightsByDepartureDateAndCity = () => {
+    fetch(`${apiBaseUrl}/flights/byDepartureDateCity/${departureDate}/${selectedFrom}`)
+      .then((response) => response.json())
+      .then((data: { flights: flight[] }) => {    
+        setFlightTableData(data.flights);
+        }) 
+     
+      .catch((error: any) => {
+        setErrorMessage("An error occurred");
+        console.log("Error fetching data: ", error);
+      });
+  };
+
+  const fectchAllFlights = () => {
+    fetch(`${apiBaseUrl}/flights`)
       .then((response) => {
-        if (!response.ok) {
+        if (!response.ok) {          
           throw new Error("Error fetching data");
-        }
-        return response.json();
+        }     
+        return response.json(); // This will automatically parse the JSON response
       })
       .then((data) => {
-        setLocations(data.locations);
+        setFlightTableData(data.flights); 
       })
-      .catch((error) => {
-        throw new Error("Error fetching data: " + error);
+      .catch((_error) => {        
+        throw new Error("Error fetching data: ");
       });
-  }, []);
+  } 
 
-  const handleFromChange = (selectedOption) => {
+  //end of flight filters
+  
+  //locations
+  useEffect(() => {
+    fetch(`${apiBaseUrl}/cities`)
+      .then((response) => {
+        if (!response.ok) {          
+          throw new Error("Error fetching data");
+        }     
+        return response.json(); // This will automatically parse the JSON response
+      })
+      .then((data) => {
+        setLocations(data.cities); 
+      })
+      .catch((_error) => {        
+        throw new Error("Error fetching data: ");
+      });
+  }, []); 
+
+  const handleFromChange = (selectedOption: string) => {
     setSelectedFrom(selectedOption);
-    const filteredLocations = locations.filter((location) => location.name !== selectedOption.value);
+    const filteredLocations = locations.filter(
+      (location: locations) => location.name !== selectedOption
+    );
     setSelectedTo("");
-    setFilteredLocations(filteredLocations);
-  };
+    setFilteredLocations(filteredLocations); // Make sure this is not mutating the original state
+  };  
 
-  const handleToChange = (selectedOption) => {
+  const handleToChange = (selectedOption: string) => {
     setSelectedTo(selectedOption);
   };
+ 
 
-  // Handle submit
-  const handleSubmit = () => {
-
-    fetchData(departureDate, returnDate, selectedFrom, selectedTo);
-
-    console.log("Dep", departureDate);
-
-    //navigate to bookflight component with query parameters
-    navigate("/bookflight", {state: {
-      sfDepartureDate: departureDate,
-      sfReturnDate: returnDate,
-      sfSelectedFrom: selectedFrom,
-      sfSelectedTo: selectedTo,
+   //function to handle flight selection
+   const handleFlightSelection = (flight: flight) => {
+    if(selectedFlight === null){
+      setSelectedFlight(flight); 
+      navigate('/bookflight');           
+    }else {
+      const confirmUpdate = window.confirm("Are you sure you want to switch flights");
+      if(confirmUpdate){
+        setSelectedFlight(flight);
+      }
     }
-  });
+    
+   };
+
+   //----------- Handle submit --------------//
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
   };
 
@@ -159,8 +225,8 @@ export default function SearchFlight() {
                     required
                   >
                     <option value="">Select Departure Location</option>
-                    {locations.map((option, index) => (
-                      <option key={index} value={option.name}>
+                    {locations.map((option: locations, index: number) => (
+                      <option key={index} value={option.id}>
                         {option.name}
                       </option>
                     ))}
@@ -183,7 +249,7 @@ export default function SearchFlight() {
                     required
                   >
                     <option value="">Select Destination</option>
-                    {filteredLocations.map((option, index) => (
+                    {filteredLocations.map((option: locations, index: number) => (
                       <option key={index} value={option.name}>
                         {option.name}
                       </option>
@@ -202,54 +268,64 @@ export default function SearchFlight() {
 
         <hr />
 
-        <Row className="mt-4">
-          <Col>
-            {errorAlert && (
-              <Alert variant="danger" onClose={() => setErrorAlert(false)} dismissible>
-                No flights found!
-              </Alert>
-            )}
-            <h3 className="text-center">These are the available flights!</h3>
-            <div className="table-responsive table-container">
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Flight Number</th>
-                    <th>Destination</th>
-                    <th>AirLine</th>
-                    <th>Duration</th>
-                    <th>Departure Date</th>
-                    <th>Return Date</th>
-                    <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tableData.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.name}</td>
-                    <td>{item.flightNumber}</td>
-                    <td>{item.destination}</td>
-                    <td>{item.airline}</td>
-                    <td>{item.duration}</td>
-                    <td>{item.depdate.date}</td>
-                    <td>{item.retdate.date}</td>
-                    <td>
-                      <Button
-                        onClick={() => { handleSubmit(); }}
-                        variant="primary"
-                        type="button"
-                      >
-                        Book
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-            </div>
-          </Col>
-        </Row>
+        {flightTableData.length > 0 ? (
+          <div>
+            <p className="text-primary text-center"><b>These are The Available Flights</b></p>
+            <hr/>
+            <Row className="mt-4">
+              <Col>
+                <div className="table-responsive table-container" style={{scrollbarWidth: 'none'}}>
+                  <Table striped bordered hover>
+                    <thead>
+                      <tr>
+                        <th>Status</th>
+                        <th>Flight Number</th>
+                        <th>Departure</th>
+                        <th>Destination</th>
+                        <th>AirLine</th>
+                        <th>Duration</th>
+                        <th>Departure Date</th>
+                        <th>Return Date</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {flightTableData.map((item, index) => (
+                        <tr
+                          className={selectedFlight === item ? "selected-row" : ""}
+                          style={{cursor: "pointer"}}
+                          key={index}
+                          onClick={() => handleFlightSelection(item)}
+                        >
+                          <td>{item.flight_status.name}</td>
+                          <td>{item.flight_number}</td>
+                          <td>{item.departure_city.name}</td>
+                          <td>{item.arrival_city.name}</td>
+                          <td>{item.airline.name}</td>
+                          <td>{item.duration}</td>
+                          <td>{item.departure_time}</td>
+                          <td>{item.return_time}</td>
+                          <td>
+                            <Button                      
+                              variant="primary"
+                              type="button"
+                              disabled={selectedFlight !== item} // Disable if not selected
+                            >
+                              Book
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              </Col>
+            </Row>
+          </div>
+          ) : (
+            <Alert variant='warning'>No Flights Available</Alert>
+          )}
+
       </Container>
     </div>
   );

@@ -10,6 +10,7 @@ import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
 import { useSeatContext, SeatContextType } from "../../context/seats/sendseatdata";
 import { BookingContextType, useBookingContext } from '../../context/booking/bookflightcontext';
+import { useSearchFlightContext, SearchFlightContextType } from '../../context/flights/flightcontext';
 import Seat from "../seats/viewseat.js";
 
 import apiBaseUrl from '../../../../../config';
@@ -114,6 +115,9 @@ export default function BookFlight() {
   // Handle plane row select
   const [isButtonClicked, setIsButtonClicked] = useState(false);
   const navigate = useNavigate();
+
+  
+  
 
   const {
     sfDepartureDate,
