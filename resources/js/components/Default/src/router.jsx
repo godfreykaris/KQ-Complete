@@ -28,7 +28,6 @@ import { ContextProvider } from "./components/miscallenious/contextprovider";
 import SignInComponent from "../../Auth/SignInComponent.tsx"
 import SignUpComponent from "../../Auth/SignUpComponent.tsx"
 import { BookingProvider } from "./context/booking/bookflightcontext";
-import SendInquiry "./components/Default/src/views/inquiries/inquiries";
 
 
 const router = [
