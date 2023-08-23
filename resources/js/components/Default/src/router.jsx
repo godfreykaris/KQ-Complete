@@ -12,9 +12,6 @@ import ChangePassenger from "./views/passengers/changepassenger";
 import EditBooking from "./views/booking/editbooking";
 import Deletebooking from "./views/booking/deletebooking";
 import ChangeBooking from "./views/booking/changebooking";
-import AddBookingInquiry from "./views/inquiries/addbookinginquiry";
-import ChangeBookingInquiry from "./views/inquiries/changebookinginquiry";
-import DeleteBookingInquiry from "./views/inquiries/deletebookinginquiry";
 import PassengerProvider from "./context/passengers/passengercontext";
 import SeatProvider from "./context/seats/sendseatdata";
 import Footer from "./components/homeelements/footer";
@@ -129,16 +126,8 @@ const router = [
         element: <Deletebooking/>
     },
     {
-        path: '/addbookinginquiry',
-        element: <AddBookingInquiry/>
-    },
-    {
-        path: '/changebookinginquiry',
-        element: <ChangeBookingInquiry/>
-    },
-    {
-        path: '/deletebookinginquiry',
-        element: <DeleteBookingInquiry/>
+        path: '/inquiries',
+        element: <SendInquiry/>
     },
     {
         path: '/footer',

@@ -10,6 +10,7 @@ import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
 import { useSeatContext, SeatContextType } from "../../context/seats/sendseatdata";
 import { BookingContextType, useBookingContext } from '../../context/booking/bookflightcontext';
+import { useSearchFlightContext, SearchFlightContextType } from '../../context/flights/flightcontext';
 import Seat from "../seats/viewseat.js";
 
 import apiBaseUrl from '../../../../../config';
@@ -35,9 +36,9 @@ interface seat{
 
 interface passenger{
   name: string;
-  passport: number;
-  idNumber: number;
-  birthDate: string;
+  passport_number: number;
+  identification_number: number;
+  date_of_birth: string;
   seat: seat | {
     seat_number: 0,
     flight_class: {id: 0, name: ''},
@@ -79,7 +80,7 @@ export default function BookFlight() {
   const [tripType, setTripType] = useState("");
   const [departureDate, setDepartureDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
-   const [flightTableData, setFlightTableData] = useState<flight[]>([]);
+  //const [flightTableData, setFlightTableData] = useState<flight[]>([]);
 
   const [locations, setLocations] = useState([]);
   const [selectedFrom, setSelectedFrom] = useState("");
@@ -103,8 +104,8 @@ export default function BookFlight() {
   const {flightId, passengers, removePassenger, updatePassenger, newFlightId} = usePassengerContext() as PassengerContextType;
   const [selectedPassenger, setSelectedPassenger] = useState<passenger | undefined>(undefined);
 
-  //to store variables
-  //const {formData, setFormData, flightTableData, setFlightTableData} = useBookingContext() as BookingContextType;
+  //to store values
+  const {formData, setFormData, flightTableData, setFlightTableData} = useBookingContext() as BookingContextType;
 
   //access seats from seat context
   const {updateSeat} = useSeatContext() as SeatContextType;
@@ -115,6 +116,9 @@ export default function BookFlight() {
   const [isButtonClicked, setIsButtonClicked] = useState(false);
   const navigate = useNavigate();
 
+  
+  
+
   const {
     sfDepartureDate,
     sfReturnDate,
@@ -122,13 +126,13 @@ export default function BookFlight() {
     sfSelectedTo,
   } = state || {}; 
 
-  const [formData, setFormData] = useState({
-    email: '',
-    departureDate: sfDepartureDate || "",
-    returnDate: sfReturnDate || "",
-    selectedFrom: sfSelectedFrom || "",
-    selectedTo: sfSelectedTo || "",
-  }); 
+  // const [formData, setFormData] = useState({
+  //   email: '',
+  //   departureDate: sfDepartureDate || "",
+  //   returnDate: sfReturnDate || "",
+  //   selectedFrom: sfSelectedFrom || "",
+  //   selectedTo: sfSelectedTo || "",
+  // }); 
 
   
   useEffect(() => {
@@ -305,7 +309,7 @@ export default function BookFlight() {
 
   //----------- Handle submit --------------//
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+    e.preventDefault();    
 
     setErrorMessage(""); //clear previous errors
 
@@ -321,15 +325,17 @@ export default function BookFlight() {
       
       //data to be sent
       const sendData = {
-        email: formData.email,
         flightId: flightId,
+        email: formData.email,        
         passengers: passengers,
-      }
+      }  
+      
+      alert(JSON.stringify(sendData));
   
       setLoading(true);
   
       //perform POST reuest
-      const response = await fetch("", {
+      const response = await fetch(`${apiBaseUrl}/bookings/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -356,7 +362,7 @@ export default function BookFlight() {
 
       setLoading(false);
     }
-    
+       
   };
 
   //the seat modal  
@@ -535,6 +541,54 @@ export default function BookFlight() {
                   </div>
                 )}
               </Form.Group>
+
+              <br/>
+
+              <div className="d-flex justify-content-center align-items-center">
+               
+                <OverlayTrigger
+                  placement="top"
+                  overlay={
+                    selectedFlight === null ? (
+                      renderTooltip("Select a flight inorder to add a passenger")
+                    ) : (
+                      <></> // An empty fragment, effectively disabling the overlay
+                    )
+                  }
+                  >
+                    <span>
+                      <Button
+                        variant="primary"
+                        onClick={(event) => {
+                          if (selectedFlight === null) {
+                            event.preventDefault(); // Prevent the default link behavior
+                          } else {
+                            handleAddPassengerClick();
+                            navigate('/addpassenger1');
+                          }
+                        }}
+                        disabled={selectedFlight === null}
+                        type="button"
+                      >
+                        Add Passenger
+                      </Button>
+                    </span>
+                </OverlayTrigger>
+                
+              </div>
+
+              <hr/>
+
+              <div className='d-flex justify-content-center'>
+                <Button type="submit" variant="primary" disabled={loading}>
+                  {loading ? (
+                    <Spinner animation='border' size='sm'/>
+                  ) : (
+                    "Book Now!"
+                  )}                    
+                </Button>
+              </div>
+              
               </Form>
             </Col> 
 
@@ -574,9 +628,9 @@ export default function BookFlight() {
                     {passengers.map((passenger: passenger, index: number) => (
                       <tr key={index}>
                         <td>{passenger.name}</td>
-                        <td>{passenger.passport}</td>
-                        <td>{passenger.idNumber}</td>
-                        <td>{formatDate(passenger.birthDate)}</td>
+                        <td>{passenger.passport_number}</td>
+                        <td>{passenger.identification_number}</td>
+                        <td>{formatDate(passenger.date_of_birth)}</td>
                         <td>
                           <Button variant="primary" 
                           onClick={() => {
@@ -633,97 +687,63 @@ export default function BookFlight() {
 
               <hr/>
 
-              <div className="d-flex justify-content-between align-items-center">
-               
-                <OverlayTrigger
-                  placement="top"
-                  overlay={
-                    selectedFlight === null ? (
-                      renderTooltip("Select a flight inorder to add a passenger")
-                    ) : (
-                      <></> // An empty fragment, effectively disabling the overlay
-                    )
-                  }
-                  >
-                    <span>
-                      <Button
-                        variant="primary"
-                        onClick={(event) => {
-                          if (selectedFlight === null) {
-                            event.preventDefault(); // Prevent the default link behavior
-                          } else {
-                            handleAddPassengerClick();
-                            navigate('/addpassenger1');
-                          }
-                        }}
-                        disabled={selectedFlight === null}
-                        type="button"
-                      >
-                        Add Passenger
-                      </Button>
-                    </span>
-                </OverlayTrigger>
-                
-                 <hr/>
-
-                <Button type="submit" variant="primary">
-                  Book Now!
-                </Button>
-              </div>
-
-              <hr/>
-
-              <p className="text-primary text-center"><b>These are The Available Flights</b></p>
-              <hr/>
-              <Row className="mt-4">
-                <Col>
-                  <div className="table-responsive table-container" style={{scrollbarWidth: 'none'}}>
-                    <Table striped bordered hover>
-                      <thead>
-                        <tr>
-                          <th>Status</th>
-                          <th>Flight Number</th>
-                          <th>Departure</th>
-                          <th>Destination</th>
-                          <th>AirLine</th>
-                          <th>Duration</th>
-                          <th>Departure Date</th>
-                          <th>Return Date</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {flightTableData.map((item: flight, index: number) => (
-                          <tr
-                            className={selectedFlight === item ? "selected-row" : ""}
-                            style={{cursor: "pointer"}}
-                            key={index}
-                            onClick={() => handleFlightSelection(item)}
-                          >
-                            <td>{item.flight_status.name}</td>
-                            <td>{item.flight_number}</td>
-                            <td>{item.departure_city.name}</td>
-                            <td>{item.arrival_city.name}</td>
-                            <td>{item.airline.name}</td>
-                            <td>{item.duration}</td>
-                            <td>{item.departure_time}</td>
-                            <td>{item.return_time}</td>
-                            <td>
-                              <Button                      
-                                variant="primary"
-                                type="button"
-                                disabled={selectedFlight !== item} // Disable if not selected
+              {flightTableData.length > 0 ? (
+                <div>
+                  <p className="text-primary text-center"><b>These are The Available Flights</b></p>
+                  <hr/>
+                  <Row className="mt-4">
+                    <Col>
+                      <div className="table-responsive table-container" style={{scrollbarWidth: 'none'}}>
+                        <Table striped bordered hover>
+                          <thead>
+                            <tr>
+                              <th>Status</th>
+                              <th>Flight Number</th>
+                              <th>Departure</th>
+                              <th>Destination</th>
+                              <th>AirLine</th>
+                              <th>Duration</th>
+                              <th>Departure Date</th>
+                              <th>Return Date</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {flightTableData.map((item, index) => (
+                              <tr
+                                className={selectedFlight === item ? "selected-row" : ""}
+                                style={{cursor: "pointer"}}
+                                key={index}
+                                onClick={() => handleFlightSelection(item)}
                               >
-                                Select
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
-                  </div>
-                </Col>
-              </Row>
+                                <td>{item.flight_status.name}</td>
+                                <td>{item.flight_number}</td>
+                                <td>{item.departure_city.name}</td>
+                                <td>{item.arrival_city.name}</td>
+                                <td>{item.airline.name}</td>
+                                <td>{item.duration}</td>
+                                <td>{item.departure_time}</td>
+                                <td>{item.return_time}</td>
+                                <td>
+                                  <Button                      
+                                    variant="primary"
+                                    type="button"
+                                    disabled={selectedFlight !== item} // Disable if not selected
+                                  >
+                                    Select
+                                  </Button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </Table>
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
+                ) : (
+                  <Alert variant='warning'>No Flights Available</Alert>
+                )}
         
         </Row>
       </Container>

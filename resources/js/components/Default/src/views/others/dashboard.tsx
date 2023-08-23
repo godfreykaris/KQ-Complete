@@ -1,9 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Carousel, Button } from "react-bootstrap";
-import Footer from "../../components/homeelements/footer";
 import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
+import Footer from "../../components/homeelements/footer";
 import Cards from "../../components/homeelements/cards";
 import "./dashboard-image.css";
 
@@ -14,7 +14,6 @@ import hostessImage from "../../../public/hostess.jpg";
 import seatsImage from "../../../public/seats.webp";
 import planeImage from "../../../public/787-8.png";
 import kqImage from "../../../public/KQ-1.png";
-
 
 export default function Dashboard() {
   return (
@@ -28,7 +27,7 @@ export default function Dashboard() {
      <p className="text-center">
         <b className="text-glow">Enjoy The Greatest Experience With KQ!</b>
       </p>
-     <Container className="dashboard-body" fluid>
+     <Container fluid>
         <Row>
           <Col md={7} className="mx-auto">
             <Carousel fade interval={3000}>
@@ -37,7 +36,7 @@ export default function Dashboard() {
                   className="d-block w-100 image-container carousel-image"
                   src={hostessImage}
                   alt="Dashboard Image 1"
-                  style={{ width: '100%', height: 'auto', maxHeight: '500px' }} // Adjust the maxHeight as needed
+                  
                 />
                 <Carousel.Caption>
                   <h3>Welcome to KQ Airlines</h3>
@@ -85,6 +84,6 @@ export default function Dashboard() {
      <Cards />
      <hr />
      <Footer />
-    </div>  
+    </div>
   );
 }

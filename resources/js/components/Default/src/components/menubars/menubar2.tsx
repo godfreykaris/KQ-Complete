@@ -20,6 +20,9 @@ const menuItems = [
     { label: 'Change Passenger', link: '/changepassenger' },
     { label: 'Delete Passenger', link: '/deletepassenger' },
   ]},
+  
+  { label: 'Inquiry', link: '/inquiries'},
+
   {label: 'Print Ticket', link:'/printticket'},
 ];
 
