@@ -15,7 +15,7 @@ const menuItems = [
     { label: 'Change Booking', link: '/changebookinginquiry' },
     { label: 'Delete Booking', link: '/deletebookinginquiry' },
   ]},
-  { label: 'Travellers', link: '/travellers', dropdown: true, items: [
+  { label: 'Passengers', link: '/passengers', dropdown: true, items: [
     { label: 'Add Passenger', link: '/addpassenger' },
     { label: 'Change Passenger', link: '/changepassenger' },
     { label: 'Delete Passenger', link: '/deletepassenger' },

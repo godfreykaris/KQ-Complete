@@ -105,7 +105,50 @@ class BookingsController extends Controller
             return null;
     }
 
-    
+    /**
+     * Get the booking associated with the booking reference and ticket number
+     */
+    public function getBooking(string $bookingReference, string $ticketNumber)
+    {
+        try 
+        {
+            // Retrieve the booking
+            $booking = Booking::where('booking_reference', $bookingReference)->first();
+
+            //Make sure it is a valid booking
+            if (!$booking) 
+            {
+                return response()->json(['error' => 'Booking not found.', 'status' => 0]);
+            }
+
+            // Get the associated ticket
+            $ticket = Ticket::where('booking_reference', $bookingReference)
+                              ->where('ticket_number', $ticketNumber)
+                              ->first();
+            
+            // Make sure it is a valid ticket
+            if (!$ticket)
+            {               
+                return response()->json(['error' => 'No ticket matches the booking reference and ticket number.', 'status' => 0]);
+            }
+
+            
+            // Return a success response
+            return response()->json(['success' => 'Booking found.', 'status' => 1, 'booking' => $booking]);
+
+        } 
+        catch (\Exception $e) 
+        {
+            // Log the error
+            Log::error($e->getMessage());
+
+            // For debugging
+            //return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+
+            // Return the error response
+            return response()->json(['error' => 'An error occurred. ', 'status' => 0]);
+        }
+    }
 
     /**
      * Store a newly created resource in storage.
