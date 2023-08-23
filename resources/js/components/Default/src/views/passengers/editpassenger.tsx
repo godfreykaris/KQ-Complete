@@ -1,45 +1,119 @@
 
-import React, { useEffect, useState } from "react";
-import { Modal, Button } from "react-bootstrap";
+import React, { FormEvent, useEffect, useRef, useState } from "react";
+import { Modal, Button, Alert, Container, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import LoadingComponent from "../../../../Common/LoadingComponent";
+import apiBaseUrl from "../../../../../config";
 
-import SeatMap from "../seats/seatmap";
+interface FlightClass{
+  id: number;
+  name: string;
+}
 
-export default function EditPassenger({ showEditModal, handleResubmission, passengerDataObject, handleClose }) {
+interface Location{
+  id: number;
+  name: string;
+}
+
+interface Seat{
+  id: number | 0;
+  seat_number: string;
+  flight_class: FlightClass;
+  location: Location;
+  is_available: boolean;
+  price: 0;
+}
+
+interface Passenger {
+  id: number;
+  passenger_id: string;
+  name: string;
+  passport_number: string;
+  identification_number: string;
+  date_of_birth: string;
+  seat: Seat;
+}
+
+interface EditPassengerProps {
+  showEditModal: boolean; // Specify the type explicitly as boolean
+  handleResubmission: (editedPassenger: Passenger) => void;
+  passengerDataObject: Passenger | undefined;
+  flightId: string;
+  handleClose: () => void;
+}
+
+export default function EditPassenger({ showEditModal, handleResubmission, passengerDataObject, handleClose, flightId }: EditPassengerProps) {
   
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedSeatNumber, setSelectedSeatNumber] = useState<string>('');
+  const [displaySeatTable, setDisplaySeatTable] = useState<boolean>(false);
 
-  const [editedPassenger, setEditedPassenger] = useState({
+  const [refError, setRefError] = useState<string>('');
+  const tableContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const [responseMessage, setResponseMessage] = useState('');
+  const [responseStatus, setResponseStatus] = useState<number | null>(null);
+  
+  const [editedPassenger, setEditedPassenger] = useState<Passenger>(passengerDataObject ?? {
+    id: 0, // You may need to provide default values for other properties
+    passenger_id: '',
+    name: '',
+    passport_number: '',
+    identification_number: '',
+    date_of_birth: '',
     seat: {
-      number: "",
-      class: "",      
-      location: "",
-      availability: "",
-      price: "",
+      id: 0,
+      seat_number: '',
+      flight_class: {
+        id: 0,
+        name: '',
+      },
+      location: {
+        id: 0,
+        name: '',
+      },
+      is_available: false,
+      price: 0,
     },
   });
+
 
   //for the seat map
   const [isSeatMapVisible, setIsSeatMapVisible] = useState(false);
 
-  //toggle seatMap visibility
-  const handleSeatSelection = () => {
-    setIsSeatMapVisible(!isSeatMapVisible);
-  };
-
   //state variable to store seat map data retrieved from the SeatMap
-  const [selectedSeat, setSelectedSeat] = useState(null);
+  const [selectedSeat, setSelectedSeat] = useState<Seat>();
+  const [seats, setSeats] = useState<Seat[]>([]);
 
-  // a function to handle the selected seat
-  const handleSelectedSeat = (selectedSeatData) => {
-    setSelectedSeat(selectedSeatData);
+
+
+  const showSeatsTable = () => {
+    setDisplaySeatTable(true);
+    tableContainerRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  //seat selection from the table
+  const handleSeatSelection = (index: number) => {
+    const selectedSeat = seats[index];
+
+    const selectedSeatObject: Seat = {
+      id: selectedSeat.id,
+      seat_number: selectedSeat.seat_number,
+      flight_class: selectedSeat.flight_class,
+      location: selectedSeat.location,
+      is_available: selectedSeat.is_available,
+      price: selectedSeat.price,
+    };
+
+    setSelectedSeat(selectedSeatObject);
+
+    setSelectedSeatNumber(seats[index].seat_number.toString());
+  
+    setDisplaySeatTable(false); // Hide the seat selection table after seat selection
   };
 
-  const formatDate = (dateString) => {
-    const [day, month, year] = dateString.split('/');
-    return `${year}-${month}-${day}`;
-  };
-
-  const parseDate = (dateString) => {
+  
+  const parseDate = (dateString: string) => {
     const [year, month, day] = dateString.split('-');
     return `${day}/${month}/${year}`;
   };
@@ -51,11 +125,11 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
         ...prevPassenger,
         seat: {
           ...prevPassenger.seat,
-          number:selectedSeat.number || "",
-          class: selectedSeat.class || "",
+          seat_number:selectedSeat.seat_number || "",
+          flight_class: selectedSeat.flight_class || "",
           location: selectedSeat.location || "",
-          availability: selectedSeat.availability || "",
-          price: selectedSeat.price || "",
+          is_available: selectedSeat.is_available || false,
+          price: selectedSeat.price || 0,
         },
       }));
     }
@@ -67,25 +141,64 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
       setEditedPassenger({
         ...restData,
         seat: {
-          number: seat.number || "",
-          class: seat.class || "",          
+          id: seat.id || 0,
+          seat_number: seat.seat_number || "",
+          flight_class: seat.flight_class || "",          
           location: seat.location || "",
-          availability: seat.availability || "",
-          price: seat.price || "",
+          is_available: seat.is_available || false,
+          price: seat.price || 0,
         },
       });
     }
   }, [passengerDataObject]);
 
+  useEffect(() => {
+    if(flightId)
+        fetchSeats(flightId);
+}, [flightId]);
+
+const fetchSeats = async (flightId: string) => {
+  setIsLoading(true);
+
+  try 
+  {
+    const response = await fetch(`${apiBaseUrl}/seats/flight/${flightId}`);
+    const data = await response.json();
+    setSeats(data.seats);
+    setIsLoading(false);
+
+  }
+  catch (error) 
+  {
+    console.error('Error fetching data:', error);
+    setIsLoading(false);
+  }
+};
+
+const getResponseClass = () => {
+  if (responseStatus === 1) 
+  {
+    return 'text-success'; // Green color for success
+  } 
+  else if (responseStatus === 0) 
+  {
+    return 'text-danger'; // Red color for error
+  } 
+  else 
+  {
+    return ''; // No specific styles (default)
+  }
+};
+
   //handling changes in form data
-  const handleChange = (event) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
 
     if (name === 'birthDate') {
-      const dateObject = value ? parseDate(value) : null;
+      const dateObject = value ?  parseDate(value) : '';
       setEditedPassenger((prevPassenger) => ({
         ...prevPassenger,
-        dob: dateObject,
+        date_of_birth: dateObject,
       }));
     } else if (name.startsWith("seat")) {
       //handle seat fields separately
@@ -97,17 +210,7 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
           [seatField]: value,
         },
       }));
-    } else if (name === "seat.price") {
-      // remove dollar sign and non-numeric characters
-      const numericPrice = parseFloat(value.replace(/[^\d.]/g, ""));
-      setEditedPassenger((prevPassenger) => ({
-        ...prevPassenger,
-        seat: {
-          ...prevPassenger.seat,
-          price: numericPrice,
-        },
-      }));
-    }else {
+    } else {
       setEditedPassenger((prevPassenger) => ({
         ...prevPassenger,
         [name]: value,
@@ -116,49 +219,20 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
   };
 
   //submit form after edit
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    
     handleResubmission(editedPassenger);
   };
 
   //formating seat price to dollars
-  const formatPriceToDollars = (price) => {
-    if (typeof price === 'number') {
-      // Assuming the price is stored as a number, format it as dollars
-      const formattedPrice = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(price);
+  const formatPriceToDollars = (price: number) => {
+    // Assuming the price is stored as a number, format it as dollars
+    const formattedPrice = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(price);
 
-      return formattedPrice;
-    } else if (typeof price === 'string') {
-      // Assuming the price is stored as a string with comma as thousand separator
-      // and using the Intl.NumberFormat API to format it as dollars
-      const numericPrice = Number(price.replace(/[^0-9.-]+/g,"")); // Remove non-numeric characters like dollar sign
-      const formattedPrice = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(numericPrice);
-
-      return formattedPrice;
-    } else {
-      return "";
-    }
-  };
-
-  //change seat button
-  const [isButtonClicked1, setIsButtonClicked1] = useState(false);
-
-  const handleButtonClick = () => {
-    setIsButtonClicked1(true);
-    handleSeatSelection();
-
-    // Scroll to the SeatMap component
-    const seatMapComponent = document.getElementById("seatMapComponent");
-    if (seatMapComponent) {
-      seatMapComponent.scrollIntoView({ behavior: "smooth" });
-    }
+    return formattedPrice;
   };
 
 
@@ -186,39 +260,43 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
               </div>
 
               <div className="form-group">
-                <label htmlFor="passport">Passport: </label>
+                <label htmlFor="passport_number">Passport: </label>
                 <input
                   type="text"
-                  id="passport"
+                  id="passport_number"
                   className="form-control"
-                  name="passport"
-                  value={editedPassenger.passport || ''}
+                  name="passport_number"
+                  value={editedPassenger.passport_number}
                   onChange={handleChange}
+                  max = {10}
+                  min ={4}
                   required
                 />
               </div>
 
               <div className="form-group">
-                <label htmlFor="idNumber">ID Number: </label>
+                <label htmlFor="identification_number">ID Number: </label>
                 <input
                   type="text"
-                  id="idNumber"
+                  id="identification_number"
                   className="form-control"
-                  name="idNumber"
-                  value={editedPassenger.idNumber || ''}
+                  name="identification_number"
+                  value={editedPassenger.identification_number || ''}
                   onChange={handleChange}
+                  max = {10}
+                  min = {4}
                   required
                 />
               </div>
 
               <div className="form-group">
-                <label htmlFor="birthdate">Birth Date:</label>
+                <label htmlFor="birthDate">Birth Date:</label>
                 <input
                   type="date"
-                  id="birthdate"
+                  id="birthDate"
                   className="form-control"
                   name="birthDate"
-                  value={editedPassenger.dob ? formatDate(editedPassenger.dob) : ''}
+                  value={editedPassenger.date_of_birth}
                   onChange={handleChange}
                   required
                 />
@@ -234,7 +312,7 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
                   id="seatNumber"
                   className="form-control"
                   name="seat.seatNumber"
-                  value={editedPassenger.seat.number}
+                  value={editedPassenger.seat.seat_number}
                   onChange={handleChange}
                   readOnly
                   required
@@ -248,7 +326,7 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
                   id="seatClass"
                   className="form-control"
                   name="seat.class"
-                  value={editedPassenger.seat.class}
+                  value={editedPassenger.seat.flight_class.name}
                   onChange={handleChange}
                   readOnly
                   required
@@ -263,7 +341,7 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
                   id="seatLocation"
                   className="form-control"
                   name="seat.location"
-                  value={editedPassenger.seat.location}
+                  value={editedPassenger.seat.location.name}
                   onChange={handleChange}
                   readOnly
                   required
@@ -271,13 +349,13 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
               </div>
 
               <div className="form-group">
-                <label htmlFor="availability">Availability: </label>
+                <label htmlFor="is_available">Availability: </label>
                 <input
                   type="text"
-                  id="availability"
+                  id="is_available"
                   className="form-control"
-                  name="seat.availability"
-                  value={editedPassenger.seat.availability}
+                  name="seat.is_available"
+                  value={editedPassenger.seat.is_available ? "Booked" : "Available"}
                   onChange={handleChange}
                   readOnly
                   required
@@ -298,31 +376,83 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
                 />
               </div> 
 
+            <div className="text-center">
               <button
-                onClick={() => {handleButtonClick();
-              }}
-                type="button"
-                className="btn btn-primary"
-              >
-                Change Seat
-              </button>              
+                  onClick={() => {showSeatsTable() ;
+                }}
+                  type="button"
+                  className="btn btn-primary mt-3"
+                >
+                  Change Seat
+                </button>              
 
-              <hr></hr>           
 
-              <Button type="submit">Submit</Button>
+                <hr></hr>           
+
+                <Button type="submit">Submit</Button>
+              </div>
+              
             </form>
           </div>
         </div>
       </Modal.Body>
-      {isSeatMapVisible && (
-        <div id="seatMapComponent"> {/* Add an id to the container for scrolling */}
-          <SeatMap
-            planeId={editedPassenger.seat.planeId} // Pass the planeId from passenger data
-            handleSeatSelection={handleSeatSelection}
-            handleClose={() => setIsSeatMapVisible(false)}
-            onSeatSelected={handleSelectedSeat}
-          />
-        </div>
+      {/*       Show the success alert when a seat is selected */}
+
+      {selectedSeatNumber && (
+        <Alert variant="success" className="text-center" style={{ marginTop: '30px', marginBottom: '10px'}}>
+          Seat {selectedSeatNumber} has been selected successfully!
+        </Alert>
+      )}
+  
+      {/* Display seat selection table when Select Seat button is clicked */}
+      {(displaySeatTable && isLoading) ?
+      (
+        /**Show loading */
+        <LoadingComponent />
+      ): (((seats.length == 0  && selectedSeatNumber == '') || (seats.length > 0  && selectedSeatNumber == '')) && !displaySeatTable) ? (
+        <Alert variant="error" className="text-center" style={{ marginTop: '90px', marginBottom: '10px'}}>
+          Select a seat for the passenger!
+        </Alert>
+      ): displaySeatTable && (
+        <Container ref={tableContainerRef} className="d-flex justify-content-center align-items-center" style={{ marginTop: '10px', position: 'relative' }}>
+          {refError ? (
+            <Alert variant="danger">{refError}</Alert>
+          ) : (
+            <Table  striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Seat Number</th>
+                  <th>Seat Location</th>
+                  <th>Availability</th>
+                  <th>Seat Price</th>
+                  <th>Flight Class</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {seats.map((availableSeat: Seat, index: number) => (
+                    <tr key={index}>
+                      <td>{availableSeat.seat_number}</td>
+                      <td>{availableSeat.location.name}</td>
+                      <td>{!availableSeat.is_available ? 'Booked' : 'Available'}</td>
+                      <td>{availableSeat.price}</td>
+                      <td>{availableSeat.flight_class.name}</td>
+                      <td>
+                      <Button
+                        onClick={() => handleSeatSelection(index)}
+                        variant="primary"
+                        type="button"
+                        disabled={!availableSeat.is_available}
+                      >
+                        Select
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>        
+          )}
+        </Container>
       )}
     </Modal>
   );

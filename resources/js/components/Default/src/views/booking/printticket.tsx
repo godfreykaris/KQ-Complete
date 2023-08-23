@@ -251,7 +251,7 @@ export default function PrintTicket() {
                   </>
                   ) : (
                     <div>
-                    <Col md={6} lg={5} className="mx-auto">
+                    <Col md={6} lg={8} className="mx-auto">
                       <hr />
                       
                       <h4 className="text-center">Your Ticket:</h4>

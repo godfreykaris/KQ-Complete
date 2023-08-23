@@ -1,122 +1,269 @@
-import React, { useState, useRef, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useRef, ChangeEvent, FormEvent, useEffect } from 'react';
 import { Container, Form, Button, Alert, Spinner, Table, Col } from 'react-bootstrap';
 import MenuBar1 from '../../components/menubars/menubar1';
+import { useNavigate } from 'react-router-dom';
+import LoadingComponent from '../../../../Common/LoadingComponent';
+import apiBaseUrl from '../../../../../config';
 
 interface Passenger {
   name: string;
-  passport: string;
-  idNumber: string;
-  birthDate: Date | null;
+  passport_number: string;
+  identification_number: string;
+  date_of_birth: string;
+  seat_id: number;
 }
 
-interface Seat {
-  number: string;
-  location: string;
-  availability: string;
-  price: number;
+interface FlightClass{
+  id: number;
+  name: string;
 }
+
+interface Location{
+  id: number;
+  name: string;
+}
+
+interface Seat{
+  id: number | 0;
+  seat_number: number;
+  flight_class: FlightClass;
+  location: Location;
+  is_available: boolean;
+  price: string;
+}
+
 
 export default function AddPassenger() {
   const [formData, setFormData] = useState<{
     bookingReference: string;
+    ticketNumber: string;
     passport: string;
     idNumber: string;
     name: string;
     birthDate: Date | null;
   }>({
     bookingReference: '',
+    ticketNumber: '',
     passport: '',
     idNumber: '',
     name: '',
     birthDate: null,
   });
   
-  const [loading, setLoading] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const [bookingData, setBookingData] = useState<any>(null);
   const [refError, setRefError] = useState<string>('');
   const [passengers, setPassengers] = useState<Passenger[]>([]);
+
+
   const [seats, setSeats] = useState<Seat[]>([]);
-  const [selectedSeat, setSelectedSeat] = useState<Seat | null>(null);
+  const [selectedSeat, setSelectedSeat] = useState<Seat>();
+  
+  const [flightId, setFlightId] = useState<string>('0');
+
   const [nameError, setNameError] = useState<string>('');
   const [displaySeatTable, setDisplaySeatTable] = useState<boolean>(false);
   const [selectedSeatNumber, setSelectedSeatNumber] = useState<string>('');
   const tableContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const handleButtonClick = () => {
-    setDisplaySeatTable(!displaySeatTable);
+  const navigate = useNavigate();
+
+  const [responseMessage, setResponseMessage] = useState('');
+  const [responseStatus, setResponseStatus] = useState<number | null>(null);
+
+
+  useEffect(() => {
+       fetchSeats(flightId);
+  }, [flightId]);
+
+  const fetchSeats = async (flightId: string) => {
+    setIsLoading(true);
+
+    try 
+    {
+      const response = await fetch(`${apiBaseUrl}/seats/flight/${flightId}`);
+      const data = await response.json();
+      setSeats(data.seats);
+      setIsLoading(false);
+
+    }
+    catch (error) 
+    {
+      console.error('Error fetching data:', error);
+      setIsLoading(false);
+    }
+  };
+
+  const getResponseClass = () => {
+    if (responseStatus === 1) 
+    {
+      return 'text-success'; // Green color for success
+    } 
+    else if (responseStatus === 0) 
+    {
+      return 'text-danger'; // Red color for error
+    } 
+    else 
+    {
+      return ''; // No specific styles (default)
+    }
+  };
+  
+  const showSeatsTable = () => {
+    setDisplaySeatTable(true);
     tableContainerRef.current?.scrollIntoView({ behavior: 'smooth' });
   }
 
-  const handleSeatSelect = (index: number) => {
-    setSelectedSeatNumber(seats[index].number);
-    setSelectedSeat(seats[index]);
+  
+  //seat selection from the table
+  const handleSeatSelection = (index: number) => {
+    const selectedSeat = seats[index];
+
+    const selectedSeatObject: Seat = {
+      id: selectedSeat.id,
+      seat_number: selectedSeat.seat_number,
+      flight_class: selectedSeat.flight_class,
+      location: selectedSeat.location,
+      is_available: selectedSeat.is_available,
+      price: selectedSeat.price,
+    };
+
+    setSelectedSeat(selectedSeatObject);
+
+    setSelectedSeatNumber(seats[index].seat_number.toString());
+  
+    setDisplaySeatTable(false); // Hide the seat selection table after seat selection
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-  
-    if (name === 'name' && !/^[A-Za-z\s]+$/.test(value)) {
-      setNameError('Name must contain only alphabetic characters.');
-    } else {
-      setNameError('');
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const sanitizedValue = value.replace(/[^a-zA-Z0-9]/g, ""); // Allow only letters and numbers
+
+    if (name === "name") 
+    {
+        if (!/^[A-Za-z\s]+$/.test(value)) {
+            setNameError('Name must contain only alphabetic characters.');
+        } 
+        else 
+        {
+            
+            setNameError('');
+        }
     }
-  
-    if (name === 'bookingReference') {
-      let newValue = value.replace(/\D/g, '');
-  
-      if (newValue.length === 6) {
-        newValue = `KQ-${newValue}`;
-        setRefError('');
-      } else {
-        setRefError('The input must be numbers');
-      }
-  
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        [name]: newValue,
-      }));
+
+    let prefix = ""; // Initialize prefix based on context
+
+    if (name === "bookingReference") 
+    {
+        prefix = "KQ-BR-"; // Booking reference prefix
     } 
-    else if (name === 'birthDate') 
+    else if (name === "ticketNumber") 
+    {
+        prefix = "KQ-TK-"; // Ticket number prefix
+    }
+    else if (name === "birthDate") 
     {
       const dateObject = value ? new Date(value) : null;
       setFormData((prevFormData) => ({
-        ...prevFormData,
-        [name]: dateObject,
+          ...prevFormData,
+          [name]: dateObject,
       }));
     }
-    else 
+    else
     {
       setFormData((prevFormData) => ({
         ...prevFormData,
         [name]: value,
       }));
     }
-  };
+    
+    if (prefix != "" && sanitizedValue.length <= 10) 
+    {
+        const newValue = `${prefix}${sanitizedValue.slice(4, 11)}`; // Use the first 7 characters
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            [name]: newValue,
+        }));
+        setRefError(""); // Clear any previous errors
+    } 
+    else if (prefix != "" && sanitizedValue.length > 10)
+    {
+        setRefError("The input must be the appropriate prefix followed by 6 characters");
+    }
+};
   
 
   const handleSubmitPassenger = async (event: FormEvent) => {
     event.preventDefault();
 
+    if(!formData.bookingReference || !formData.ticketNumber)
+    {
+      alert('Retrieve your booking to be able to add passenger');
+
+      return;
+    }
+
     const newPassenger: Passenger = {
       name: formData.name,
-      passport: formData.passport,
-      idNumber: formData.idNumber,
-      birthDate: formData.birthDate || null, // Use null if formData.birthDate is null
+      passport_number: formData.passport,
+      identification_number: formData.idNumber,
+      date_of_birth: formData.birthDate ? formData.birthDate.toISOString().split('T')[0] : '',
+      seat_id: selectedSeat ? selectedSeat.id : 0 ,
     };
     
 
     try {
-      const response = await fetch('/src/components/bookings', {
+
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        if (!csrfToken) 
+        {
+          console.error('CSRF token not found.');
+          setIsLoading(false);
+
+          navigate('/');
+          return;
+        }
+      const response = await fetch(`${apiBaseUrl}/passengers/add/${formData.bookingReference}/${formData.ticketNumber}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrfToken,
+
         },
-        body: JSON.stringify(newPassenger),
+        body: JSON.stringify({ passengers: [newPassenger] }),
       });
 
-      if (response.ok) {
-        setPassengers((prevPassengers) => [...prevPassengers, newPassenger]);
-      }
+      
+      const data = await response.json();
+
+        if (response.ok) 
+        {
+          if (data.status) 
+          {
+            setResponseStatus(1); // Success
+            setResponseMessage(`Success: ${data.success}.`);
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth',
+            });
+          } 
+          else 
+          {
+            setResponseStatus(0); // Error
+            setResponseMessage(`Error: ${data.error}`);
+          }
+        } 
+        else 
+        {
+          setResponseStatus(0); // Error
+          setResponseMessage(`Error: ${response.statusText}`);
+        }
+
+        setIsLoading(false);
+
     } catch (error) {
       throw new Error("An error occurred during submission");
     }
@@ -127,80 +274,125 @@ export default function AddPassenger() {
     setRefError("");
     setBookingData(null);
 
-    const { bookingReference } = formData;
+    setIsLoading(true);
 
-    if (!bookingReference) {
-      setRefError("Booking Reference is required");
-      return;
-    }
+    try 
+    {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-    setLoading(true);
+        if (!csrfToken) 
+        {
+          console.error('CSRF token not found.');
+          setIsLoading(false);
 
-    try {
-      const response = await fetch("/src/components/testdata/bookings");
-      const data = await response.json();
-
-      if (response.ok && data && data.bookings && data.bookings.length > 0) {
-        const booking = data.bookings[0];
-        const { planeId, passengers: passengerData } = booking;
-
-        setBookingData(booking);
-        setPassengers(passengerData);
-
-        const seatResponse = await fetch(`/src/components/${planeId}`);
-        const seatData = await seatResponse.json();
-
-        if (seatResponse.ok && seatData && seatData.seats) {
-          setSeats(seatData.seats);
-        } else {
-          throw new Error("Seats not Found");
+          navigate('/');
+          return;
         }
-      } else {
-        setRefError("Booking not found, Check the booking reference and try again");
+
+        const response = await fetch(`${apiBaseUrl}/bookings/get/${formData.bookingReference}/${formData.ticketNumber}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            'X-CSRF-TOKEN': csrfToken,
+          },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) 
+        {
+          if (data.status) 
+          {
+            setResponseStatus(1); // Success
+            setResponseMessage(`Success: ${data.success} You can now add a passenger.`);
+
+            setFlightId(data.booking.flight_id);
+
+          } 
+          else 
+          {
+            setResponseStatus(0); // Error
+            setResponseMessage(`Error: ${data.error}`);
+          }
+        } 
+        else 
+        {
+          setResponseStatus(0); // Error
+          setResponseMessage(`Error: ${response.statusText}`);
+        }
+
+        setIsLoading(false);
+
+      } 
+      catch (error) 
+      {
+        setIsLoading(false);
+        setResponseStatus(0); // Error
+        setResponseMessage('Error submitting data. Please try again or contact support.');
+        console.error('Error submitting data:', error);
       }
-    } catch (error) {
-      setRefError("An error occurred while fetching the booking. Please try again later");
-    } finally {
-      setLoading(false);
-    }
-  }
+    };
+    
 
   return (
     <div>
-      <MenuBar1/>
-      <Container className="d-flex justify-content-center align-items-center mt-5" style={{ height: '100vh' }}>
+      <MenuBar1 isAuthenticated={false} />
+      <Container className="d-flex justify-content-center align-items-center" style={{ marginTop: '20vh', marginBottom: '20px', height: '100vh', position: 'relative' }}>
       <Container fluid>
       <h2 className="text-primary text-center"><b>Add Passenger|</b></h2>
         <hr />
         <Col md={6} className="mx-auto">
+        {isLoading ? (
+                /**Show loading */
+                <LoadingComponent />
+              ) : (
+
         <Form onSubmit={handleRetrieveBooking}>
-          <Form.Group>
-            <Form.Label>Booking Reference:</Form.Label>
-            <Form.Control
-              type="text"
-              id="bookingReference"
-              name="bookingReference"
-              maxLength={8}
-              value={formData.bookingReference}
-              onChange={handleChange}
-              required
-            />
-            {refError && <Form.Text className="text-danger">{refError}</Form.Text>}
-          </Form.Group>
+            <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+
+            <Form.Group>
+                <Form.Label>Booking Reference:</Form.Label>
+                <Form.Control
+                  type="text"
+                  id="bookingReference"
+                  name="bookingReference"
+                  maxLength={12}
+                  value={formData.bookingReference}
+                  onChange={handleChange}
+                  required
+                />
+                {refError && (
+                  <Form.Text className="text-danger">{refError}</Form.Text>
+                )}
+              </Form.Group>
+
+              <Form.Group>
+                <Form.Label>Ticket Number:</Form.Label>
+                <Form.Control
+                  type="text"
+                  id="ticketNumber"
+                  name="ticketNumber"
+                  maxLength={12}
+                  value={formData.ticketNumber}
+                  onChange={handleChange}
+                  required
+                />
+              </Form.Group>
 
           <br/>
 
-          <button type="submit" className="btn btn-primary d-flex justify-content-center align-items-center" >Retrieve Booking</button>
+          <div className="text-center">
+            <button type="submit" className="btn btn-primary" >
+              Retrieve Booking</button>
+          </div>
+
 
           </Form>
+              )}
         </Col>
 
           <hr/>
 
-          {loading && (<div className="d-flex align-items-center">
-            <Spinner animation="border" variant="primary" size="sm" />
-            <span className="ml-2">Please Wait...</span>
-          </div>) }
 
           {passengers.length < 10 ? (
             <Col md={6} className='mx-auto'>
@@ -258,21 +450,31 @@ export default function AddPassenger() {
 
                 <br/>
 
-                <Button
-                  onClick={() => {
-                    handleButtonClick();
-                  }}
-                  type="button"
-                  variant="primary"
-                >
-                  Select Seat
-                </Button>
+
+                <div className="text-center">
+
+                  <Button
+                    onClick={() => {
+                      showSeatsTable();
+                    }}
+                    type="button"
+                    variant="primary"
+                  >
+                    Select Seat
+                  </Button>
                 
+                </div>
+
                 <hr />
                 
-                <Button type="submit" variant="primary" disabled={selectedSeat === null}>
-                  Add
-                </Button>
+                <div className="text-center">
+                  <Button type="submit" variant="primary" disabled={selectedSeat === null}>
+                    Add Passenger
+                  </Button>
+                </div>
+
+                <br/>
+
               </Form>
             </Col>
           ) : (
@@ -281,35 +483,52 @@ export default function AddPassenger() {
       </Container>
     </Container>
 
+    {/* Show the success alert when a seat is selected */}
+    {selectedSeatNumber && (
+      <Alert variant="success" className="text-center" style={{ marginTop: '90px', marginBottom: '10px'}}>
+        Seat {selectedSeatNumber} has been selected successfully!
+      </Alert>
+    )}
+
     {/* Display seat selection table when Select Seat button is clicked */}
-    {displaySeatTable && (
-      <Container className="mt-0">
+    {(displaySeatTable && isLoading) ?
+    (
+      /**Show loading */
+      <LoadingComponent />
+    ): (((seats.length == 0  && selectedSeatNumber == '') || (seats.length > 0  && selectedSeatNumber == '')) && !displaySeatTable) ? (
+      <Alert variant="error" className="text-center" style={{ marginTop: '90px', marginBottom: '10px'}}>
+        Select a seat for the passenger!
+      </Alert>
+    ): displaySeatTable && (
+      <Container ref={tableContainerRef} className="d-flex justify-content-center align-items-center" style={{ marginTop: '10px', position: 'relative' }}>
         {refError ? (
           <Alert variant="danger">{refError}</Alert>
-        ) : seats.length > 0 ? (
-          <Table striped bordered hover>
+        ) : (
+          <Table  striped bordered hover>
             <thead>
               <tr>
                 <th>Seat Number</th>
                 <th>Seat Location</th>
                 <th>Availability</th>
                 <th>Seat Price</th>
+                <th>Flight Class</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {seats.map((seat, index) => (
-                <tr key={index}>
-                  <td>{seat.number}</td>
-                  <td>{seat.location}</td>
-                  <td>{seat.availability}</td>
-                  <td>{seat.price}</td>
-                  <td>
+              {seats.map((availableSeat: Seat, index: number) => (
+                  <tr key={index}>
+                    <td>{availableSeat.seat_number}</td>
+                    <td>{availableSeat.location.name}</td>
+                    <td>{!availableSeat.is_available ? 'Booked' : 'Available'}</td>
+                    <td>{availableSeat.price}</td>
+                    <td>{availableSeat.flight_class.name}</td>
+                    <td>
                     <Button
-                      onClick={() => handleSeatSelect(index)}
+                      onClick={() => handleSeatSelection(index)}
                       variant="primary"
                       type="button"
-                      disabled={seat.availability === 'BOOKED'}
+                      disabled={!availableSeat.is_available}
                     >
                       Select
                     </Button>
@@ -317,22 +536,11 @@ export default function AddPassenger() {
                 </tr>
               ))}
             </tbody>
-          </Table>
-        ) : (
-          <div className="d-flex align-items-center">
-            <Spinner animation="border" variant="primary" size="sm" />
-            <span className="text-primary ml-2">Loading seats...</span>
-          </div>
+          </Table>        
         )}
       </Container>
     )}
-
-    {/* Show the success alert when a seat is selected */}
-    {selectedSeatNumber && (
-      <Alert variant="success" className="mt-3">
-        Seat {selectedSeatNumber} has been selected successfully!
-      </Alert>
-    )}
+    
   </div>
   );
 }

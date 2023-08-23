@@ -67,7 +67,8 @@ class SeatsController extends Controller
                         ->where('plane_id', $itemId)->get();
             elseif($itemName === "flight") 
                 $seats = Seat::with(['plane', 'flight', 'location', 'flightClass'])
-                        ->where('flight_id', $itemId)->get();
+                        ->where('flight_id', $itemId)
+                        ->where('is_available', 1)->get();
             else
                 return response()->json(['error' => "Invalid item name", 'status' => 0]);
 

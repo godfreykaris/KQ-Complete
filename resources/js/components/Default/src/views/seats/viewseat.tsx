@@ -1,53 +1,50 @@
 import React from "react";
 import { Modal, Button } from "react-bootstrap";
 
-interface flight_class{
+interface FlightClass{
   id: number;
   name: string;
 }
 
-interface location{
+interface Location{
   id: number;
   name: string;
 }
 
-interface seat{
-  _id: number;
-  seat_number: number;
-  flight_class: flight_class;
-  location: location;
+interface Seat{
+  id: number | 0;
+  seat_number: string;
+  flight_class: FlightClass;
+  location: Location;
   is_available: boolean;
-  price: string;
+  price: 0;
 }
 
 interface SeatProps{
   showSeatModal: boolean;
   handleCloseSeatModal: () => void;
-  seatObject: seat | {seat_number: 0,
-    flight_class: {id: 0, name: ''},
-    location: {id: 0, name: ''},
-    is_available: false,
-    price: '',
-    _id: 0 
-  };
+  seatObject: Seat ;
 }
 
-  const Seat: React.FC<SeatProps> = ({showSeatModal, handleCloseSeatModal, seatObject}) => {
+  const PassengerSeat: React.FC<SeatProps> = ({showSeatModal, handleCloseSeatModal, seatObject}) => {
 
   return (
+    
     <Modal show={showSeatModal} onHide={handleCloseSeatModal}>
+      
       <Modal.Header>
         <Modal.Title>Seat Information</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {/* Add your seat information here */}
         {seatObject ? (
-            <div>
+            <div>   
+                       
                 <p><b>Seat Number:</b> {seatObject?.seat_number}</p>
                 <p><b>Seat Class</b>: {seatObject?.flight_class.name}</p>
                 <p><b>Seat Location:</b> {seatObject?.location.name}</p>
-                <p><b>Availability:</b> {seatObject?.is_available}</p>
-                <p><b>Price:</b> {(seatObject?.price)}</p>
+                <p><b>Availability:</b> {seatObject?.is_available ? 'Available' : 'Booked'}</p>
+                <p><b>Price:</b> ${(seatObject?.price)}</p>
             </div>
         ) : (
             <p>No seat Information available</p>
@@ -62,4 +59,4 @@ interface SeatProps{
   )
 }
 
-export default Seat;
+export default PassengerSeat;

@@ -1,65 +1,171 @@
-import React, { useState } from "react";
+import React, { FormEvent, useState } from "react";
 import { Container, Form, Button, Table, Modal, Spinner } from "react-bootstrap";
 import EditPassenger from "./editpassenger.js";
-import Seat from "../seats/viewseat";
+import PassengerSeat from "../seats/viewseat.js";
 import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
 import {Col} from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import apiBaseUrl from "../../../../../config.js";
+import LoadingComponent from "../../../../Common/LoadingComponent.js";
+
+
+interface FlightClass{
+  id: number;
+  name: string;
+}
+
+interface Location{
+  id: number;
+  name: string;
+}
+
+interface Seat{
+  id: number | 0;
+  seat_number: string;
+  flight_class: FlightClass;
+  location: Location;
+  is_available: boolean;
+  price: 0;
+}
+
+interface Passenger {
+  id: number;
+  passenger_id: string;
+  name: string;
+  passport_number: string;
+  identification_number: string;
+  date_of_birth: string;
+  seat: Seat;
+}
 
 export default function ChangePassenger() {
   const [formData, setFormData] = useState({
-    refNumber: "",
+    bookingReference: "",
+    ticketNumber: ""
   });
 
-  const [passengers, setPassengers] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [passengers, setPassengers] = useState<Passenger[]>([]);
+
+  const [isLoading, setIsLoading] = useState(false);
   const [refError, setRefError] = useState("");
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    let newValue = value.replace(/\D/g, "");
+  const navigate = useNavigate();
 
-    // Add the "KQ-" prefix and set the error message
-    if (newValue.length <= 6) {
-      newValue = `KQ-${newValue}`;
-      setRefError("");
-    } else {
-      setRefError("The input must be 6 digits or less");
+  const [responseMessage, setResponseMessage] = useState('');
+  const [responseStatus, setResponseStatus] = useState<number | null>(null);
+
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const sanitizedValue = value.replace(/[^a-zA-Z0-9]/g, ""); // Allow only letters and numbers
+
+    let prefix = ""; // Initialize prefix based on context
+
+    if (name === "bookingReference") 
+    {
+        prefix = "KQ-BR-"; // Booking reference prefix
+    } 
+    else if (name === "ticketNumber") 
+    {
+        prefix = "KQ-TK-"; // Ticket number prefix
     }
 
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: newValue,
-    }));
-  };
+    if (sanitizedValue.length <= 10) 
+    {
+        const newValue = `${prefix}${sanitizedValue.slice(4, 11)}`; // Use the first 7 characters
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            [name]: newValue,
+        }));
+        setRefError(""); // Clear any previous errors
+    } 
+    else 
+    {
+        setRefError("The input must be the appropriate prefix followed by 6 characters or less");
+    }
+};
 
-  const handleSubmit = (event) => {
+const getResponseClass = () => {
+  if (responseStatus === 1) 
+  {
+    return 'text-success'; // Green color for success
+  } 
+  else if (responseStatus === 0) 
+  {
+    return 'text-danger'; // Red color for error
+  } 
+  else 
+  {
+    return ''; // No specific styles (default)
+  }
+};
+
+  const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    fetchData(formData.refNumber);
+    fetchPassengers();
   };
 
-  const fetchData = async (refNumber) => {
-    setLoading(true);
+  const fetchPassengers = async () => {
+    setIsLoading(true);
     setRefError("");
 
-    try {
-      const response = await fetch("/src/components/testdata/passengers.json");
-      if (!response.ok) {
-        throw new Error("Error fetching data");
+    try 
+    {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        if (!csrfToken) 
+        {
+          console.error('CSRF token not found.');
+          setIsLoading(false);
+
+          navigate('/');
+          return;
+        }
+
+        const response = await fetch(`${apiBaseUrl}/passengers/get/${formData.bookingReference}/${formData.ticketNumber}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            'X-CSRF-TOKEN': csrfToken,
+          },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) 
+        {
+          if (data.status) 
+          {
+            setResponseStatus(1); // Success
+            setResponseMessage(`Success: ${data.success} You can now edit passengers.`);
+
+            setPassengers(data.passengers);
+            setFlightId(data.flightId);
+
+          } 
+          else 
+          {
+            setResponseStatus(0); // Error
+            setResponseMessage(`Error: ${data.error}`);
+          }
+        } 
+        else 
+        {
+          setResponseStatus(0); // Error
+          setResponseMessage(`Error: ${response.statusText}`);
+        }
+
+        setIsLoading(false);
+
+      } 
+      catch (error) 
+      {
+        setIsLoading(false);
+        setResponseStatus(0); // Error
+        setResponseMessage('Error submitting data. Please try again or contact support.');
+        console.error('Error submitting data:', error);
       }
-
-      const data = await response.json();
-
-      const filteredData = data.passengers.filter(
-        (passenger) => passenger.refNumber === refNumber
-      );
-
-      setPassengers(filteredData);
-      setLoading(false);
-    } catch (error) {
-      setRefError("Error fetching data");
-      setLoading(false);
-    }
   };
 
   //handling the edit button click
@@ -68,9 +174,12 @@ export default function ChangePassenger() {
   //handle the seat button click
   //states to set visibility of the modal
   const [showSeatModal, setShowSeatModal] = useState(false);
-  const [passengerSeat, setPassengerSeat] = useState(null);
+  const [passengerSeat, setPassengerSeat] = useState<Seat>();
+  const [passengerData, setPassengerData] = useState<Passenger>();
+  const [flightId, setFlightId] = useState('');
 
-  const handleSeat = (passengerSeatData) => {
+
+  const handleSeat = (passengerSeatData: Seat) => {
     setIsButtonClicked(true);
     setPassengerSeat(passengerSeatData);
     setShowSeatModal(true);
@@ -88,45 +197,105 @@ export default function ChangePassenger() {
     setShowEditModal(false);
   };
 
-  const handleEdit = () => {
+  const handleEdit = (passengerData: Passenger) => {
+    setPassengerData(passengerData);
     setIsButtonClicked(true);
     setShowEditModal(true);
   };
 
-  const handleResubmission = (editedPassenger) => {
+  const handleResubmission = (editedPassenger : Passenger) => {
     // Find the index of the edited passenger in the passengers array
     const editedPassengerIndex = passengers.findIndex(
-      (passenger) => passenger.refNumber === formData.refNumber
+      (passenger) => passenger.id === editedPassenger.id
     );
 
     if (editedPassengerIndex !== -1) {
       // Update the seat data for the edited passenger only
-      const updatedPassengers = passengers.map((passenger, index) =>
-        index === editedPassengerIndex
-          ? {
-              ...passenger,
-              seat: {
-                ...passenger.seat,
-                seatNumber: editedPassenger.seat.number,
-                class: editedPassenger.seat.class,
-                location: editedPassenger.seat.location,
-                availability: editedPassenger.seat.availability,
-                price: editedPassenger.seat.price,
-              },
-            }
-          : passenger
-      );
+      const updatedPassengers = [...passengers]; // Create a copy of the passengers array
+      updatedPassengers[editedPassengerIndex] = {
+        ...editedPassenger, // Copy the existing passenger data
+        seat: {
+          ...updatedPassengers[editedPassengerIndex].seat, // Copy the existing seat data
+          seat_number: editedPassenger.seat.seat_number,
+          flight_class: editedPassenger.seat.flight_class,
+          location: editedPassenger.seat.location,
+          is_available: editedPassenger.seat.is_available,
+          price: editedPassenger.seat.price,
+        },
+      };
 
       setPassengers(updatedPassengers);
+
     }
+    
 
     // Close the modal
-    setIsButtonClicked(false);
+    setShowEditModal(false);
   };
+
+  const handleSubmitPassengers = async (event: FormEvent) => {
+    event.preventDefault();
+
+    setIsLoading(true);
+    
+    try {
+
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        if (!csrfToken) 
+        {
+          console.error('CSRF token not found.');
+          setIsLoading(false);
+
+          navigate('/');
+          return;
+        }
+      const response = await fetch(`${apiBaseUrl}/passengers/change/${formData.bookingReference}/${formData.ticketNumber}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrfToken,
+
+        },
+        body: JSON.stringify({ passengers: passengers }),
+      });
+
+      
+      const data = await response.json();
+
+        if (response.ok) 
+        {
+          if (data.status) 
+          {
+            setResponseStatus(1); // Success
+            setResponseMessage(`Success: ${data.success}`);
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth',
+            });
+          } 
+          else 
+          {
+            setResponseStatus(0); // Error
+            setResponseMessage(`Error: ${data.error}`);
+          }
+        } 
+        else 
+        {
+          setResponseStatus(0); // Error
+          setResponseMessage(`Error: ${response.statusText}`);
+        }
+
+        setIsLoading(false);
+
+    } catch (error) {
+      throw new Error("An error occurred during submission");
+    }
+  }
 
   return (
     <div>
-      <MenuBar1/>
+      <MenuBar1 isAuthenticated={false}/>
       <br/>
       <br/>
       <br/>
@@ -136,36 +305,64 @@ export default function ChangePassenger() {
       <h2 className="text-primary text-center">Edit Passenger Details|</h2>
         <hr/>
         <Col md={6} className="mx-auto">
-        <Form onSubmit={handleSubmit}>
-          <Form.Group>
-            <Form.Label>Booking Reference:</Form.Label>
-            <Form.Control
-              type="text"
-              id="refNumber"
-              name="refNumber"
-              maxLength="8"
-              value={formData.refNumber}
-              onChange={handleChange}
-              required
-            />
-            {refError && <p className="text-danger">{refError}</p>}
-          </Form.Group>
-          <hr/>
-          <Button type="submit" variant="primary" className="d-flex justify-content-center align-items-center">
-            Retrieve Passenger
-          </Button>
-        </Form>
+        <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+
+        {isLoading ? (
+          <LoadingComponent />
+        ) :
+        (
+          <>
+            <Form onSubmit={handleSubmit}>
+              <Form.Group>
+                <Form.Label>Booking Reference:</Form.Label>
+                <Form.Control
+                  type="text"
+                  id="bookingReference"
+                  name="bookingReference"
+                  maxLength={12}
+                  value={formData.bookingReference}
+                  onChange={handleChange}
+                  required
+                />
+                {refError && (
+                  <Form.Text className="text-danger">{refError}</Form.Text>
+                )}
+              </Form.Group>
+
+              <Form.Group>
+                <Form.Label>Ticket Number:</Form.Label>
+                <Form.Control
+                  type="text"
+                  id="ticketNumber"
+                  name="ticketNumber"
+                  maxLength={12}
+                  value={formData.ticketNumber}
+                  onChange={handleChange}
+                  required
+                />
+              </Form.Group>
+              <hr/>
+              <div className="text-center">
+                <Button type="submit" variant="primary">
+                  Retrieve Passengers
+                </Button>
+              </div>
+
+              <div className="text-center mt-5">
+                <Button type="button" variant="primary" onClick={ handleSubmitPassengers}>
+                  Save Changes
+                </Button>
+              </div>
+
+            </Form>
+          </>
+        )            
+        }
+        
         </Col>
 
         <br/>
-        {}
-
-        {loading && 
-          <div className="d-flex align-items-center">
-            <Spinner animation="border" variant="primary" size="sm" />
-            <span className="ml-2">Loading...</span>
-          </div>
-        }
+              
 
         {/* display passenger data */}
         <div style={{overflow: "auto"}}>
@@ -185,11 +382,11 @@ export default function ChangePassenger() {
             <tbody>
               {passengers.map((passenger, index) => (
                 <tr key={index}>
-                  <td>{passenger.passId}</td>
-                  <td>{passenger.passport}</td>
-                  <td>{passenger.idNumber}</td>
+                  <td>{passenger.passenger_id }</td>
+                  <td>{passenger.passport_number}</td>
+                  <td>{passenger.identification_number}</td>
                   <td>{passenger.name}</td>
-                  <td>{passenger.dob}</td>
+                  <td>{passenger.date_of_birth}</td>
                   <td>
                     <Button onClick={() => handleSeat(passenger.seat)} variant="primary" type="button">
                       Seat
@@ -213,17 +410,24 @@ export default function ChangePassenger() {
         <EditPassenger
           showEditModal={showEditModal} // Pass the correct prop
           handleResubmission={handleResubmission}
-          passengerDataObject={isButtonClicked && passengers.length > 0 ? passengers[0] : null}
+          passengerDataObject={passengerData}
+          flightId={flightId} // Pass the flightId as a prop
           handleClose={handleCloseEditModal}
         />
 
       {/* Seat Modal */}
       <Modal show={showSeatModal} onHide={handleCloseSeatModal}>
-        <Seat
-          showSeatModal={showSeatModal} // Pass the correct prop
-          handleCloseSeatModal={handleCloseSeatModal}
-          seatObject={passengerSeat}
-        />
+        {passengerSeat ? (
+           <PassengerSeat
+               showSeatModal={showSeatModal}
+               handleCloseSeatModal={handleCloseSeatModal}
+               seatObject={passengerSeat}
+             />
+           ) : (
+             // You can add some loading or placeholder content here
+             // if passengerSeat is not available yet
+             <div>Loading...</div>
+           )}
       </Modal>
     </Container>
     </div>

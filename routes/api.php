@@ -199,6 +199,8 @@ Route::post('/bookings', [BookingsController::class, 'store'])->name('bookings.s
 Route::put('/bookings/{bookingReference}', [BookingsController::class, 'update'])->name('bookings.update');
 Route::delete('/bookings/{bookingReference}', [BookingsController::class, 'destroy'])->name('bookings.destroy');
 
+Route::get('/bookings/get/{bookingReference}/{ticketNumber}', [BookingsController::class, 'getBooking'])->name('booking.get');
+
 Route::get('/stripe-payment', function () {
         return view('stripe.stripe');
     })->name('stripe.payment');
@@ -213,9 +215,10 @@ Route::get('/booking-creation-success', function () {
 Route::post('/booking_inquiry/guest', [GuestBookingInquiryController::class, 'store'])->name('guest_booking_inquiry.store');
 Route::post('/booking_inquiry/registered_user', [AccountBasedBookingInquiriesController::class, 'store'])->name('account_based_booking_inquiry.store');
 
-Route::post('/passengers/add/{booking_reference}', [PassengersController::class, 'addPassengers'])->name('passengers.add');
-Route::delete('/passengers/delete/{passengerId}', [PassengersController::class, 'deletePassenger'])->name('passengers.delete');
-Route::put('/passengers/change/{passengerId}', [PassengersController::class, 'updatePassenger'])->name('passengers.update');
+Route::get('/passengers/get/{booking_reference}/{ticket_number}', [PassengersController::class, 'getPassengers'])->name('passengers.get');
+Route::post('/passengers/add/{booking_reference}/{ticket_number}', [PassengersController::class, 'addPassengers'])->name('passengers.add');
+Route::delete('/passengers/delete/{booking_reference}/{ticket_number}/{seat_number}', [PassengersController::class, 'deletePassenger'])->name('passengers.delete');
+Route::put('/passengers/change/{booking_reference}/{ticket_number}', [PassengersController::class, 'updatePassengers'])->name('passengers.update');
 
 Route::get('/payment/create', [PayPalController::class,'createPayment'])->name('payment.create');
 Route::get('/payment/success', [PayPalController::class, 'handlePaymentResponse'])->name('payment.response');

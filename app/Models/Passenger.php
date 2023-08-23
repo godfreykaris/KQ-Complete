@@ -28,12 +28,12 @@ class Passenger extends Model
 
     public function generatePassengerId()
     {
-        $passengerId = 'KQ-P-' . strtoupper(Str::random(15));
+        $passengerId = 'KQ-P-' . strtoupper(Str::random(7));
 
         // Check if the generated booking reference already exists in the database
         while (Passenger::where('passenger_id', $passengerId)->exists()) 
         {
-            $passengerId = 'KQ-P-' . strtoupper(Str::random(15));
+            $passengerId = 'KQ-P-' . strtoupper(Str::random(7));
         }
     
            
