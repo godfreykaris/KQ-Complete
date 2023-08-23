@@ -21,9 +21,9 @@ interface seat{
 
 interface passenger{  
   name: string;
-  passport: number;
-  idNumber: number;
-  birthDate: string;
+  passport_number: number;
+  identification_number: number;
+  date_of_birth: string;
   seat: seat | {
     seat_number: 0,
     flight_class: {id: 0, name: ''},

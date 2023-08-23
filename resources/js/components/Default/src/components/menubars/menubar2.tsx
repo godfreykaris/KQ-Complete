@@ -9,17 +9,15 @@ const menuItems = [
     { label: 'Book Flight', link: '/bookflight' },
     { label: 'Change Booking', link: '/changebooking' },
     { label: 'Delete Booking', link: '/deletebooking' },
-  ]},
-  { label: 'Inquiry', link: '/inquiry', dropdown: true, items: [
-    { label: 'Add Booking', link: '/addbookinginquiry' },
-    { label: 'Change Booking', link: '/changebookinginquiry' },
-    { label: 'Delete Booking', link: '/deletebookinginquiry' },
-  ]},
+  ]},  
   { label: 'Travellers', link: '/travellers', dropdown: true, items: [
     { label: 'Add Passenger', link: '/addpassenger' },
     { label: 'Change Passenger', link: '/changepassenger' },
     { label: 'Delete Passenger', link: '/deletepassenger' },
   ]},
+  
+  { label: 'Inquiry', link: '/inquiries'},
+
   {label: 'Print Ticket', link:'/printticket'},
 ];
 
