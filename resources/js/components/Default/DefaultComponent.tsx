@@ -33,8 +33,8 @@ import { ContextProvider } from "./src/components/miscallenious/contextprovider"
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import SignInComponent from '../Auth/SignInComponent';
 import SignUpComponent from '../Auth/SignUpComponent';
-import { BookingProvider, BookingContextType } from './src/context/booking/bookflightcontext';
-
+import { BookingProvider } from './src/context/booking/bookflightcontext';
+import { EditBookingProvider } from './src/context/booking/editbookingcontext';
 
 const router = [
       
@@ -87,9 +87,11 @@ const router = [
   {
       path: 'changepassenger',
       element: (
-          <SeatProvider>
+          <EditBookingProvider>
+            <SeatProvider>
               <ChangePassenger/>
-          </SeatProvider>
+            </SeatProvider>
+          </EditBookingProvider>
       )
   },
   {
@@ -110,9 +112,11 @@ const router = [
   {
       path: 'editpassenger',
       element: (
-          <SeatProvider>
-              <EditPassenger showEditModal={undefined} handleResubmission={undefined} passengerDataObject={undefined} handleClose={undefined}/>
-          </SeatProvider>
+          <EditBookingProvider>
+            <SeatProvider>
+              <EditPassenger showEditModal={false} handleResubmission={undefined} passengerDataObject={undefined} handleClose={undefined}/>
+            </SeatProvider>
+          </EditBookingProvider>
       )
   },
   {
@@ -121,11 +125,19 @@ const router = [
   },
   {
       path: 'changebooking',
-      element: <ChangeBooking/>
+      element: (
+        <EditBookingProvider>
+            <ChangeBooking/>
+        </EditBookingProvider>
+      )
   },
   {
       path: 'editbooking',
-      element: <EditBooking showEditModal={undefined} handleResubmission={undefined} bookingDataObject={undefined} handleClose={undefined}/>
+      element: (
+        <EditBookingProvider>
+            <EditBooking showEditModal={undefined} handleResubmission={undefined} bookingDataObject={undefined} handleClose={undefined}/>
+        </EditBookingProvider>
+      )
   },
   {
       path: 'deletebooking',

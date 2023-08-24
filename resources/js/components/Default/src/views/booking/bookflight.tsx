@@ -10,7 +10,6 @@ import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
 import { useSeatContext, SeatContextType } from "../../context/seats/sendseatdata";
 import { BookingContextType, useBookingContext } from '../../context/booking/bookflightcontext';
-import { useSearchFlightContext, SearchFlightContextType } from '../../context/flights/flightcontext';
 import Seat from "../seats/viewseat.js";
 
 import apiBaseUrl from '../../../../../config';
@@ -88,9 +87,7 @@ export default function BookFlight() {
   const [filteredLocations, setFilteredLocations] = useState([]);
 
   const [loading, setLoading] = useState(false);
-
   const [errorMessage, setErrorMessage] = useState("");
-
   const [emailError, setEmailError] = useState("");
 
   // State to manage the seat modal
@@ -116,36 +113,6 @@ export default function BookFlight() {
   const [isButtonClicked, setIsButtonClicked] = useState(false);
   const navigate = useNavigate();
 
-  
-  
-
-  const {
-    sfDepartureDate,
-    sfReturnDate,
-    sfSelectedFrom,
-    sfSelectedTo,
-  } = state || {}; 
-
-  // const [formData, setFormData] = useState({
-  //   email: '',
-  //   departureDate: sfDepartureDate || "",
-  //   returnDate: sfReturnDate || "",
-  //   selectedFrom: sfSelectedFrom || "",
-  //   selectedTo: sfSelectedTo || "",
-  // }); 
-
-  
-  useEffect(() => {
-    if (sfDepartureDate) {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        departureDate: sfDepartureDate,
-        returnDate: sfReturnDate,
-        selectedFrom: sfSelectedFrom,
-        selectedTo: sfSelectedTo,
-      }));
-    }
-  }, [sfDepartureDate, sfReturnDate, sfSelectedFrom, sfSelectedTo]); 
 
   //to remove passenger when delete button is clicked
   const handleDeletePassenger = (index: number) => {
@@ -328,9 +295,7 @@ export default function BookFlight() {
         flightId: flightId,
         email: formData.email,        
         passengers: passengers,
-      }  
-      
-      alert(JSON.stringify(sendData));
+      }
   
       setLoading(true);
   

@@ -1,4 +1,4 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { Container, Form, Button, Table, Modal, Spinner } from "react-bootstrap";
 import EditPassenger from "./editpassenger.js";
 import PassengerSeat from "../seats/viewseat.js";
@@ -8,6 +8,7 @@ import {Col} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import apiBaseUrl from "../../../../../config.js";
 import LoadingComponent from "../../../../Common/LoadingComponent.js";
+import { useEditBookingContext } from "../../context/booking/editbookingcontext.js";
 
 
 interface FlightClass{
@@ -44,6 +45,15 @@ export default function ChangePassenger() {
     bookingReference: "",
     ticketNumber: ""
   });
+
+  const {bookingReference, setBookingReference, ticketNumber, setTicketNumber} = useEditBookingContext();
+
+  useEffect(() => {
+    setBookingReference(formData.bookingReference);
+    setTicketNumber(formData.ticketNumber);
+    alert(bookingReference);
+    alert(ticketNumber);
+  }, [bookingReference, formData.bookingReference, ticketNumber, formData.ticketNumber]);
 
   const [passengers, setPassengers] = useState<Passenger[]>([]);
 
