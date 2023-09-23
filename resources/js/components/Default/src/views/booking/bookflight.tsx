@@ -9,10 +9,12 @@ import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
 
 import PassengerSeat from "../seats/viewseat.js";
+import { useSeatContext, SeatContextType } from "../../context/seats/sendseatdata";
+import { BookingContextType, useBookingContext } from '../../context/booking/bookflightcontext';
+import Seat from "../seats/viewseat.js";
 
 import apiBaseUrl from '../../../../../config';
-import { SeatContextType, useSeatContext } from '../../context/seats/sendseatdata';
-import { useBookingContext } from '../../context/BookingContext';
+
 import LoadingComponent from '../../../../Common/LoadingComponent';
 
 
@@ -100,10 +102,13 @@ export default function BookFlight() {
   const [selectedTo, setSelectedTo] = useState("");
 
   const {updateSeat} = useSeatContext() as SeatContextType;
-  const [showSeatModal, setShowSeatModal] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [emailError, setEmailError] = useState("");
+
+  // State to manage the seat modal
+  const [showSeatModal, setShowSeatModal] = useState(false);
+  
   const [responseMessage, setResponseMessage] = useState('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
@@ -111,44 +116,6 @@ export default function BookFlight() {
   const [selectedPassenger, setSelectedPassenger] = useState<Passenger | undefined>(undefined);
 
   const navigate = useNavigate();
-
-  // Access the BookingContext for flight data
-  const { flightData, updateFlightData } = useBookingContext();
-  const { passengerData, updatePassengerData, passengers, removePassenger, updatePassenger, } = useBookingContext();
-
-  const {
-    sfFlightId,
-    sfEmail,
-    sfDepartureDate,
-    sfSelectedFrom,
-    sfSelectedTo,
-  } = FlightState || {};
-
-  useEffect(() => {
-
-    setFormData(flightData);
-
-    if (sfDepartureDate) {
-      // Update the flight data in the BookingContext
-      updateFlightData({
-        flightId: flightData.flightId ? flightData.flightId  : sfFlightId,
-        email: flightData.email ? flightData.email : sfEmail,
-        departureDate: sfDepartureDate,
-        selectedFrom: sfSelectedFrom,
-        selectedTo: sfSelectedTo,
-      });
-    }
-  }, [sfDepartureDate,  sfSelectedFrom, sfSelectedTo]);
-
-  const [formData, setFormData] = useState<FlightData>({
-    flightId: 0,
-    email: '',
-    departureDate: '',
-    selectedFrom: '',
-    selectedTo: '',
-  });
-
-  const {flightTableData, setFlightTableData} = useBookingContext();
 
 
   //to remove passenger when delete button is clicked
@@ -442,9 +409,14 @@ export default function BookFlight() {
       const sendData = {
         flight_id: flightData.flightId,
         email: formData.email,        
+<<<<<<< HEAD
         passengers: selectedProperties,
       }  
       
+=======
+        passengers: passengers,
+      }
+>>>>>>> origin/main
   
       setIsLoading(true);
   

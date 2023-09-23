@@ -12,7 +12,7 @@ const ContactUs = () => {
 
   const [emailError, setEmailError] = useState("");
 
-  const handleChange = (event) => {
+  const handleChange: React.ChangeEventHandler<HTMLInputElement>  = (event) => {
     const { name, value } = event.target;
     if (name === "email") {
         // Email validation
@@ -34,7 +34,7 @@ const ContactUs = () => {
       }      
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log(formData); // You can add your logic for handling the form submission here
 
@@ -48,7 +48,7 @@ const ContactUs = () => {
 
   return (
     <div>
-      <MenuBar1/>
+      <MenuBar1 isAuthenticated={false}/>
       <br/>
       <br/>
       <br/>

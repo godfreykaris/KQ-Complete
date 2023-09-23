@@ -1,36 +1,65 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Spinner } from "react-bootstrap";
+import apiBaseUrl from "../../../../../config";
 
-export default function EditBooking({ showEditModal, handleResubmission, bookingDataObject, handleClose }) {
-  const [editedBooking, setEditedBooking] = useState({}); // Use the correct state variable name
-  const [emailError, setEmailError] = useState("");
+import { useEditBookingContext } from "../../context/booking/editbookingcontext";
 
-  //date formatting
-  const formatDate = (dateString) => {
-    const [day, month, year] = dateString.split('/');
-    return `${year}-${month}-${day}`;
-  };
+interface Location {
+  name: string;
+}
 
-  const parseDate = (dateString) => {
-    const [year, month, day] = dateString.split('-');
-    return `${day}/${month}/${year}`;
-  };
+interface Booking {
+  bookingReference: string;
+  email: string;
+  flight_id: number;
+  departure_date: string;
+  from: Location;
+  to: Location;
+}
 
+interface EditBookingProps {
+  showEditModal: boolean;
+  handleResubmission?: (editedBooking: Booking) => void;
+  bookingDataObject?: Booking;
+  handleClose?: () => void;
+}
 
-   // Update the state when bookingDataObject prop changes
-   useEffect(() => {
-    setEditedBooking(bookingDataObject || {});
+export default function EditBooking({
+  showEditModal,
+  handleResubmission,
+  bookingDataObject,
+  handleClose,
+}: EditBookingProps) {
+  // const [editedBooking, setEditedBooking] = useState<Booking>({
+  //   bookingReference: "",
+  //   email: "",
+  //   flight_id: 0,
+  //   departure_date: "",
+  //   from: { name: "" },
+  //   to: { name: "" },
+  // });
+
+  const {editedBooking, setEditedBooking} = useEditBookingContext();
+
+  // from and to locations
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [selectedFrom, setSelectedFrom] = useState<string>(editedBooking.from.name);
+  const [selectedTo, setSelectedTo] = useState<string>(editedBooking.to.name);
+
+  const [emailError, setEmailError] = useState<string>("");
+
+  const [filteredLocations, setFilteredLocations] = useState<Location[]>([]);
+
+  // Update the state when bookingDataObject prop changes
+  useEffect(() => {
+    if(bookingDataObject)
+      setEditedBooking(bookingDataObject);
   }, [bookingDataObject]);
 
-  const handleChange = (event) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    if (name === 'departure') {
-      const dateObject = value ? parseDate(value) : null;
-      setEditedBooking((prevBooking) => ({
-        ...prevBooking,
-        departure: dateObject,
-      }));
-    } else if(name === 'email') {
+
+    if (name === "email") {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       setEditedBooking((prevFormData) => ({
         ...prevFormData,
@@ -41,22 +70,16 @@ export default function EditBooking({ showEditModal, handleResubmission, booking
       } else {
         setEmailError("Invalid email format");
       }
-    }else{
+    } else {
       setEditedBooking((prevBooking) => ({
         ...prevBooking,
         [name]: value,
       }));
     }
-        
   };
 
-  //from and to locations
-  const [locations, setLocations] = useState([]);
-  const [selectedFrom, setSelectedFrom] = useState("");
-  const [selectedTo, setSelectedTo] = useState("");
-
   useEffect(() => {
-    fetch("/src/components/destinations.json")
+    fetch(`${apiBaseUrl}/cities`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Error fetching data");
@@ -64,39 +87,32 @@ export default function EditBooking({ showEditModal, handleResubmission, booking
         return response.json();
       })
       .then((data) => {
-        setLocations(data.locations);
-        if (bookingDataObject) {
-          setSelectedFrom(bookingDataObject.from || data.locations[0].name);
-        } else if (data.locations.length > 0) {
-          setSelectedFrom(data.locations[0].name);
-        }
+        setLocations(data.cities);
+        setSelectedFrom(data.cities[0]?.name || "");
       })
       .catch((error) => {
         console.error("Error fetching data: ", error);
       });
-  }, [bookingDataObject]);
+  }, []);
 
-  const handleFromChange = (selectedOption) => {
-    setSelectedFrom(selectedOption.value);
+  const handleFromChange = (selectedOption: string) => {
+    setSelectedFrom(selectedOption);
     const filteredLocations = locations.filter(
-      (location) => location.name !== selectedOption.value
+      (location) => location.name !== selectedOption
     );
     setSelectedTo("");
     setFilteredLocations(filteredLocations);
   };
 
-  
-
-  const handleToChange = (selectedOption) => {
-    setSelectedTo(selectedOption.value);
+  const handleToChange = (selectedOption: string) => {
+    setSelectedTo(selectedOption);
   };
 
-  const [filteredLocations, setFilteredLocations] = useState([]); 
-
-  //handle form submission
-  const handleSubmit = (event) => {
+  // handle form submission
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    handleResubmission(editedBooking);
+    if(handleResubmission)
+      handleResubmission(editedBooking);
   };
 
   return (
@@ -109,14 +125,14 @@ export default function EditBooking({ showEditModal, handleResubmission, booking
         <div className="d-flex justify-content-center align-items-center container-md" style={{ minHeight: "100vh" }}>
           <div className="container-fluid">
             <form onSubmit={handleSubmit}>
-            <div className="form-group">
+              <div className="form-group">
                 <label htmlFor="email">Email: </label>
                 <input
                   type="text"
                   id="email"
                   className={`form-control ${emailError ? "is-invalid" : ""}`}
                   name="email"
-                  value={editedBooking.email || ""}
+                  value={editedBooking.email}
                   onChange={handleChange}
                   required
                 />
@@ -124,28 +140,13 @@ export default function EditBooking({ showEditModal, handleResubmission, booking
               </div>
 
               <div className="form-group">
-                <label htmlFor="tripType">Trip Type: </label>
-                <select
-                  id="tripType"
-                  className="form-control"
-                  defaultValue={editedBooking.email || ''}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="OneWay">One Way</option>
-                  <option value="Round">Round Trip</option>
-                  <option value="MultiCity">Multi-city</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="departure">Departure Date: </label>
+                <label htmlFor="departure-date">Departure Date: </label>
                 <input
                   type="date"
-                  id="departure"
+                  id="departure-date"
                   className="form-control"
-                  name="departure"
-                  value={editedBooking.departure ? formatDate(editedBooking.departure) : ''}
+                  name="departure_date"
+                  value={editedBooking.departure_date}
                   onChange={handleChange}
                   required
                 />
@@ -158,10 +159,11 @@ export default function EditBooking({ showEditModal, handleResubmission, booking
                     id="from"
                     className="form-control"
                     value={selectedFrom}
-                    onChange={handleFromChange}
+                    onChange={(e) => handleFromChange(e.target.value)}
                     required
                   >
-                    {locations.map((option, index) => (
+                    <option value="">Select Departure Location</option>
+                    {locations.map((option: Location, index: number) => (
                       <option key={index} value={option.name}>
                         {option.name}
                       </option>
@@ -177,30 +179,27 @@ export default function EditBooking({ showEditModal, handleResubmission, booking
 
               <div className="form-group">
                 <label htmlFor="to">To:</label>
-                {filteredLocations.length > 0 ? (
-                  <select
-                    id="to"
-                    className="form-control"
-                    value={selectedTo}
-                    defaultValue={editedBooking.to || ''}                    
-                    onChange={handleToChange}
-                    required
-                  >
-                    {filteredLocations.map((option, index) => (
-                      <option key={index} value={option.name}>
-                        {option.name}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <div className="d-flex align-items-center">
-                    <Spinner animation="border" variant="primary" size="sm" />
-                    <span className="ml-2">Loading Destinations...</span>
-                  </div>
-                )}
+                <select
+                  id="to"
+                  className="form-control"
+                  value={selectedTo}
+                  onChange={(e) => handleToChange(e.target.value)}
+                  required
+                >
+                  <option value="">Select Destinations</option>
+                  {filteredLocations.map((option: Location, index: number) => (
+                    <option key={index} value={option.name}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              <Button type="submit">Submit</Button>
+              <br />
+
+              <div className="d-flex justify-content-center">
+                <Button type="submit">Submit</Button>
+              </div>
             </form>
           </div>
         </div>

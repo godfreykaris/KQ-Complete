@@ -36,10 +36,10 @@ interface Passenger {
 
 interface EditPassengerProps {
   showEditModal: boolean; // Specify the type explicitly as boolean
-  handleResubmission: (editedPassenger: Passenger) => void;
+  handleResubmission?: (editedPassenger: Passenger) => void;
   passengerDataObject: Passenger | undefined;
   flightId: string;
-  handleClose: () => void;
+  handleClose?: () => void;
 }
 
 export default function EditPassenger({ showEditModal, handleResubmission, passengerDataObject, handleClose, flightId }: EditPassengerProps) {
@@ -221,7 +221,8 @@ const getResponseClass = () => {
   //submit form after edit
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    handleResubmission(editedPassenger);
+    if(handleResubmission)
+      handleResubmission(editedPassenger);
   };
 
   //formating seat price to dollars

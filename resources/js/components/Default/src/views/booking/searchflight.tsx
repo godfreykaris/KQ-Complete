@@ -178,15 +178,15 @@ export default function SearchFlight() {
    //----------- Handle submit --------------//
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    
   };
 
   return (
     <div>
       <MenuBar1 isAuthenticated={false} />
-      <br />
-      <br />
-      <br />
+      <br/>
+      <br/>
+      <br/>
       <MenuBar2 />
 
       <Container className="mt-10">

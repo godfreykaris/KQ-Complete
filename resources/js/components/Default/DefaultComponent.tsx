@@ -35,6 +35,8 @@ import SignInComponent from '../Auth/SignInComponent';
 import SignUpComponent from '../Auth/SignUpComponent';
 import { BookingContextProvider} from './src/context/BookingContext';
 
+import { BookingProvider } from './src/context/booking/bookflightcontext';
+import { EditBookingProvider } from './src/context/booking/editbookingcontext';
 
 const router = [
       
@@ -89,9 +91,11 @@ const router = [
   {
       path: 'changepassenger',
       element: (
-          <SeatProvider>
+          <EditBookingProvider>
+            <SeatProvider>
               <ChangePassenger/>
-          </SeatProvider>
+            </SeatProvider>
+          </EditBookingProvider>
       )
   },
   {
@@ -100,21 +104,23 @@ const router = [
       showSeatModal={false}
       handleCloseSeatModal={() => {}}
       seatObject={{
-        seat_number: 0,
+        seat_number: '',
         flight_class: { id: 0, name: '' },
         location: { id: 0, name: '' },
         is_available: false,
-        price: '',
-        _id: 0,
+        price: 0,
+        id: 0,
       }}
       />
   },
   {
       path: 'editpassenger',
       element: (
-          <SeatProvider>
-              <EditPassenger showEditModal={undefined} handleResubmission={undefined} passengerDataObject={undefined} handleClose={undefined}/>
-          </SeatProvider>
+          <EditBookingProvider>
+            <SeatProvider>
+              <EditPassenger showEditModal={false} handleResubmission={undefined} passengerDataObject={undefined} handleClose={undefined} flightId={''}/>
+            </SeatProvider>
+          </EditBookingProvider>
       )
   },
   {
@@ -123,11 +129,19 @@ const router = [
   },
   {
       path: 'changebooking',
-      element: <ChangeBooking/>
+      element: (
+        <EditBookingProvider>
+            <ChangeBooking/>
+        </EditBookingProvider>
+      )
   },
   {
       path: 'editbooking',
-      element: <EditBooking showEditModal={undefined} handleResubmission={undefined} bookingDataObject={undefined} handleClose={undefined}/>
+      element: (
+        <EditBookingProvider>
+            <EditBooking showEditModal={false} handleResubmission={undefined} bookingDataObject={undefined} handleClose={undefined}/>
+        </EditBookingProvider>
+      )
   },
   {
       path: 'deletebooking',
