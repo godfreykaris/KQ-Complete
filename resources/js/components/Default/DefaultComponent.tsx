@@ -33,7 +33,7 @@ import { ContextProvider } from "./src/components/miscallenious/contextprovider"
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import SignInComponent from '../Auth/SignInComponent';
 import SignUpComponent from '../Auth/SignUpComponent';
-import { BookingProvider, BookingContextType } from './src/context/booking/bookflightcontext';
+import { BookingContextProvider} from './src/context/BookingContext';
 
 
 const router = [
@@ -47,9 +47,9 @@ const router = [
       element: (
           <SeatProvider>
               <PassengerProvider>
-                <BookingProvider>
+                <BookingContextProvider>
                     <BookFlight />
-                </BookingProvider>                                  
+                </BookingContextProvider>                                  
               </PassengerProvider>             
          </SeatProvider>
       )        
@@ -79,7 +79,9 @@ const router = [
       element: (
           <SeatProvider>
               <PassengerProvider>
-                  <AddPassenger1/>
+                <BookingContextProvider>
+                    <AddPassenger1/>
+                </BookingContextProvider>
               </PassengerProvider>
           </SeatProvider>
       )

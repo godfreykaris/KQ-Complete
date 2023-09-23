@@ -185,12 +185,12 @@ class CitiesController extends Controller
     }
 
     // Get arrival cities given a destination city
-    public function getArrivalCities($departureCity)
+    public function getArrivalCities($departureCityId)
     {
         try 
         {
             //Ge the departure city details
-            $departureCityDetails = City::where('name', $departureCity)->first();
+            $departureCityDetails = City::where('id', $departureCityId)->first();
 
             // Make sure the departure city exists in the database
             if (!$departureCityDetails) 
@@ -198,8 +198,7 @@ class CitiesController extends Controller
                 return response()->json(['error' => 'Departure city does not exist!', 'status' => 0]);
             } 
             
-            $departureCityId = $departureCityDetails->id;
-            $arrivalCities = Flight::where('departure_city_id', $departureCityId)->get();
+            $arrivalCities = Flight::where('departure_city_id', $departureCityId)->pluck('arrival_city_id');
             
         
             return response()->json(['arrival_cities' => $arrivalCities, 'status' => 1]);

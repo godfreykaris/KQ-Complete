@@ -11,12 +11,12 @@ interface location{
 }
 
 interface seat{
-  _id: number;
-  seat_number: number;
+  id: number;
+  seat_number: string;
   flight_class: flight_class | {id: 0, name: ''};
   location: location | {id: 0, name: ''};
   is_available: boolean;
-  price: string;
+  price: number;
 }
 
 interface SeatContextType{

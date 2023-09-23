@@ -196,14 +196,11 @@ class BookingsController extends Controller
                         return response()->json(['error' => 'You must provide the passport number for ' . $passengerData['name'] . ' for international travels'], 400);
                     }
 
-                    //$seat = DB::table('seats')->where('id', $passengerData['seat_id'])->first();
+                    $seat =Seat::where('id', $passengerData['seat_id'])->first();
 
-                    /** For testing only */
-                    $availableSeat = Seat::where('is_available', true)->first();      // For testing only 
-                    if($availableSeat) // For testing only :  use $seat instead of $availableSeat
+                    if($seat) 
                     {
-                        $seat = Seat::where('id', $availableSeat->id)->first(); // For testing only 
-
+                
                         if (!$seat || !$seat->is_available) {
                             return response()->json(['error' => 'Selected seat for ' . $passengerData['name'] . ' is not available.'], 400);
                         }
@@ -224,158 +221,26 @@ class BookingsController extends Controller
                 }                
             
 
-                // // Store the booking data in the session
-                // $request->session()->put('bookingData', $bookingData);
+                // Store the booking data in the session
+                $request->session()->put('bookingData', $bookingData);
 
-                // $request->session()->put('seats', $seats);
+                $request->session()->put('seats', $seats);
 
 
-                // /* ------------- Payment Integration ---------- */
-                // //Get the total ticket price
-                // $ticketPrice = 0;
-                // foreach($seats as $seat)
-                // {
-                //     $ticketPrice += $seat->price;
-                // }
-
-                // // Store the ticket price in the session
-                // $request->session()->put('ticketPrice', $ticketPrice);
-                
-                // // Redirect to a specific route after booking creation
-                // return response()->json(['redirect' => route('stripe.payment')]);   
-                
-                // Create a new booking
-                $booking = Booking::create([
-                    // 'flight_id' => $bookingData['flight_id'],
-                    // 'email' => $bookingData['passenger_email'],
-                    // 'booking_date' => Carbon::now(), // Use the current date and time as the booking date
-                    'booking_reference' => $this->generateBookingReference(),
-                    'user_id' => Auth::check() ? Auth::id() : null,
-
-                    /**For testing only */
-                    'booking_date' => fake()->dateTime(),
-                    'flight_id' => Flight::pluck('id')->random(),
-                    'email' => fake()->safeEmail,
-                ]);
-                            
-                // Create and save the new passengers
-                $addedPassengers = [];
-                $counter = 0;
-                foreach ($bookingData['passengers'] as $passengerData) {
-
-                    // For testing only
-                    $passengerData['seat_id'] = $seats[$counter]->id; 
-                    
-                    // For testing only
-                    if($passengerData['passport_number'])
-                        $passengerData['passport_number'] = fake()->numerify('##########'); // For testing only
-                    if($passengerData['identification_number'])
-                        $passengerData['identification_number'] = fake()->numerify('##########'); // For testing only
-                                    
-                    $passenger = new Passenger($passengerData);
-                    
-                    $passenger->passenger_id = $passenger->generatePassengerId();
-
-                    $booking->passengers()->save($passenger);
-                    $addedPassengers[] = $passenger; // Convert passenger object to an array and store it
-
-                    // Update the seat's availability
-                    
-                    $seat = Seat::where('id', $passenger->seat_id)->first();
-                    $seat->update([
-                        'is_available' => false,
-                    ]); 
-
-                    $counter++;
+                /* ------------- Payment Integration ---------- */
+                //Get the total ticket price
+                $ticketPrice = 0;
+                foreach($seats as $seat)
+                {
+                    $ticketPrice += $seat->price;
                 }
 
-                /* Generate a ticket for the booking after adding the passengers
-                   to facilitate ticket price calculation */
-
-                // Generate the ticket number
-                $ticketNumber = $this->generateTicketNumber();
-
-                // Get the flight status id
-                $flightStatusId = $this->getFlightStatus($booking->flight_id);
-                if($flightStatusId == null)
-                    return response()->json(['error' => 'An error occurred when setting the flight status'], 400);
-
-                // Get the ticket price
-                $ticketPrice = $this->calculateTicketPrice($booking->id);
-
-                // Generate the boarding pass
-                $boardingPass = $this->generateBoardingPass();
-
-                $ticket = Ticket::create([
-                    'ticket_number' => $ticketNumber,
-                    'ticket_price' => $ticketPrice,
-                    'booking_reference' => $booking->booking_reference,
-                    'boarding_pass' => $boardingPass,
-                    'flight_status_id' => $flightStatusId,
-                    'flight_id' => $booking->flight_id,
-                    ]);
+                // Store the ticket price in the session
+                $request->session()->put('ticketPrice', $ticketPrice);
                 
-            
-                // Ticket data to be passed to the PDF template
-                $ticketData = [
-                    'ticketNumber' => $ticket->ticket_number,
-                    'ticketPrice' =>$ticket->ticket_price,
-                    'bookingReference' => $ticket->booking_reference,
-                    'bookingEmail' => $booking->email, 
-                    'boardingPass' => $ticket->boarding_pass,
-                    'flightStatus' => FlightStatus::find($ticket->flight_status_id)->name,
-                    'flight' => Flight::find($ticket->flight_id)->flight_number,
-                    'destination' => City::find(Flight::find($ticket->flight_id)->arrival_city_id)->name,
-                    'flightType' => Flight::find($ticket->flight_id)->is_international == 1 ? 'International' : 'Domestic',
-                    "passengers" => $addedPassengers,
-                ];
-            
-                // // Load the blade template view that is used to organize and style the ticket data
-                // $pdf = FacadePdf::loadView('ticket.pdf_template', $ticketData);
-                            
-                // // Send an email with the PDF attachment
-                // Mail::send([], [], function (Message $message) use ($pdf, $ticketData) {
-                //     $message->to($ticketData['bookingEmail'])
-                //         ->subject('Your Ticket Information')
-                //         ->html(
-                //             "<html>
-                //                 <head>
-                //                     <style>
-                //                         /* Center-align the content */
-                //                         body {
-                //                             text-align: center;
-                //                         }
-                //                         .container {
-                //                             display: inline-block;
-                //                             text-align: center;
-                //                         }
-                //                     </style>
-                //                 </head>
-                //                 <body>
-                //                     <div class='container'>
-                //                         <h2>Your Ticket Information</h2>
-                //                         <p>Hello,</p>
-                //                         <p>Thank you for booking your ticket with us. Attached is your ticket information.</p>
-                //                         <p><strong>Ticket Number:</strong> {$ticketData['ticketNumber']}</p>
-                //                         <p><strong>Ticket Price:</strong> {$ticketData['ticketPrice']} USD</p>
-                //                         <p><strong>Booking Reference:</strong> {$ticketData['bookingReference']}</p>
-                //                         <p><strong>Flight:</strong> {$ticketData['flight']}</p>
-                //                         <p><strong>Destination:</strong> {$ticketData['destination']}</p>
-                //                         <p><strong>Flight Type:</strong> {$ticketData['flightType']}</p>
-                //                         <p>Thank you for choosing our services!</p>
-                                        
-                //                     </div>
-                //                 </body>
-                //             </html>"
-                //         )
-                //         ->attachData($pdf->output(), 'ticket.pdf', [
-                //             'mime' => 'application/pdf',
-                //         ]);
-                // });
-
-
-                // Return the created booking and ticket details
-                return response()->json(['success' => 'Booking created successfully. Ticket data sent to your email.', 'booking' => $booking, 'ticket' => $ticketData, 'passengers' => $addedPassengers, 'status' => 1]);
+                // Redirect to a specific route after booking creation
+                return response()->json(['redirect' => route('stripe.payment')]);   
+                                
 
         } 
         catch (\Exception $e) 
@@ -384,7 +249,7 @@ class BookingsController extends Controller
             Log::error($e->getMessage());
         
             // For debugging
-            return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'An error occurred. ' . $e->getMessage(), 'status' => 0]);
 
             // Return the error response
            // return response()->json(['error' => 'An error occurred. '], 500);
@@ -590,7 +455,7 @@ class BookingsController extends Controller
     /**
      * Delete the booking associated with the booking reference
      */
-    public function destroy(string $bookingReference)
+    public function destroy(string $bookingReference, string $ticketNumber)
     {
         try 
         {
@@ -600,11 +465,12 @@ class BookingsController extends Controller
             //Make sure it is a valid booking
             if (!$booking) 
             {
-                return response()->json(['error' => 'Booking not found.'], 404);
+                return response()->json(['error' => 'Booking not found.', 'status' => 0]);
             }
 
             // Get the associated ticket
-            $ticket = Ticket::where('booking_reference', $bookingReference)->first();
+            $ticket = Ticket::where('booking_reference', $bookingReference)
+                            ->where('ticket_number' , $ticketNumber)->first();
             
             // Make sure it is a valid ticket
             if ($ticket)
@@ -614,7 +480,7 @@ class BookingsController extends Controller
             }
             else
             {
-                return response()->json(['error' => 'Ticket not found. '], 500);
+                return response()->json(['error' => 'Ticket not found. ', 'status' => 0]);
             }
 
             
@@ -637,7 +503,7 @@ class BookingsController extends Controller
             $booking->delete();
 
             // Return a success response
-            return response()->json(['message' => 'Booking deleted successfully.', 'status' => 1]);
+            return response()->json(['success' => 'Booking deleted successfully.', 'status' => 1]);
 
         } 
         catch (\Exception $e) 
@@ -646,10 +512,10 @@ class BookingsController extends Controller
             Log::error($e->getMessage());
 
             // For debugging
-            //return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+            //return response()->json(['error' => 'An error occurred. ' . $e->getMessage(), 'status' => 0]);
 
             // Return the error response
-            return response()->json(['error' => 'An error occurred. '], 500);
+            return response()->json(['error' => 'An error occurred. ', 'status' => 0]);
         }
     }
 

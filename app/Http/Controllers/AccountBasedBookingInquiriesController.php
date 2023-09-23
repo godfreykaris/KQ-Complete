@@ -24,24 +24,19 @@ class AccountBasedBookingInquiriesController extends Controller
                 ]);
         
                 $accountBasedBookingInquiry = AccountBasedBookingInquiry::create([
-                            // 'name' => $inquiryData['name'],
-                            // 'email' => $inquiryData['email'],
-                            // 'user_id' => $inquiryData['user_id'],
-                            // 'booking_inquiry_type_id' => $inquiryData['inquiry_type_id'],          
-                            // 'subject' => $inquiryData['subject'],
-                            // 'message' => $inquiryData['message'],
-        
-                             /**For testing only */
-                            'name' => fake()->name,
-                            'email' => fake()->safeEmail,
-                            'user_id' => User::pluck('id')->random(), 
-                            'booking_inquiry_type_id' => BookingInquiryType::pluck('id')->random(),          
-                            'subject' => fake()->sentence,
-                            'message' => fake()->paragraph,
+                            'name' => $inquiryData['name'],
+                            'email' => $inquiryData['email'],
+                            'user_id' => $inquiryData['user_id'],
+                            'booking_inquiry_type_id' => $inquiryData['inquiry_type_id'],          
+                            'subject' => $inquiryData['subject'],
+                            'message' => $inquiryData['message'],
+                            'user_id' => User::pluck('id')->random(),  // For testing
+
+                            
                         ]
                     );
 
-                return response()->json(['booking_inquiry' => $accountBasedBookingInquiry, 'status' => 1, 'value' => "User booking inquiry sent successfully"]);
+                return response()->json(['status' => 1, 'success' => "User booking inquiry sent successfully"]);
 
             } 
             catch (\Exception $e) 
@@ -52,9 +47,32 @@ class AccountBasedBookingInquiriesController extends Controller
                 // Return the error response
                 
                 // For Debugging
-                // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+                // return response()->json(['error' => 'An error occurred. ' . $e->getMessage(), 'status' => 0]);
 
-                return response()->json(['error' => 'An error occurred.'], 500);
+                return response()->json(['error' => 'An error occurred.', 'status' => 0]);
             }
     }
+
+     // Get all enquiry types
+     public function getInquiryTypes(Request $request)
+     {
+         try
+         {
+             $inquiries = BookingInquiryType::all();
+ 
+             return response()->json(['inquiries' => $inquiries, 'status' => 1]);
+         }
+         catch (\Exception $e) 
+         {
+             // Log the exception or handle it as needed
+             // For example:
+             Log::error($e->getMessage());
+ 
+             // For debugging
+             // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()]);
+ 
+              return response()->json(['error' => 'An error occurred.', 'status' => 0]);
+         }
+     }
+ 
 }
