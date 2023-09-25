@@ -74,17 +74,10 @@ interface locations{
   id: number;
 }
 
-export default function BookFlight() {
-
-  const [tripType, setTripType] = useState("");
-  const [departureDate, setDepartureDate] = useState("");
-  const [returnDate, setReturnDate] = useState("");
-  //const [flightTableData, setFlightTableData] = useState<flight[]>([]);
-
-  const [locations, setLocations] = useState([]);
-  const [selectedFrom, setSelectedFrom] = useState("");
-  const [selectedTo, setSelectedTo] = useState("");
-  const [filteredLocations, setFilteredLocations] = useState([]);
+export default function BookFlight() { 
+  
+  const [locations, setLocations] = useState<locations[]>([]); 
+  const [filteredLocations, setFilteredLocations] = useState<locations[]>([]);
 
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -102,7 +95,7 @@ export default function BookFlight() {
   const [selectedPassenger, setSelectedPassenger] = useState<passenger | undefined>(undefined);
 
   //to store values
-  const {formData, setFormData, flightTableData, setFlightTableData} = useBookingContext() as BookingContextType;
+  const {formData, setFormData, flightTableData, setFlightTableData, selectedFlight, setSelectedFlight, isPlaneSelected, setIsPlaneSelected} = useBookingContext() as BookingContextType;
 
   //access seats from seat context
   const {updateSeat} = useSeatContext() as SeatContextType;
@@ -112,6 +105,18 @@ export default function BookFlight() {
   // Handle plane row select
   const [isButtonClicked, setIsButtonClicked] = useState(false);
   const navigate = useNavigate();
+
+
+  //check if there is formData in the location state
+  useEffect(() => {
+    if (location.state && location.state.formData) {
+      const formDataBack = location.state?.formData;
+      const selectedFlightBack = location.state?.selectedFlight;
+
+      setSelectedFlight(selectedFlightBack);
+      setFormData(formDataBack);
+    }
+  }, [location.state]);
 
 
   //to remove passenger when delete button is clicked
@@ -158,7 +163,12 @@ export default function BookFlight() {
   };  
 
   const handleTripType = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setTripType(e.target.value);
+    const {value} = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      tripType: value
+    }))
+    //setTripType(e.target.value);
   };
 
   // Handle Add passenger click
@@ -173,22 +183,22 @@ export default function BookFlight() {
 
   // Departure locations and destinations
   useEffect(() => {
-    if (departureDate !== "" && selectedFrom !== "") {
+    if (formData.departureDate !== "" && formData.selectedFrom.name !== "") {
       fetchFlightsByDepartureDateAndCity();      
-    }else if(departureDate !== ""){
+    }else if(formData.departureDate !== ""){
       fetchFlightsByDepartureDate();
-    }else if(selectedFrom !== ""){
+    }else if(formData.selectedFrom.name !== ""){
       fetchFlightsByCity();
     }
     else{
       fectchAllFlights();
     }
-  }, [departureDate, selectedFrom]);
+  }, [formData.departureDate, formData.selectedFrom]);
 
 
   //flight filters
   const fetchFlightsByCity = () => {
-    fetch(`${apiBaseUrl}/flights/byDepartureCityId/${selectedFrom}`)
+    fetch(`${apiBaseUrl}/flights/byDepartureCityId/${formData.selectedFrom.id}`)
       .then((response) => response.json())
       .then((data: { flights: flight[] }) => {
         setFlightTableData(data.flights);
@@ -201,7 +211,7 @@ export default function BookFlight() {
   };
 
   const fetchFlightsByDepartureDate = () => {
-    fetch(`${apiBaseUrl}/flights/byDepartureDate/${departureDate}`)    
+    fetch(`${apiBaseUrl}/flights/byDepartureDate/${formData.departureDate}`)    
       .then((response) => response.json())
       .then((data: { flights: flight[] }) => {
         setFlightTableData(data.flights);
@@ -214,7 +224,7 @@ export default function BookFlight() {
   };
 
   const fetchFlightsByDepartureDateAndCity = () => {
-    fetch(`${apiBaseUrl}/flights/byDepartureDateCity/${departureDate}/${selectedFrom}`)
+    fetch(`${apiBaseUrl}/flights/byDepartureDateCity/${formData.departureDate}/${formData.selectedFrom.id}`)
       .then((response) => response.json())
       .then((data: { flights: flight[] }) => {
         setFlightTableData(data.flights);
@@ -262,17 +272,51 @@ export default function BookFlight() {
   }, []); 
 
   const handleFromChange = (selectedOption: string) => {
-    setSelectedFrom(selectedOption);
+    const selectedLocation = locations.find((location) => location.name === selectedOption);
+    
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      selectedFrom: {
+        ...prevFormData.selectedFrom,
+        name: selectedLocation?.name || '',
+        country: selectedLocation?.country || '',
+        id: selectedLocation?.id || 0
+      },
+    }));
+
     const filteredLocations = locations.filter(
       (location: locations) => location.name !== selectedOption
     );
-    setSelectedTo("");
+
+  // Update the selectedTo.name property using the same approach
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      selectedTo: {
+        ...prevFormData.selectedTo,
+        name: '',
+        country: '',
+        id: 0,
+      },
+    }));
+
     setFilteredLocations(filteredLocations);
   };
 
-  const handleToChange = (selectedOption: string) => {
-    setSelectedTo(selectedOption);
+  const handleToChange = (selectedOption: string) => {    
+    const selectedLocation = filteredLocations.find((location) => location.name === selectedOption)
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      selectedTo: {
+        ...prevFormData.selectedTo,
+        name: selectedLocation?.name || '',
+        country: selectedLocation?.country || '',
+        id: selectedLocation?.id || 0
+      }
+    }));
+
   };
+
 
   //----------- Handle submit --------------//
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -342,49 +386,55 @@ export default function BookFlight() {
    const handleCloseSeatModal = () => {
      setShowSeatModal(false);
    };
-  
-
-   //to handle flight selection
-   const [selectedFlight, setSelectedFlight] = useState<flight | null>(null);
 
    //function to handle flight selection
    const handleFlightSelection = (flight: flight) => {
     if(selectedFlight === null){
       setSelectedFlight(flight);
       newFlightId(flight.id);
+      setIsPlaneSelected(true)     
     }else {
-      const confirmUpdate = window.confirm("Changing the flight will clear seats for all passengers. Do you want to continue");
-      if(confirmUpdate){
-        setSelectedFlight(flight);
+      if(passengers.length > 0){
+        const confirmUpdate = window.confirm("Changing the flight will clear seats for all passengers. Do you want to continue");
+        if(confirmUpdate){
+          setSelectedFlight(flight);
+          newFlightId(flight.id);
+          setIsPlaneSelected(true)
 
-        // Clear seat data for every passenger
-        const updatedPassengers = passengers.map((passenger) => ({
-          ...passenger,
-          seat: {
-            seat_number: 0,
-            flight_class: { id: 0, name: '' },
-            location: { id: 0, name: '' },
-            is_available: false,
-            price: '',
-            _id: 0
-          }
-        }));
+          // Clear seat data for every passenger
+          const updatedPassengers = passengers.map((passenger) => ({
+            ...passenger,
+            seat: {
+              seat_number: 0,
+              flight_class: { id: 0, name: '' },
+              location: { id: 0, name: '' },
+              is_available: false,
+              price: '',
+              _id: 0
+            }
+          }));
 
-        //update passenger data using context function
-        updatedPassengers.forEach((updatedPassenger, index: number) => {
-          updatePassenger(index, updatedPassenger);
-          updateSeat(index, {
-            seat_number: 0,
-            flight_class: { id: 0, name: '' },
-            location: { id: 0, name: '' },
-            is_available: false,
-            price: '',
-            _id: 0
+          //update passenger data using context function
+          updatedPassengers.forEach((updatedPassenger, index: number) => {
+            updatePassenger(index, updatedPassenger);
+            updateSeat(index, {
+              seat_number: 0,
+              flight_class: { id: 0, name: '' },
+              location: { id: 0, name: '' },
+              is_available: false,
+              price: '',
+              _id: 0
+            });
           });
-        });
+        }
+      }else{
+        setSelectedFlight(flight);
+        newFlightId(flight.id);
+        setIsPlaneSelected(true);
       }
+      
     }
-    
+
    };
 
    //maintaining form state during navigation
@@ -422,14 +472,13 @@ export default function BookFlight() {
                 <Form.Control
                   as="select"
                   id="trip-type"
-                  value={tripType}
+                  value={formData.tripType}
                   onChange={(event) => handleTripType(event)}
                   required
                 >
                   <option value="">Select Trip Type</option>
                   <option value="OneWay">One Way</option>
                   <option value="Round">Round Trip</option>
-                  <option value="MultiCity">Multi-city</option>
                 </Form.Control>
               </Form.Group>
 
@@ -438,20 +487,20 @@ export default function BookFlight() {
                 <Form.Control
                   type="date"
                   id="departure-date"
-                  value={departureDate}
-                  onChange={(e) => setDepartureDate(e.target.value)}
+                  value={formData.departureDate}
+                  onChange={(e) => setFormData({...formData, departureDate: e.target.value})}
                   required
                 />
               </Form.Group>
 
-              {tripType === "Round" && (
+              {formData.tripType === "Round" && (
                 <Form.Group>
                   <Form.Label>Return Date:</Form.Label>
                   <Form.Control
                     type="date"
                     id="return-date"
-                    value={returnDate}
-                    onChange={(e) => setReturnDate(e.target.value)}
+                    value={formData.returnDate}
+                    onChange={(e) => setFormData({...formData, returnDate: e.target.value})}
                     required
                   />
                 </Form.Group>
@@ -463,13 +512,13 @@ export default function BookFlight() {
                   <Form.Control
                     as="select"
                     id="from"
-                    value={selectedFrom}
+                    value={formData.selectedFrom.name}
                     onChange={(e) => handleFromChange(e.target.value)}
                     required
                   >
                     <option value="">Select Departure Location</option>
                     {locations.map((option: location, index: number) => (
-                      <option key={index} value={option.id}>
+                      <option key={index} value={option.name}>
                         {option.name}
                       </option>
                     ))}
@@ -484,17 +533,21 @@ export default function BookFlight() {
 
               <Form.Group>
                 <Form.Label>To:</Form.Label>
-                {filteredLocations.length > 0 ? (
+                {filteredLocations.length > 0 || formData.selectedFrom.name !== "" ? (
                   <Form.Control
                     as="select"
                     id="to"
-                    value={selectedTo}
+                    value={formData.selectedTo.name}
                     onChange={(e) => handleToChange(e.target.value)}
                     required
                   >
-                    <option value="">Select Destination</option>
+                    <option value={formData.selectedFrom.name !== "" && filteredLocations.length === 0
+                        ? formData.selectedTo.name
+                        : ""}
+                        >{formData.selectedTo.name === "" ? "Select Destination": formData.selectedTo.name}
+                    </option>
                     {filteredLocations.map((option: location, index: number) => (
-                      <option key={index} value={option.id}>
+                      <option key={index} value={option.name}>
                         {option.name}
                       </option>
                     ))}
@@ -529,7 +582,7 @@ export default function BookFlight() {
                             event.preventDefault(); // Prevent the default link behavior
                           } else {
                             handleAddPassengerClick();
-                            navigate('/addpassenger1');
+                            navigate('/addpassenger1', {state: {formData, selectedFlight}});
                           }
                         }}
                         disabled={selectedFlight === null}
@@ -694,6 +747,7 @@ export default function BookFlight() {
                                     variant="primary"
                                     type="button"
                                     disabled={selectedFlight !== item} // Disable if not selected
+                                    active={!isPlaneSelected}
                                   >
                                     Select
                                   </Button>
