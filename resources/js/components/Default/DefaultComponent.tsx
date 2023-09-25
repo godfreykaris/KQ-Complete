@@ -158,9 +158,9 @@ const router = [
   {
       path: 'searchflight',
       element: (
-          <FlightProvider>
+          <BookingProvider>
               <SearchFlight/>
-          </FlightProvider>
+          </BookingProvider>
       )
   },
   {

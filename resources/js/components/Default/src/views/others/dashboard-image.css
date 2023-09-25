@@ -2,7 +2,7 @@
 {
   justify-content: center;
   align-items: center;
-  width: 800px;
+  width: 100%;
 
 }
 
@@ -26,18 +26,16 @@
 }
 
 .image-container {
-  border-radius: 10%; /* Set the border-radius to 50% to make it round */
+  border-radius: 8px;
   overflow: hidden; /* Hide any content that might overflow outside the round container */
-  width: 1000px; 
-  height: 300px;
-
+  width: 100%; 
+  height: 100%;
 }
 
 /* Improve readability of text on images */
 .carousel-caption {
   background-color: rgba(0, 0, 0, 0.6); /* Add a semi-transparent background */
   color: white; /* Set text color to white */
-  padding: 10px; /* Add some padding to the caption */
 }
 
 
@@ -66,5 +64,5 @@
 
 /* Improve the spacing between carousel and other sections */
 .carousel-section {
-  margin-top: 40px; /* Add space at the top of the carousel */
+  margin-bottom: 40px; /* Add space at the top of the carousel */
 }

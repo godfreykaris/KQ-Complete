@@ -12,7 +12,7 @@ interface Location{
 }
 
 interface Seat{
-  _id: number | 0;
+  seat_id: number | 0;
   seat_number: string;
   flight_class: FlightClass;
   location: Location;

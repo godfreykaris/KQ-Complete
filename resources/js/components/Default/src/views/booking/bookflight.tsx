@@ -25,7 +25,7 @@ interface location{
 }
 
 interface seat{
-  _id: number;
+  seat_id: number;
   seat_number: number;
   flight_class: flight_class | {id: 0, name: ''}; 
   location: location | {id: 0, name: ''};
@@ -44,8 +44,9 @@ interface passenger{
     location: {id: 0, name: ''},
     is_available: false,
     price: '',
-    _id: 0
+    seat_id: 0
   };
+  seat_id: number
 }
 
 interface status{
@@ -81,6 +82,7 @@ export default function BookFlight() {
 
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [emailError, setEmailError] = useState("");
 
   // State to manage the seat modal
@@ -88,14 +90,13 @@ export default function BookFlight() {
 
   //data from the search flight component
   const location = useLocation();
-  const {state} = location;
 
   // Access the "passengers" array from the context using the usePassengerContext hook
-  const {flightId, passengers, removePassenger, updatePassenger, newFlightId} = usePassengerContext() as PassengerContextType;
+  const {flight_id, passengers, removePassenger, updatePassenger, newFlightId} = usePassengerContext() as PassengerContextType;
   const [selectedPassenger, setSelectedPassenger] = useState<passenger | undefined>(undefined);
 
   //to store values
-  const {formData, setFormData, flightTableData, setFlightTableData, selectedFlight, setSelectedFlight, isPlaneSelected, setIsPlaneSelected} = useBookingContext() as BookingContextType;
+  const {formData, setFormData, flightTableData, setFlightTableData, selectedFlight, setSelectedFlight} = useBookingContext() as BookingContextType;
 
   //access seats from seat context
   const {updateSeat} = useSeatContext() as SeatContextType;
@@ -126,7 +127,7 @@ export default function BookFlight() {
 
   //to edit passenger when the edit button is clicked
   const handleEditPassenger = (passenger: passenger, index: number) => {   
-    navigate2('/addpassenger1', {state: {passenger, index}});
+    navigate2('/addpassenger1', {state: {passenger, index, formData, selectedFlight}});
   };  
 
   // Format date imported from AddPassenger1
@@ -336,7 +337,7 @@ export default function BookFlight() {
       
       //data to be sent
       const sendData = {
-        flightId: flightId,
+        flight_id: flight_id,
         email: formData.email,        
         passengers: passengers,
       }
@@ -344,7 +345,7 @@ export default function BookFlight() {
       setLoading(true);
   
       //perform POST reuest
-      const response = await fetch(`${apiBaseUrl}/bookings/add`, {
+      const response = await fetch(`${apiBaseUrl}/bookings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -363,6 +364,8 @@ export default function BookFlight() {
         }else{
           throw new Error("Error sending data");
         }        
+      }else{
+        setSuccessMessage("Success!");
       }
   
       setLoading(false);
@@ -389,17 +392,15 @@ export default function BookFlight() {
 
    //function to handle flight selection
    const handleFlightSelection = (flight: flight) => {
-    if(selectedFlight === null){
+    if(selectedFlight === null || selectedFlight.id === flight.id){
       setSelectedFlight(flight);
-      newFlightId(flight.id);
-      setIsPlaneSelected(true)     
+      newFlightId(flight.id);  
     }else {
       if(passengers.length > 0){
         const confirmUpdate = window.confirm("Changing the flight will clear seats for all passengers. Do you want to continue");
         if(confirmUpdate){
           setSelectedFlight(flight);
           newFlightId(flight.id);
-          setIsPlaneSelected(true)
 
           // Clear seat data for every passenger
           const updatedPassengers = passengers.map((passenger) => ({
@@ -410,7 +411,7 @@ export default function BookFlight() {
               location: { id: 0, name: '' },
               is_available: false,
               price: '',
-              _id: 0
+              seat_id: 0
             }
           }));
 
@@ -423,21 +424,18 @@ export default function BookFlight() {
               location: { id: 0, name: '' },
               is_available: false,
               price: '',
-              _id: 0
+              seat_id: 0
             });
           });
         }
       }else{
         setSelectedFlight(flight);
         newFlightId(flight.id);
-        setIsPlaneSelected(true);
       }
       
     }
 
    };
-
-   //maintaining form state during navigation
 
 
    return (
@@ -448,6 +446,7 @@ export default function BookFlight() {
       <br/>
       <MenuBar2/>
       <h2 className="text-primary text-center"><b>Book Flight|</b></h2>
+      {successMessage ? <Alert variant='success text-center'>{successMessage}</Alert> : ""}
       <Container className="d-flex justify-content-center align-items-center mt-3" style={{ minHeight: '100vh' }}>
       <Container fluid>
         <Row>
@@ -532,31 +531,29 @@ export default function BookFlight() {
               </Form.Group>
 
               <Form.Group>
-                <Form.Label>To:</Form.Label>
-                {filteredLocations.length > 0 || formData.selectedFrom.name !== "" ? (
-                  <Form.Control
-                    as="select"
-                    id="to"
-                    value={formData.selectedTo.name}
-                    onChange={(e) => handleToChange(e.target.value)}
-                    required
-                  >
-                    <option value={formData.selectedFrom.name !== "" && filteredLocations.length === 0
-                        ? formData.selectedTo.name
-                        : ""}
-                        >{formData.selectedTo.name === "" ? "Select Destination": formData.selectedTo.name}
-                    </option>
-                    {filteredLocations.map((option: location, index: number) => (
-                      <option key={index} value={option.name}>
-                        {option.name}
+                
+                {(filteredLocations.length > 0 || formData.selectedFrom.name !== "")  && (
+                  <>
+                  <Form.Label>To:</Form.Label>
+                    <Form.Control
+                      as="select"
+                      id="to"
+                      value={formData.selectedTo.name}
+                      onChange={(e) => handleToChange(e.target.value)}
+                      required
+                    >
+                      <option value={formData.selectedFrom.name !== "" && filteredLocations.length === 0
+                          ? formData.selectedTo.name
+                          : ""}
+                          >{formData.selectedTo.name === "" ? "Select Destination": formData.selectedTo.name}
                       </option>
-                    ))}
-                  </Form.Control>
-                ) : (
-                  <div className="d-flex align-items-center">
-                    <Spinner animation="border" variant="primary" size="sm" />
-                    <span className="ml-2">Loading Destinations...</span>
-                  </div>
+                      {filteredLocations.map((option: location, index: number) => (
+                        <option key={index} value={option.name}>
+                          {option.name}
+                        </option>
+                      ))}
+                    </Form.Control>
+                  </>
                 )}
               </Form.Group>
 
@@ -608,10 +605,11 @@ export default function BookFlight() {
               </div>
               
               </Form>
-            </Col> 
+            </Col>
+            
 
                 {/* Display error message if there's an error */}
-              {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
+              {errorMessage && <Alert variant="danger text-center mt-4">{errorMessage}</Alert>}
 
               <hr/>
           
@@ -699,11 +697,13 @@ export default function BookFlight() {
                                                                           location: { id: 0, name: '' },
                                                                           is_available: false,
                                                                           price: '',
-                                                                          _id: 0}
+                                                                          seat_id: 0}
                 }
               />
 
               <hr/>
+
+              {selectedFlight !== null ? <Alert variant='success text-center'>Flight {selectedFlight.flight_number}, {selectedFlight.airline.name} selected</Alert> : <Alert variant='warning text-center'>You haven't selected any flight</Alert>}
 
               {flightTableData.length > 0 ? (
                 <div>
@@ -747,7 +747,6 @@ export default function BookFlight() {
                                     variant="primary"
                                     type="button"
                                     disabled={selectedFlight !== item} // Disable if not selected
-                                    active={!isPlaneSelected}
                                   >
                                     Select
                                   </Button>
