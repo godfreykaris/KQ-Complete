@@ -5,117 +5,118 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Container, Row, Col, Form, Button, Table, Spinner, OverlayTrigger, Tooltip, Alert } from "react-bootstrap";
 
+import { usePassengerContext, PassengerContextType } from "../../context/passengers/passengercontext";
 import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
-
-import PassengerSeat from "../seats/viewseat.js";
 import { useSeatContext, SeatContextType } from "../../context/seats/sendseatdata";
 import { BookingContextType, useBookingContext } from '../../context/booking/bookflightcontext';
 import Seat from "../seats/viewseat.js";
 
 import apiBaseUrl from '../../../../../config';
 
-import LoadingComponent from '../../../../Common/LoadingComponent';
-
-
-interface FlightClass{
+interface flight_class{
   id: number;
   name: string;
 }
 
-interface Location{
+interface location{
   id: number;
   name: string;
 }
 
-interface Seat{
-  id: number | 0;
-  seat_number: string;
-  flight_class: FlightClass;
-  location: Location;
+interface seat{
+  _id: number;
+  seat_number: number;
+  flight_class: flight_class | {id: 0, name: ''}; 
+  location: location | {id: 0, name: ''};
   is_available: boolean;
-  price: number;
+  price: string;
 }
 
-interface Passenger {
+interface passenger{
   name: string;
-  passport_number: string;
-  identification_number: string;
+  passport_number: number;
+  identification_number: number;
   date_of_birth: string;
-  seat: Seat;
+  seat: seat | {
+    seat_number: 0,
+    flight_class: {id: 0, name: ''},
+    location: {id: 0, name: ''},
+    is_available: false,
+    price: '',
+    _id: 0
+  };
 }
 
-interface Status{
-  id: number;
+interface status{
   name: string;
 }
 
-interface Airline{
-  id: number;
+interface airline{
   name: string;
 }
 
-interface City
-{
+interface flight{
+  id: number;
+  flight_status: status;
+  flight_number: number;
+  departure_city: locations;
+  arrival_city: locations;
+  airline: airline;
+  duration: string;
+  departure_time:  string;
+  return_time: string;
+}
+
+interface locations{
   name: string;
   country: string;
   id: number;
 }
 
-interface Flight{
-  id: number;
-  flight_status: Status;
-  flight_number: number;
-  departure_city: City;
-  arrival_city: City;
-  airline: Airline;
-  duration: string;
-  departure_time:  string;
-}
+export default function BookFlight() { 
+  
+  const [locations, setLocations] = useState<locations[]>([]); 
+  const [filteredLocations, setFilteredLocations] = useState<locations[]>([]);
 
-const FlightState = {
-  sfFlightId: 0,
-  sfEmail: '',
-  sfDepartureDate: '',
-  sfSelectedFrom: '',
-  sfSelectedTo: '',
-};
-
-interface FlightData {
-  flightId: number;
-  email: string;
-  departureDate: string;
-  selectedFrom: string;
-  selectedTo: string;
-}
-
-export default function BookFlight() {
-
-  const [isLoading, setIsLoading] = useState(false);
-
-  const [departureDate, setDepartureDate] = useState("");
-  const [returnDate, setReturnDate] = useState("");
-
-  const [cities, setCities] = useState([]);
-  const [filteredCities, setFilteredCities] = useState<City[]>([]);
-  const [selectedFrom, setSelectedFrom] = useState("");
-  const [selectedTo, setSelectedTo] = useState("");
-
-  const {updateSeat} = useSeatContext() as SeatContextType;
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [emailError, setEmailError] = useState("");
 
   // State to manage the seat modal
   const [showSeatModal, setShowSeatModal] = useState(false);
-  
-  const [responseMessage, setResponseMessage] = useState('');
-  const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
-  const [isAddPassengerClicked, setIsAddPassengerClicked] = useState(false);
-  const [selectedPassenger, setSelectedPassenger] = useState<Passenger | undefined>(undefined);
+  //data from the search flight component
+  const location = useLocation();
+  const {state} = location;
 
+  // Access the "passengers" array from the context using the usePassengerContext hook
+  const {flightId, passengers, removePassenger, updatePassenger, newFlightId} = usePassengerContext() as PassengerContextType;
+  const [selectedPassenger, setSelectedPassenger] = useState<passenger | undefined>(undefined);
+
+  //to store values
+  const {formData, setFormData, flightTableData, setFlightTableData, selectedFlight, setSelectedFlight, isPlaneSelected, setIsPlaneSelected} = useBookingContext() as BookingContextType;
+
+  //access seats from seat context
+  const {updateSeat} = useSeatContext() as SeatContextType;
+
+  const navigate2 = useNavigate();
+
+  // Handle plane row select
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
   const navigate = useNavigate();
+
+
+  //check if there is formData in the location state
+  useEffect(() => {
+    if (location.state && location.state.formData) {
+      const formDataBack = location.state?.formData;
+      const selectedFlightBack = location.state?.selectedFlight;
+
+      setSelectedFlight(selectedFlightBack);
+      setFormData(formDataBack);
+    }
+  }, [location.state]);
 
 
   //to remove passenger when delete button is clicked
@@ -124,8 +125,8 @@ export default function BookFlight() {
   };
 
   //to edit passenger when the edit button is clicked
-  const handleEditPassenger = (passenger: Passenger, index: number) => {   
-    navigate('/addpassenger1', {state: {passenger, index}});
+  const handleEditPassenger = (passenger: passenger, index: number) => {   
+    navigate2('/addpassenger1', {state: {passenger, index}});
   };  
 
   // Format date imported from AddPassenger1
@@ -137,78 +138,42 @@ export default function BookFlight() {
     return `${year}/${month}/${day}`;
   };  
 
-  const handleUpdateFlightData = () => {
-    updateFlightData(formData);
+  // Handle change
+  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    const { name, value } = event.target;
+
+    if (name === "email") {
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+      if (emailRegex.test(value)) {
+        setEmailError("");
+      } else {
+        setEmailError("Invalid email format");
+      }
+    } else {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+    }
+  };  
+
+  const handleTripType = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const {value} = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      tripType: value
+    }))
+    //setTripType(e.target.value);
   };
-
-// Handle change
- const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
-  const { name, value } = event.target;
-
-  if (name === "email") 
-  {
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
-    if (emailRegex.test(value))
-    {
-      setEmailError("");
-      handleUpdateFlightData();
-    } 
-    else 
-    {
-      setEmailError("Invalid email format");
-    }
-  } 
-  else if(name === "departureDate")
-  {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      departureDate: value,
-    }));
-
-    handleUpdateFlightData();
-  }
-  else if(name === "selectedFrom")
-  {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      selectedFrom: value,
-    }));
-
-    handleUpdateFlightData();
-
-    const filteredCities = cities.filter(
-      (city: City) => city.id !== Number(selectedFrom)
-    );
-    setSelectedTo("");
-    setFilteredCities(filteredCities);
-  }
-  else if(name === "selectedTo")
-  {
-    if(formData.selectedFrom === value)
-    {
-      alert("From and To cannot be the same");
-      return;
-    }
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      selectedTo: value,
-    }));
-
-    handleUpdateFlightData();
-  }
-};
-
-
 
   // Handle Add passenger click
   const handleAddPassengerClick = () => {
-    setIsAddPassengerClicked(false);
-    handleUpdateFlightData();
+    setIsButtonClicked(false);
   };
 
   //addpassenger message befor selecting flight
@@ -216,170 +181,142 @@ export default function BookFlight() {
     <Tooltip id='tooltip'>{message}</Tooltip>
   )
 
-  // Reusable function to fetch flights
-  const fetchFlights = (url: string) => {
-    setIsLoading(true);
-    return fetch(url)
-      .then((response) => {
-        if (!response.ok) 
-        {
-          throw new Error("Error fetching data");
-        }
-        setIsLoading(false);
-        return response.json();
-      })
-      .catch((error) => {
-        setIsLoading(false);
+  // Departure locations and destinations
+  useEffect(() => {
+    if (formData.departureDate !== "" && formData.selectedFrom.name !== "") {
+      fetchFlightsByDepartureDateAndCity();      
+    }else if(formData.departureDate !== ""){
+      fetchFlightsByDepartureDate();
+    }else if(formData.selectedFrom.name !== ""){
+      fetchFlightsByCity();
+    }
+    else{
+      fectchAllFlights();
+    }
+  }, [formData.departureDate, formData.selectedFrom]);
+
+
+  //flight filters
+  const fetchFlightsByCity = () => {
+    fetch(`${apiBaseUrl}/flights/byDepartureCityId/${formData.selectedFrom.id}`)
+      .then((response) => response.json())
+      .then((data: { flights: flight[] }) => {
+        setFlightTableData(data.flights);
+        }) 
+     
+      .catch((error: any) => {
         setErrorMessage("An error occurred");
         console.log("Error fetching data: ", error);
-        throw error;
       });
   };
 
-  // Departure locations and destinations
-  useEffect(() => {
-    let url = `${apiBaseUrl}/flights`;
-
-    if (formData.departureDate !== "") {
-      url = `${apiBaseUrl}/flights/byDepartureDate/${formData.departureDate}`;
-    }
-
-    if (formData.selectedFrom !== "") {
-      url = `${apiBaseUrl}/flights/byDepartureCityId/${formData.selectedFrom}`;
-    }
-
-    if (formData.departureDate !== "" && formData.selectedFrom !== "") {
-      url = `${apiBaseUrl}/flights/byDepartureDateCity/${formData.departureDate}/${formData.selectedFrom}`;
-    }
-
-    fetchFlights(url)
-      .then((data: { flights: Flight[] }) => {
+  const fetchFlightsByDepartureDate = () => {
+    fetch(`${apiBaseUrl}/flights/byDepartureDate/${formData.departureDate}`)    
+      .then((response) => response.json())
+      .then((data: { flights: flight[] }) => {
         setFlightTableData(data.flights);
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          flightId: 0,
-        }));
-      })
-      .catch((error) => {
-        // Handle errors here
+        }) 
+     
+      .catch((error: any) => {
+        setErrorMessage("An error occurred");
+        console.log("Error fetching data: ", error);
       });
-  }, [formData.departureDate, formData.selectedFrom]);
+  };
 
-  //cities
-  useEffect(() => {
-    fetch(`${apiBaseUrl}/cities`)
+  const fetchFlightsByDepartureDateAndCity = () => {
+    fetch(`${apiBaseUrl}/flights/byDepartureDateCity/${formData.departureDate}/${formData.selectedFrom.id}`)
+      .then((response) => response.json())
+      .then((data: { flights: flight[] }) => {
+        setFlightTableData(data.flights);
+        }) 
+     
+      .catch((error: any) => {
+        setErrorMessage("An error occurred");
+        console.log("Error fetching data: ", error);
+      });
+  };
+
+  const fectchAllFlights = () => {
+    fetch(`${apiBaseUrl}/flights`)
       .then((response) => {
-        if (!response.ok) 
-        {          
+        if (!response.ok) {          
           throw new Error("Error fetching data");
         }     
         return response.json(); // This will automatically parse the JSON response
       })
       .then((data) => {
-        setCities(data.cities); 
+        setFlightTableData(data.flights); 
       })
-      .catch((error) => {        
+      .catch((_error) => {        
+        throw new Error("Error fetching data: ");
+      });
+  } 
+
+  //end of flight filters
+  
+  //locations
+  useEffect(() => {
+    fetch(`${apiBaseUrl}/cities`)
+      .then((response) => {
+        if (!response.ok) {          
+          throw new Error("Error fetching data");
+        }     
+        return response.json(); // This will automatically parse the JSON response
+      })
+      .then((data) => {
+        setLocations(data.cities); 
+      })
+      .catch((_error) => {        
         throw new Error("Error fetching data: ");
       });
   }, []); 
 
   const handleFromChange = (selectedOption: string) => {
-    setSelectedFrom(selectedOption);
-    const filteredCities = cities.filter(
-      (city: City) => city.name !== selectedOption
-    );
-    setSelectedTo("");
-    setFilteredCities(filteredCities);
-
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      selectedFrom: selectedOption,
-    }));
-
-    handleUpdateFlightData();
-  };
-
-  const handleToChange = (selectedOption: string) => {
-    setSelectedTo(selectedOption);
-
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      selectedTo: selectedOption,
-    }));
-
-    handleUpdateFlightData();
-  };
-
-  // Function to open the seat modal
-  const handleViewSeat = (passenger: Passenger) => {
-    setShowSeatModal(true);
-    setSelectedPassenger(passenger);
-  };
-
-  // Function to close the seat modal
-  const handleCloseSeatModal = () => {
-    setShowSeatModal(false);
-  };
-
-  //to handle flight selection
-   const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
-
-   //function to handle flight selection
-   const handleFlightSelection = (flight: Flight) => {
-    if(selectedFlight === null)
-    {
-      setSelectedFlight(flight);
-
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-          flightId: flight.id,
-      }));
-
-      handleUpdateFlightData();
-
-    }
-    else 
-    {
-      const confirmUpdate = window.confirm("Changing the flight will clear seats for all passengers. Do you want to continue");
-      if(confirmUpdate){
-        setSelectedFlight(flight);
-
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-            flightId: flight.id,
-        }));
-  
-        handleUpdateFlightData();
-
-        // Clear seat data for every passenger
-        const updatedPassengers = passengers.map((passenger) => ({
-          ...passenger,
-          seat: {
-            seat_number: '',
-            flight_class: { id: 0, name: '' },
-            location: { id: 0, name: '' },
-            is_available: false,
-            price: 0,
-            id: 0
-          }
-        }));
-
-        //update passenger data using context function
-        updatedPassengers.forEach((updatedPassenger, index: number) => {
-          updatePassenger(index, updatedPassenger);
-          updateSeat(index, {
-            seat_number: '',
-            flight_class: { id: 0, name: '' },
-            location: { id: 0, name: '' },
-            is_available: false,
-            price: 0,
-            id: 0
-          });
-        });
-      }
-    }
+    const selectedLocation = locations.find((location) => location.name === selectedOption);
     
-   };
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      selectedFrom: {
+        ...prevFormData.selectedFrom,
+        name: selectedLocation?.name || '',
+        country: selectedLocation?.country || '',
+        id: selectedLocation?.id || 0
+      },
+    }));
+
+    const filteredLocations = locations.filter(
+      (location: locations) => location.name !== selectedOption
+    );
+
+  // Update the selectedTo.name property using the same approach
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      selectedTo: {
+        ...prevFormData.selectedTo,
+        name: '',
+        country: '',
+        id: 0,
+      },
+    }));
+
+    setFilteredLocations(filteredLocations);
+  };
+
+  const handleToChange = (selectedOption: string) => {    
+    const selectedLocation = filteredLocations.find((location) => location.name === selectedOption)
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      selectedTo: {
+        ...prevFormData.selectedTo,
+        name: selectedLocation?.name || '',
+        country: selectedLocation?.country || '',
+        id: selectedLocation?.id || 0
+      }
+    }));
+
+  };
+
 
   //----------- Handle submit --------------//
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -397,22 +334,14 @@ export default function BookFlight() {
         return;
       }
       
-      const selectedProperties = passengers.map((passenger) => ({
-        name: passenger.name,
-        passport_number: passenger.passport_number,
-        identification_number: passenger.identification_number,
-        date_of_birth: passenger.date_of_birth,
-        seat_id: passenger.seat.id,
-      }));
-
       //data to be sent
       const sendData = {
-        flight_id: flightData.flightId,
+        flightId: flightId,
         email: formData.email,        
         passengers: passengers,
       }
   
-      setIsLoading(true);
+      setLoading(true);
   
       //perform POST reuest
       const response = await fetch(`${apiBaseUrl}/bookings/add`, {
@@ -423,65 +352,95 @@ export default function BookFlight() {
           'Accept': 'application/json',
         },
         body: JSON.stringify(sendData),
-      }).then(response => {
-        if (response.headers.get('content-type')?.includes('application/json')) {
-          return response.json(); // Extract the response as JSON
-        } else {
-          return response.text(); // Extract the response as text
-        }
-    })
-      .then(data => {
-        // Check if the response contains a 'redirect' property
-        if (data.redirect) 
-        {
-          window.location.href = data.redirect; // Redirect to the provided URL
-        } 
-        else 
-        {
-          if (data.status) 
-            {
-              setResponseStatus(1); // Success
-              setResponseMessage(`Success: ${data.success}.`);
-              window.scrollTo({
-                top: 0,
-                behavior: 'smooth',
-              });
-            } 
-            else 
-            {
-              setResponseStatus(0); // Error
-              setResponseMessage(`Error: ${data.error}`);
-            }
-        }
-      })
-      .catch(error => console.error(error));
+      });
   
-      
-        setIsLoading(false);
+      if(!response.ok){
+        if(response.status === 400){
+          const errorData = await response.json();
+          throw new Error(`Bad Request: ${errorData.message}`);
+        }else if(response.status === 500){
+          throw new Error("Internal server error");
+        }else{
+          throw new Error("Error sending data");
+        }        
+      }
+  
+      setLoading(false);
     }catch (error){
       setErrorMessage("An error occured while booking the flight");
 
-      setIsLoading(false);
+      setLoading(false);
     }
        
   };
 
-  const getResponseClass = () => {
-    if (responseStatus === 1) 
-    {
-      return 'text-success'; // Green color for success
-    } 
-    else if (responseStatus === 0) 
-    {
-      return 'text-danger'; // Red color for error
-    } 
-    else 
-    {
-      return ''; // No specific styles (default)
-    }
-  };
+  //the seat modal  
 
-  return (
+   // Function to open the seat modal
+   const handleViewSeat = (passenger: passenger) => {
+     setShowSeatModal(true);
+     setSelectedPassenger(passenger);
+   };
+ 
+   // Function to close the seat modal
+   const handleCloseSeatModal = () => {
+     setShowSeatModal(false);
+   };
+
+   //function to handle flight selection
+   const handleFlightSelection = (flight: flight) => {
+    if(selectedFlight === null){
+      setSelectedFlight(flight);
+      newFlightId(flight.id);
+      setIsPlaneSelected(true)     
+    }else {
+      if(passengers.length > 0){
+        const confirmUpdate = window.confirm("Changing the flight will clear seats for all passengers. Do you want to continue");
+        if(confirmUpdate){
+          setSelectedFlight(flight);
+          newFlightId(flight.id);
+          setIsPlaneSelected(true)
+
+          // Clear seat data for every passenger
+          const updatedPassengers = passengers.map((passenger) => ({
+            ...passenger,
+            seat: {
+              seat_number: 0,
+              flight_class: { id: 0, name: '' },
+              location: { id: 0, name: '' },
+              is_available: false,
+              price: '',
+              _id: 0
+            }
+          }));
+
+          //update passenger data using context function
+          updatedPassengers.forEach((updatedPassenger, index: number) => {
+            updatePassenger(index, updatedPassenger);
+            updateSeat(index, {
+              seat_number: 0,
+              flight_class: { id: 0, name: '' },
+              location: { id: 0, name: '' },
+              is_available: false,
+              price: '',
+              _id: 0
+            });
+          });
+        }
+      }else{
+        setSelectedFlight(flight);
+        newFlightId(flight.id);
+        setIsPlaneSelected(true);
+      }
+      
+    }
+
+   };
+
+   //maintaining form state during navigation
+
+
+   return (
     <div>
       <MenuBar1 isAuthenticated={false}/>
       <br/>
@@ -508,34 +467,58 @@ export default function BookFlight() {
                 {emailError && <p className="text-danger">{emailError}</p>}
               </Form.Group>
 
-  
+              <Form.Group>
+                <Form.Label>Trip Type:</Form.Label>
+                <Form.Control
+                  as="select"
+                  id="trip-type"
+                  value={formData.tripType}
+                  onChange={(event) => handleTripType(event)}
+                  required
+                >
+                  <option value="">Select Trip Type</option>
+                  <option value="OneWay">One Way</option>
+                  <option value="Round">Round Trip</option>
+                </Form.Control>
+              </Form.Group>
+
               <Form.Group>
                 <Form.Label>Departure Date:</Form.Label>
                 <Form.Control
                   type="date"
                   id="departure-date"
-                  name="departureDate"
                   value={formData.departureDate}
-                  onChange={handleChange}
+                  onChange={(e) => setFormData({...formData, departureDate: e.target.value})}
                   required
                 />
               </Form.Group>
 
-              
+              {formData.tripType === "Round" && (
+                <Form.Group>
+                  <Form.Label>Return Date:</Form.Label>
+                  <Form.Control
+                    type="date"
+                    id="return-date"
+                    value={formData.returnDate}
+                    onChange={(e) => setFormData({...formData, returnDate: e.target.value})}
+                    required
+                  />
+                </Form.Group>
+              )}
+
               <Form.Group>
                 <Form.Label>From:</Form.Label>
-                {cities.length > 0 ? (
+                {locations.length > 0 ? (
                   <Form.Control
                     as="select"
                     id="from"
-                    name="selectedFrom"
-                    value={formData.selectedFrom}
-                    onChange={handleChange}
+                    value={formData.selectedFrom.name}
+                    onChange={(e) => handleFromChange(e.target.value)}
                     required
                   >
                     <option value="">Select Departure Location</option>
-                    {cities.map((option: City, index: number) => (
-                      <option key={index} value={option.id}>
+                    {locations.map((option: location, index: number) => (
+                      <option key={index} value={option.name}>
                         {option.name}
                       </option>
                     ))}
@@ -550,24 +533,30 @@ export default function BookFlight() {
 
               <Form.Group>
                 <Form.Label>To:</Form.Label>
-                {(cities.length > 0 && !isLoading) ? (
+                {filteredLocations.length > 0 || formData.selectedFrom.name !== "" ? (
                   <Form.Control
                     as="select"
                     id="to"
-                    name="selectedTo"
-                    value={formData.selectedTo}
-                    onChange={handleChange}
+                    value={formData.selectedTo.name}
+                    onChange={(e) => handleToChange(e.target.value)}
                     required
                   >
-                    <option value="">Select Destination</option>
-                    {cities.map((option: City, index: number) => (
-                      <option key={index} value={option.id}>
+                    <option value={formData.selectedFrom.name !== "" && filteredLocations.length === 0
+                        ? formData.selectedTo.name
+                        : ""}
+                        >{formData.selectedTo.name === "" ? "Select Destination": formData.selectedTo.name}
+                    </option>
+                    {filteredLocations.map((option: location, index: number) => (
+                      <option key={index} value={option.name}>
                         {option.name}
                       </option>
                     ))}
                   </Form.Control>
                 ) : (
-                  <LoadingComponent />
+                  <div className="d-flex align-items-center">
+                    <Spinner animation="border" variant="primary" size="sm" />
+                    <span className="ml-2">Loading Destinations...</span>
+                  </div>
                 )}
               </Form.Group>
 
@@ -593,10 +582,10 @@ export default function BookFlight() {
                             event.preventDefault(); // Prevent the default link behavior
                           } else {
                             handleAddPassengerClick();
-                            navigate('/addpassenger1');
+                            navigate('/addpassenger1', {state: {formData, selectedFlight}});
                           }
                         }}
-                        disabled={formData.flightId === 0}
+                        disabled={selectedFlight === null}
                         type="button"
                       >
                         Add Passenger
@@ -608,12 +597,13 @@ export default function BookFlight() {
 
               <hr/>
 
-
-              <div className='text-center'>
-                <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
-
-                <Button type="submit" variant="primary" className="mb-3">
-                  Book Now                   
+              <div className='d-flex justify-content-center'>
+                <Button type="submit" variant="primary" disabled={loading}>
+                  {loading ? (
+                    <Spinner animation='border' size='sm'/>
+                  ) : (
+                    "Book Now!"
+                  )}                    
                 </Button>
               </div>
               
@@ -621,11 +611,11 @@ export default function BookFlight() {
             </Col> 
 
                 {/* Display error message if there's an error */}
-              {errorMessage && <Alert variant="danger" className="text-center">{errorMessage}</Alert>}
+              {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
 
               <hr/>
           
-              {(passengers.length > 0) ? (
+              {passengers.length > 0 ? (
               <div style={{ maxHeight: '300px', overflowY: 'auto', scrollbarWidth: 'none'}}>
                 <style>
                   {`
@@ -653,7 +643,7 @@ export default function BookFlight() {
                     </tr>
                   </thead>
                   <tbody>
-                    {passengers.map((passenger: Passenger, index: number) => (
+                    {passengers.map((passenger: passenger, index: number) => (
                       <tr key={index}>
                         <td>{passenger.name}</td>
                         <td>{passenger.passport_number}</td>
@@ -695,27 +685,27 @@ export default function BookFlight() {
                 </Table>
               </div>
               ) : (
-                <p className="text-danger text-center mt-2"><b>You haven't added any passengers yet</b></p>
+                <p className="text-danger text-center mt-5"><b>You haven't added any passengers yet</b></p>
               )}
 
 
               {/* Render the Seat component */}
-              <PassengerSeat
+              <Seat
                 showSeatModal={showSeatModal}
                 handleCloseSeatModal={handleCloseSeatModal}
                 seatObject={selectedPassenger ? selectedPassenger.seat : {
-                                                                          seat_number: '',
+                                                                          seat_number: 0,
                                                                           flight_class: { id: 0, name: '' },
                                                                           location: { id: 0, name: '' },
                                                                           is_available: false,
-                                                                          price: 0,
-                                                                          id: 0}
+                                                                          price: '',
+                                                                          _id: 0}
                 }
               />
 
               <hr/>
 
-              {(flightTableData.length > 0 && !isLoading) ? (
+              {flightTableData.length > 0 ? (
                 <div>
                   <p className="text-primary text-center"><b>These are The Available Flights</b></p>
                   <hr/>
@@ -756,7 +746,8 @@ export default function BookFlight() {
                                   <Button                      
                                     variant="primary"
                                     type="button"
-                                    disabled={item.id !== flightData.flightId} // Disable if not selected
+                                    disabled={selectedFlight !== item} // Disable if not selected
+                                    active={!isPlaneSelected}
                                   >
                                     Select
                                   </Button>
@@ -770,11 +761,7 @@ export default function BookFlight() {
                   </Row>
                 </div>
                 ) : (
-                  <div className="text-center">
-                      {isLoading && <LoadingComponent/>}
-                      <Alert variant='warning' className="mt-2">No Flights Available</Alert>
-                      
-                  </div>
+                  <Alert variant='warning'>No Flights Available</Alert>
                 )}
         
         </Row>
@@ -782,5 +769,4 @@ export default function BookFlight() {
     </Container>
     </div>    
   ); 
-
-};
+}
