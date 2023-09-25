@@ -13,7 +13,7 @@ interface Plane {
 type Seat = {
     plane_id: number;
     seat_number: string;
-    price: number;
+    price: string;
     is_available: boolean;
     location_id: number;
     flight_class_id:number;

@@ -16,12 +16,12 @@ interface Location{
 }
 
 interface Seat{
-  id: number | 0;
+  seat_id: number | 0;
   seat_number: string;
   flight_class: FlightClass;
   location: Location;
   is_available: boolean;
-  price: 0;
+  price: "";
 }
 
 interface Passenger {
@@ -73,7 +73,7 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
         name: '',
       },
       is_available: false,
-      price: 0,
+      price: "",
     },
   });
 
@@ -226,7 +226,7 @@ const getResponseClass = () => {
   };
 
   //formating seat price to dollars
-  const formatPriceToDollars = (price: number) => {
+  const formatPriceToDollars = (price: string) => {
     // Assuming the price is stored as a number, format it as dollars
     const formattedPrice = new Intl.NumberFormat("en-US", {
       style: "currency",

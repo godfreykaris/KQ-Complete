@@ -25,7 +25,7 @@ interface location{
 }
 
 interface seat{
-  _id: number;
+ seat_id: number;
   seat_number: number;
   flight_class: flight_class | {id: 0, name: ''}; 
   location: location | {id: 0, name: ''};
@@ -44,7 +44,7 @@ interface passenger{
     location: {id: 0, name: ''},
     is_available: false,
     price: '',
-    _id: 0
+   seat_id: 0
   };
 }
 
@@ -410,7 +410,7 @@ export default function BookFlight() {
               location: { id: 0, name: '' },
               is_available: false,
               price: '',
-              _id: 0
+             seat_id: 0
             }
           }));
 
@@ -423,7 +423,7 @@ export default function BookFlight() {
               location: { id: 0, name: '' },
               is_available: false,
               price: '',
-              _id: 0
+             seat_id: 0
             });
           });
         }
@@ -699,7 +699,7 @@ export default function BookFlight() {
                                                                           location: { id: 0, name: '' },
                                                                           is_available: false,
                                                                           price: '',
-                                                                          _id: 0}
+                                                                         seat_id: 0}
                 }
               />
 

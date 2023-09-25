@@ -114,7 +114,19 @@ class BookingsController extends Controller
         {
             // Retrieve the booking
             $booking = Booking::where('booking_reference', $bookingReference)
-                        ->with('flight') // Eager load the flight relationship
+                        ->with([
+                            'flight',
+                            'passengers' => function ($query) {
+                                $query->select('id', 'booking_id', 'name', 'seat_id', 'identification_number', 'passport_number', 'date_of_birth')
+                                    ->with([
+                                        'seat:id,seat_number,price,is_available,flight_id,flight_class_id,location_id',
+                                        'seat.location:id,name',
+                                        'seat.plane:id,name',
+                                        'seat.flight:id,flight_number',
+                                        'seat.flightClass:id,name',
+                                    ]);
+                            },
+                        ])
                         ->first();
 
             //Make sure it is a valid booking
@@ -165,6 +177,7 @@ class BookingsController extends Controller
                         'created_at' => $booking->flight->created_at,
                         'updated_at' => $booking->flight->updated_at,
                     ],
+                    'passengers' => $booking->passengers,
                 ],
             ]);
 

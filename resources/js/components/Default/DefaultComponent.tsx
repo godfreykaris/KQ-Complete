@@ -108,8 +108,8 @@ const router = [
         flight_class: { id: 0, name: '' },
         location: { id: 0, name: '' },
         is_available: false,
-        price: 0,
-        id: 0,
+        price: '',
+        seat_id: 0,
       }}
       />
   },
@@ -130,9 +130,13 @@ const router = [
   {
       path: 'changebooking',
       element: (
-        <EditBookingProvider>
-            <ChangeBooking/>
-        </EditBookingProvider>
+        <SeatProvider>
+              <PassengerProvider>
+                <BookingProvider>
+                    <ChangeBooking/>
+                </BookingProvider>                                  
+              </PassengerProvider>             
+         </SeatProvider>
       )
   },
   {

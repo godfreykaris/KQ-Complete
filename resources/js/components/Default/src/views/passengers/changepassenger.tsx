@@ -22,12 +22,12 @@ interface Location{
 }
 
 interface Seat{
-  id: number | 0;
+  seat_id: number | 0;
   seat_number: string;
   flight_class: FlightClass;
   location: Location;
   is_available: boolean;
-  price: 0;
+  price: "";
 }
 
 interface Passenger {

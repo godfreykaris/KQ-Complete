@@ -21,7 +21,7 @@ type SeatLocation = {
 
 type Seat = {
   seat_number: string;
-  price: number;
+  price: string;
   is_available: boolean;
   location_id: number;
 };
@@ -31,7 +31,7 @@ const AddSeatForm = () => {
   
   const [formData, setFormData] = useState({
     seat_number: '',
-    price: 0,
+    price: "",
     is_available: false,      
     location_id: 0,
   });
@@ -146,7 +146,7 @@ const AddSeatForm = () => {
       {
         setFormData({
           seat_number: '',
-          price: 0,
+          price: "",
           is_available: false,
           location_id: 0,
         });
@@ -222,7 +222,7 @@ const AddSeatForm = () => {
         setFormData(
             {
               seat_number: '',
-              price: 0,
+              price: "",
               is_available: false,
               location_id: 0,
             }

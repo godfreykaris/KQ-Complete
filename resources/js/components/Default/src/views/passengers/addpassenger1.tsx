@@ -24,12 +24,12 @@ interface Location{
 }
 
 interface Seat{
-  id: number;
+  seat_id: number;
   seat_number: string;
   flight_class: FlightClass;
   location: Location;
   is_available: boolean;
-  price: number;
+  price: string;
 }
 
 interface Passenger{
@@ -42,8 +42,8 @@ interface Passenger{
     flight_class: {id: 0, name: ''},
     location: {id: 0, name: ''},
     is_available: false,
-    price: number,
-    id: number
+    price: string,
+    seat_id: number
   };
   index: number | null;
 }
@@ -58,8 +58,8 @@ const intitPassenger: Passenger = {
     flight_class: {id: 0, name: ''},
     location: {id: 0, name: ''},
     is_available: false,
-    price: 0,
-    id: 0
+    price: "",
+    seat_id: 0
   },
   index: null,
 }
@@ -152,10 +152,10 @@ export default function AddPassenger1() {
   //seat selection from the table
   const handleSeatSelection = (index: number) => {
     const selectedSeat = availableSeats[index];
-    setSelectedSeatId(selectedSeat.id);
+    setSelectedSeatId(selectedSeat.seat_id);
 
     const selectedSeatObject: Seat = {
-      id: selectedSeat.id,
+      seat_id: selectedSeat.seat_id,
       seat_number: selectedSeat.seat_number,
       flight_class: selectedSeat.flight_class,
       location: selectedSeat.location,

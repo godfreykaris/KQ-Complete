@@ -26,7 +26,7 @@ interface Location{
 
 interface Seat{
   id: number | 0;
-  seat_number: number;
+  seat_number: '';
   flight_class: FlightClass;
   location: Location;
   is_available: boolean;
