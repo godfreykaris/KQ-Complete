@@ -71,6 +71,10 @@ export default function AddPassenger1() {
   // Passenger Form State
   const [formData, setFormData] = useState<passenger>(intitPassenger);
 
+  //to store the form data and selected flight from the BookFlight component
+  const formDataFromBookFlight = location.state?.formData;
+  const selectedFlight = location.state?.selectedFlight;
+
   const [nameError, setNameError] = useState('');
   const [displaySeatTable, setDisplaySeatTable] = useState(false); // State to show/hide seat selection table
 
@@ -96,7 +100,6 @@ export default function AddPassenger1() {
       const { name, passport_number, identification_number, date_of_birth } = location.state.passenger;
       const index = location.state?.index;
 
-      const bookingData = location.state.fomData;
       const bookingDataFlight = location.state.flightData;
 
       // Create a new formData object
@@ -226,7 +229,7 @@ export default function AddPassenger1() {
       addPassenger(passengerToUpdate.index, passengerToUpdate);
     }
   
-    navigate(-1);
+    navigate('/bookflight', {state: {formData: formDataFromBookFlight, selectedFlight}});
 
   };
 
@@ -375,7 +378,7 @@ export default function AddPassenger1() {
           ) : (
             <div className="d-flex align-items-center">
               <Spinner animation="border" variant="primary" size="sm" />
-              <span className="text-primary ml-2">Loading seats...</span>
+              <span className="text-primary ml-2 text-center">Loading seats...</span>
             </div>
           )}
         </Container>
