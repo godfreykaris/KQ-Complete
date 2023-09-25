@@ -409,14 +409,8 @@ export default function BookFlight() {
       const sendData = {
         flight_id: flightData.flightId,
         email: formData.email,        
-<<<<<<< HEAD
-        passengers: selectedProperties,
-      }  
-      
-=======
         passengers: passengers,
       }
->>>>>>> origin/main
   
       setIsLoading(true);
   

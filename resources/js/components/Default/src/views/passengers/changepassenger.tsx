@@ -51,8 +51,6 @@ export default function ChangePassenger() {
   useEffect(() => {
     setBookingReference(formData.bookingReference);
     setTicketNumber(formData.ticketNumber);
-    alert(bookingReference);
-    alert(ticketNumber);
   }, [bookingReference, formData.bookingReference, ticketNumber, formData.ticketNumber]);
 
   const [passengers, setPassengers] = useState<Passenger[]>([]);
@@ -315,13 +313,14 @@ const getResponseClass = () => {
       <h2 className="text-primary text-center">Edit Passenger Details|</h2>
         <hr/>
         <Col md={6} className="mx-auto">
-        <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
 
         {isLoading ? (
           <LoadingComponent />
         ) :
         (
           <>
+            <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+
             <Form onSubmit={handleSubmit}>
               <Form.Group>
                 <Form.Label>Booking Reference:</Form.Label>

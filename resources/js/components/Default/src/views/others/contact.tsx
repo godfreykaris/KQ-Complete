@@ -93,12 +93,15 @@ const ContactUs = () => {
             />
           </Form.Group>
           <hr/>
-          <Button type="submit" variant="primary">
-            Submit
-          </Button>
+          <div className="text-center">
+            <Button type="submit" variant="primary">
+              Submit
+            </Button>
+          </div>
+          
         </Form>
 
-        <div className="mt-4">
+        <div className="mt-4 text-center">
           <p className="mb-1"><b>For inquiries via email:</b></p>
           <a href="mailto:info@kqairline.com" className="btn btn-info mr-3">
             Send Email

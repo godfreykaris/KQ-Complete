@@ -52,8 +52,13 @@ export default function EditBooking({
 
   // Update the state when bookingDataObject prop changes
   useEffect(() => {
+    alert(JSON.stringify(bookingDataObject));
     if(bookingDataObject)
+    {
       setEditedBooking(bookingDataObject);
+      setSelectedFrom(bookingDataObject.from.name);
+      setSelectedTo(bookingDataObject.to.name);
+    }
   }, [bookingDataObject]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -194,7 +199,6 @@ export default function EditBooking({
                   ))}
                 </select>
               </div>
-
               <br />
 
               <div className="d-flex justify-content-center">

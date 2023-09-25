@@ -147,7 +147,7 @@ Route::middleware('auth:api')->group(function () {
 });
 
 Route::get('/seats/{itemName}/{itemId}', [SeatsController::class, 'index'])->name('seats.item_seats');
-Route::get('/seats/{seatNumber}/{planeId}', [SeatsController::class, 'show'])->name('seats.show');
+Route::get('/seats/retrieve/{seatNumber}/{planeId}', [SeatsController::class, 'show'])->name('seats.show');
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/employees/add', [EmployeesController::class, 'store'])->name('employees.add');

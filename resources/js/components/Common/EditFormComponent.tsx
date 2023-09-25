@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import apiBaseUrl from '../../config';
+import LoadingComponent from './LoadingComponent';
 
 
 const EditFormComponent: React.FC = () => {
@@ -15,16 +16,21 @@ const EditFormComponent: React.FC = () => {
   const [responseMessage, setResponseMessage] = useState<string>('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
+  const [isLoading, setIsLoading] = useState(true);
+
+
   const navigate = useNavigate();
 
   useEffect(() => {
     if (itemName) {
       fetchData(itemName);
     }
-  }, [itemName]);
+  }, []);
 
   const fetchData = async (itemName: string) => {
     try {
+
+      setIsLoading(true);
 
       let url = `${apiBaseUrl}/${selectedEntity}`;
 
@@ -63,10 +69,12 @@ const EditFormComponent: React.FC = () => {
         setItemId(data.item.id);
       }
       
+      setIsLoading(false);
     } 
     catch (error) 
     {
       console.error('Error fetching data:', error);
+      setIsLoading(false);
     }
   };
 
@@ -75,6 +83,8 @@ const EditFormComponent: React.FC = () => {
 
     if (itemName && (selectedEntity  ||  itemCountry || itemCode) ) 
     {
+      setIsLoading(true);
+      
       try 
       {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
@@ -133,12 +143,17 @@ const EditFormComponent: React.FC = () => {
            setResponseMessage(`Error: ${response.statusText}`);
          }
 
+         setIsLoading(false);
+
       }
       catch (error) 
       {
         setResponseStatus(0); // Error
         setResponseMessage('Error submitting data: An error occurred');
         console.error('Error submitting data:', error);
+
+        setIsLoading(false);
+
       }
     }
   };
@@ -160,63 +175,70 @@ const EditFormComponent: React.FC = () => {
 
   return (
     <div className="col-sm-12 col-md-9 col-lg-6">
-      <h2>Edit Item</h2>
-      <form onSubmit={handleSaveChanges}>
-        
-        {(selectedEntity) && (
-          <div>
-            <div className="form-group">
-              <label htmlFor="inputName">Name</label>
-              <input
-                type="text"
-                id="inputName"
-                className="form-control"
-                value={itemName}
-                onChange={(e) => setItemName(e.target.value)}
-                placeholder="Enter name"
-                required
-              />
-            </div>
-            {itemCountry && (
-                <div className="form-group">
-                  <label htmlFor="inputCountry">Country</label>
-                  <input
-                    type="text"
-                    id="inputCountry"
-                    className="form-control"
-                    value={itemCountry}
-                    onChange={(e) => setItemCountry(e.target.value)}
-                    placeholder="Enter Country"
-                    required
-                  />
-                </div>
-              )}
+      <h2 className="text-center">Edit Item</h2>
+      {isLoading ? (
+        /**Show loading */
+        <LoadingComponent />
+      ) : (
+        <>
+          <form onSubmit={handleSaveChanges}>
 
-            {itemCode && (
+            {(selectedEntity) && (
+              <div>
                 <div className="form-group">
-                  <label htmlFor="inputCode">Code</label>
+                  <label htmlFor="inputName">Name</label>
                   <input
                     type="text"
-                    id="inputCode"
+                    id="inputName"
                     className="form-control"
-                    value={itemCode}
-                    onChange={(e) => setItemCode(e.target.value)}
-                    placeholder="Enter Code"
+                    value={itemName}
+                    onChange={(e) => setItemName(e.target.value)}
+                    placeholder="Enter name"
                     required
                   />
                 </div>
-              )}         
-            
-              
-          </div>
-        )}
-        <div className="text-center mt-3">
-          <button type="submit" className="btn btn-primary">
-            Save Changes
-          </button>
-        </div>
-      </form>
-      <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+                {itemCountry && (
+                    <div className="form-group">
+                      <label htmlFor="inputCountry">Country</label>
+                      <input
+                        type="text"
+                        id="inputCountry"
+                        className="form-control"
+                        value={itemCountry}
+                        onChange={(e) => setItemCountry(e.target.value)}
+                        placeholder="Enter Country"
+                        required
+                      />
+                    </div>
+                  )}
+
+                {itemCode && (
+                    <div className="form-group">
+                      <label htmlFor="inputCode">Code</label>
+                      <input
+                        type="text"
+                        id="inputCode"
+                        className="form-control"
+                        value={itemCode}
+                        onChange={(e) => setItemCode(e.target.value)}
+                        placeholder="Enter Code"
+                        required
+                      />
+                    </div>
+                  )}         
+
+
+              </div>
+            )}
+            <div className="text-center mt-3">
+              <button type="submit" className="btn btn-primary">
+                Save Changes
+              </button>
+            </div>
+          </form>
+          <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+        </>
+      )}
     </div>
   );
 };

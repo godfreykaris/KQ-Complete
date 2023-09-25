@@ -113,7 +113,9 @@ class BookingsController extends Controller
         try 
         {
             // Retrieve the booking
-            $booking = Booking::where('booking_reference', $bookingReference)->first();
+            $booking = Booking::where('booking_reference', $bookingReference)
+                        ->with('flight') // Eager load the flight relationship
+                        ->first();
 
             //Make sure it is a valid booking
             if (!$booking) 
@@ -132,9 +134,39 @@ class BookingsController extends Controller
                 return response()->json(['error' => 'No ticket matches the booking reference and ticket number.', 'status' => 0]);
             }
 
-            
-            // Return a success response
-            return response()->json(['success' => 'Booking found.', 'status' => 1, 'booking' => $booking]);
+            // Fetch the "from" and "to" city objects based on flight data
+        $fromCity = City::find($booking->flight->departure_city_id);
+        $toCity = City::find($booking->flight->arrival_city_id);
+
+        // Return a success response with the booking, flight, and city objects
+        return response()->json([
+                'success' => 'Booking found.',
+                'status' => 1,
+                'booking' => [
+                    'id' => $booking->id,
+                    'user_id' => $booking->user_id,
+                    'flight_id' => $booking->flight_id,
+                    'email' => $booking->email,
+                    'booking_reference' => $booking->booking_reference,
+                    'booking_date' => $booking->booking_date,
+                    'created_at' => $booking->created_at,
+                    'updated_at' => $booking->updated_at,
+                    'flight' => [
+                        'id' => $booking->flight->id,
+                        'flight_number' => $booking->flight->flight_number,
+                        'departure_time' => $booking->flight->departure_time,
+                        'arrival_time' => $booking->flight->arrival_time,
+                        'return_time' => $booking->flight->return_time,
+                        'duration' => $booking->flight->duration,
+                        'is_international' => $booking->flight->is_international,
+                        'flight_status_id' => $booking->flight->flight_status_id,
+                        'departure_city' => $fromCity, // Include the "from" city object
+                        'arrival_city' => $toCity, // Include the "to" city object
+                        'created_at' => $booking->flight->created_at,
+                        'updated_at' => $booking->flight->updated_at,
+                    ],
+                ],
+            ]);
 
         } 
         catch (\Exception $e) 

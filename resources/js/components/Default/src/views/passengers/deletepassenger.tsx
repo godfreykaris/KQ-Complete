@@ -4,6 +4,7 @@ import MenuBar1 from '../../components/menubars/menubar1';
 import { useNavigate } from 'react-router-dom';
 import LoadingComponent from '../../../../Common/LoadingComponent';
 import apiBaseUrl from '../../../../../config';
+import MenuBar2 from '../../components/menubars/menubar2';
 
 interface Passenger {
   name: string;
@@ -245,10 +246,15 @@ export default function AddPassenger() {
 
   return (
     <div>
-      <MenuBar1 isAuthenticated={false} />
+      <MenuBar1 isAuthenticated={false}/>
+      <br/>
+      <br/>
+      <br/>
+      <MenuBar2/>
+
       <Container className="d-flex justify-content-center align-items-center" style={{ marginTop: '20vh', marginBottom: '20px', height: '100vh', position: 'relative' }}>
       <Container fluid>
-      <h2 className="text-primary text-center"><b>Add Passenger|</b></h2>
+      <h2 className="text-primary text-center"><b>Delete Passenger|</b></h2>
         <hr />
         <Col md={6} className="mx-auto">
         {isLoading ? (

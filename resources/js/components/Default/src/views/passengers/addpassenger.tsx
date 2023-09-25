@@ -4,6 +4,7 @@ import MenuBar1 from '../../components/menubars/menubar1';
 import { useNavigate } from 'react-router-dom';
 import LoadingComponent from '../../../../Common/LoadingComponent';
 import apiBaseUrl from '../../../../../config';
+import MenuBar2 from '../../components/menubars/menubar2';
 
 interface Passenger {
   name: string;
@@ -213,6 +214,12 @@ export default function AddPassenger() {
       seat_id: selectedSeat ? selectedSeat.id : 0 ,
     };
     
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+
+    setIsLoading(true);
 
     try {
 
@@ -245,10 +252,7 @@ export default function AddPassenger() {
           {
             setResponseStatus(1); // Success
             setResponseMessage(`Success: ${data.success}.`);
-            window.scrollTo({
-              top: 0,
-              behavior: 'smooth',
-            });
+            
           } 
           else 
           {
@@ -336,7 +340,12 @@ export default function AddPassenger() {
 
   return (
     <div>
-      <MenuBar1 isAuthenticated={false} />
+      <MenuBar1 isAuthenticated={false}/>
+      <br/>
+      <br/>
+      <br/>
+      <MenuBar2/>
+      
       <Container className="d-flex justify-content-center align-items-center" style={{ marginTop: '20vh', marginBottom: '20px', height: '100vh', position: 'relative' }}>
       <Container fluid>
       <h2 className="text-primary text-center"><b>Add Passenger|</b></h2>
