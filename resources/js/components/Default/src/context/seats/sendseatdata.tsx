@@ -11,7 +11,7 @@ interface location{
 }
 
 interface seat{
-  _id: number;
+  seat_id: number;
   seat_number: number;
   flight_class: flight_class | {id: 0, name: ''};
   location: location | {id: 0, name: ''};

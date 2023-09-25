@@ -11,7 +11,7 @@ interface location{
 }
 
 interface seat{
-  _id: number;
+  seat_id: number;
   seat_number: number;
   flight_class: flight_class | {id: 0, name: ''};
   location: location;
@@ -30,18 +30,19 @@ interface passenger{
     location: {id: 0, name: ''},
     is_available: false,
     price: '',
-    _id: 0
+    seat_id: 0
   };
+  seat_id: number
   index: number | null;
 }
 
 interface PassengerContextType {
-  flightId: number | 0;
+  flight_id: number | 0;
   passengers: passenger[];
   addPassenger: (index: number, passengerData: passenger) => void;
   updatePassenger: (index: number, passengerData: passenger) => void;
   removePassenger: (index: number) => void;
-  newFlightId: (flightId: number) => void;
+  newFlightId: (flight_id: number) => void;
 }
 
 interface passengerProviderProps {
@@ -52,12 +53,13 @@ const PassengerContext = createContext<PassengerContextType | undefined>(undefin
 
 export default function PassengerProvider({ children }: passengerProviderProps) {
   const [passengers, setPassengers] = useState<passenger[]>([]);
-  const [flightId, setFlightId] = useState<number | 0>(0); // Fix the variable name here
+  const [flight_id, setFlightId] = useState<number | 0>(0); // Fix the variable name here
 
   const addPassenger = (index: number, passengerData: passenger) => {
     const newPassenger = {
       ...passengerData,
       seat: passengerData.seat,
+      seat_id: passengerData.seat_id,
       index: index,
     };
     setPassengers([...passengers, newPassenger]);
@@ -73,12 +75,12 @@ export default function PassengerProvider({ children }: passengerProviderProps) 
     setPassengers((prevPassengers) => prevPassengers.filter((_, i) => i !== index));
   };
 
-  const newFlightId = (flightId: number) => {
-    setFlightId(flightId);
+  const newFlightId = (flight_id: number) => {
+    setFlightId(flight_id);
   };
 
   return (
-    <PassengerContext.Provider value={{ flightId, passengers, addPassenger, removePassenger, updatePassenger, newFlightId }}>
+    <PassengerContext.Provider value={{ flight_id, passengers, addPassenger, removePassenger, updatePassenger, newFlightId }}>
       {children}
     </PassengerContext.Provider>
   );

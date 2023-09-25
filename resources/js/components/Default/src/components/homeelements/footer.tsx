@@ -14,11 +14,11 @@ export default function Footer() {
             <hr/>
             <h5>Information</h5>
             <hr/>
-            <ul className="footer-links list-unstyled">
-              <li><a href='/about' className="text-primary">About Us</a></li>
-              <li><a href='#' className="text-primary">Refunds</a></li>
-              <li><a href='#' className="text-primary">KQ-Cargo</a></li>
-              <li><a href='#' className="text-primary">FAQs</a></li>
+            <ul className="footer-links list-unstyled" style={{textDecoration: 'none'}}>
+              <li><a href='/about' className="text-primary" style={{textDecoration: 'none'}}>About Us</a></li>
+              <li><a href='#' className="text-primary" style={{textDecoration: 'none'}}>Refunds</a></li>
+              <li><a href='#' className="text-primary" style={{textDecoration: 'none'}}>KQ-Cargo</a></li>
+              <li><a href='#' className="text-primary" style={{textDecoration: 'none'}}>FAQs</a></li>
             </ul>
           </Col>
           
@@ -28,8 +28,8 @@ export default function Footer() {
             <h5>Contact Us</h5>
             <hr/>
             <ul className='list-unstyled '>
-              <li>Email: <a href="mailto:info@example.com" className="text-primary">info@example.com</a></li>
-              <li>Phone: <a href="tel:022341234" className="text-primary">022341234</a></li>
+              <li>Email: <a href="mailto:info@example.com" className="text-primary" style={{textDecoration: 'none'}}>info@example.com</a></li>
+              <li>Phone: <a href="tel:022341234" className="text-primary" style={{textDecoration: 'none'}}>022341234</a></li>
               <p className="text-white">Address: 123 Main Street, Nairobi, Kenya</p>
             </ul>
           </Col>
@@ -39,10 +39,10 @@ export default function Footer() {
             <h5>Quick Links</h5>
             <hr/>
             <ul className="footer-links list-unstyled">
-              <li><a href="/" className="text-primary">Home</a></li>
-              <li><a href="/searchflight" className="text-primary">Flights</a></li>
-              <li><a href="/bookflight" className="text-primary">Booking</a></li>
-              <li><a href="/viewopenings" className="text-primary">View Openings</a></li>
+              <li><a href="/" className="text-primary" style={{textDecoration: 'none'}}>Home</a></li>
+              <li><a href="/searchflight" className="text-primary" style={{textDecoration: 'none'}}>Flights</a></li>
+              <li><a href="/bookflight" className="text-primary" style={{textDecoration: 'none'}}>Booking</a></li>
+              <li><a href="/viewopenings" className="text-primary" style={{textDecoration: 'none'}}>View Openings</a></li>
             </ul>
           </Col>
           {/* Follow Us group */}

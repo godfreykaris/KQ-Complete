@@ -51,8 +51,6 @@ export default function ChangePassenger() {
   useEffect(() => {
     setBookingReference(formData.bookingReference);
     setTicketNumber(formData.ticketNumber);
-    alert(bookingReference);
-    alert(ticketNumber);
   }, [bookingReference, formData.bookingReference, ticketNumber, formData.ticketNumber]);
 
   const [passengers, setPassengers] = useState<Passenger[]>([]);

@@ -20,7 +20,7 @@ interface location{
 }
 
 interface seat{
-  _id: number;
+  seat_id: number;
   seat_number: number;
   flight_class: flight_class;
   location: location;
@@ -39,8 +39,9 @@ interface passenger{
     location: {id: 0, name: ''},
     is_available: false,
     price: '',
-    _id: 0
+    seat_id: 0
   };
+  seat_id: number,
   index: number | null;
 }
 
@@ -55,8 +56,9 @@ const intitPassenger: passenger = {
     location: {id: 0, name: ''},
     is_available: false,
     price: '',
-    _id: 0
+    seat_id: 0
   },
+  seat_id: 0,
   index: null,
 }
 
@@ -81,7 +83,7 @@ export default function AddPassenger1() {
   const [index, setIndex] = useState(null);
 
   // Passengers Context
-  const { flightId, passengers, addPassenger, updatePassenger } = usePassengerContext() as PassengerContextType;
+  const { flight_id, passengers, addPassenger, updatePassenger } = usePassengerContext() as PassengerContextType;
   const [passengerIndex, setPassengerIndex] = useState<number | null>(null);
 
   // Seat Selection State
@@ -97,10 +99,8 @@ export default function AddPassenger1() {
     if (location.state?.passenger) {
       // Update form fields with the data
       setPageHead("Edit Passenger|");
-      const { name, passport_number, identification_number, date_of_birth } = location.state.passenger;
+      const { name, passport_number, identification_number, date_of_birth, seat_id } = location.state.passenger;
       const index = location.state?.index;
-
-      const bookingDataFlight = location.state.flightData;
 
       // Create a new formData object
     const updatedFormData: passenger = {
@@ -109,6 +109,7 @@ export default function AddPassenger1() {
       passport_number,
       identification_number,
       date_of_birth,
+      seat_id,
       ...(index !== undefined ? { index: index } : {}), // Only include index if it's defined
     };
 
@@ -124,7 +125,7 @@ export default function AddPassenger1() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${apiBaseUrl}/seats/flight/${flightId}`);
+        const response = await fetch(`${apiBaseUrl}/seats/flight/${flight_id}`);
         if (!response.ok) {
           throw new Error('Network response was not ok.');
         }
@@ -146,7 +147,7 @@ export default function AddPassenger1() {
     setSelectedSeatId(selectedSeat.seat_number);
 
     const selectedSeatObject: seat = {
-      _id: selectedSeat._id,
+      seat_id: selectedSeat?.id,
       seat_number: selectedSeat.seat_number,
       flight_class: selectedSeat.flight_class,
       location: selectedSeat.location,
@@ -157,6 +158,7 @@ export default function AddPassenger1() {
     setFormData((prevData) => ({
       ...prevData,
       seat: selectedSeatObject,
+      seat_id: selectedSeatObject.seat_id,
     }))
 
     // Update the passenger's seat using the selectedPassengerIndex
