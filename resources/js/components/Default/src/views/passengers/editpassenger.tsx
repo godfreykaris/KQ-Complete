@@ -28,8 +28,8 @@ interface Passenger {
   id: number;
   passenger_id: string;
   name: string;
-  passport_number: string;
-  identification_number: string;
+  passport_number: number;
+  identification_number: number;
   date_of_birth: string;
   seat: Seat;
 }
@@ -225,16 +225,24 @@ const getResponseClass = () => {
       handleResubmission(editedPassenger);
   };
 
-  //formating seat price to dollars
   const formatPriceToDollars = (price: string) => {
-    // Assuming the price is stored as a number, format it as dollars
+    // Parse the string price into a number
+    const numericPrice = parseFloat(price);
+  
+    if (isNaN(numericPrice)) {
+      // Handle the case where the input is not a valid number
+      return "Invalid Price";
+    }
+  
+    // Format the numeric price as dollars
     const formattedPrice = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
-    }).format(price);
-
+    }).format(numericPrice);
+  
     return formattedPrice;
   };
+  
 
 
   return (

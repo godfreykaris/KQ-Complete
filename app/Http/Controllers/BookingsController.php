@@ -23,7 +23,7 @@ use Illuminate\Mail\Message;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 
 use App\Http\Controllers\PayPalController;
-
+use App\Models\Airline;
 
 class BookingsController extends Controller
 {
@@ -149,6 +149,7 @@ class BookingsController extends Controller
             // Fetch the "from" and "to" city objects based on flight data
         $fromCity = City::find($booking->flight->departure_city_id);
         $toCity = City::find($booking->flight->arrival_city_id);
+        $airline = Airline::find($booking->flight->airline_id);
 
         // Return a success response with the booking, flight, and city objects
         return response()->json([
@@ -174,6 +175,7 @@ class BookingsController extends Controller
                         'flight_status_id' => $booking->flight->flight_status_id,
                         'departure_city' => $fromCity, // Include the "from" city object
                         'arrival_city' => $toCity, // Include the "to" city object
+                        'airline' => $airline,
                         'created_at' => $booking->flight->created_at,
                         'updated_at' => $booking->flight->updated_at,
                     ],

@@ -11,6 +11,7 @@ import MenuBar2 from '../../components/menubars/menubar2';
 import apiBaseUrl from '../../../../../config';
 import { useBookingContext } from '../../context/BookingContext';
 import LoadingComponent from '../../../../Common/LoadingComponent';
+import { BookingContextType } from '../../context/booking/bookflightcontext';
 
 interface FlightClass{
   id: number;
@@ -24,6 +25,15 @@ interface Location{
 
 interface seat{
   seat_id: number;
+  seat_number: string;
+  flight_class: FlightClass;
+  location: Location;
+  is_available: boolean;
+  price: string;
+}
+
+interface seat1{
+  id: number;
   seat_number: string;
   flight_class: FlightClass;
   location: Location;
@@ -48,7 +58,7 @@ interface Passenger{
   index: number | null;
 }
 
-const intitPassenger: Passenger = {
+const initPassenger: Passenger = {
   name: '',
   passport_number: 0,
   identification_number: 0,
@@ -74,7 +84,7 @@ export default function AddPassenger1() {
   const { updateSeat } = useSeatContext() as SeatContextType;
 
   // Passenger Form State
-  const [formData, setFormData] = useState<Passenger>(intitPassenger);
+  const [formData, setFormData] = useState<Passenger>(initPassenger);
 
   //to store the form data and selected flight from the BookFlight component
   const formDataFromBookFlight = location.state?.formData;
@@ -91,10 +101,18 @@ export default function AddPassenger1() {
   const { flight_id, passengers, addPassenger, updatePassenger } = usePassengerContext() as PassengerContextType;
   const [passengerIndex, setPassengerIndex] = useState<number | null>(null);
 
+  const {isBookingValid} = useBookingContext() as BookingContextType;
+
+
+  const tableContainerRef = useRef<HTMLDivElement | null>(null);
+
   // Seat Selection State
-  const [availableSeats, setAvailableSeats] = useState<seat[] | []>([]);
+  const [availableSeats, setAvailableSeats] = useState<seat1[] | []>([]);
   const [error, setError] = useState("");
   const [selectedSeatId, setSelectedSeatId] = useState<number>(0);
+  const [selectedSeatNumber, setSelectedSeatNumber] = useState<string>('');
+  const [backTo, setBackTo] = useState<string>('');
+
 
   const [pageHead, setPageHead] = useState("Add Passenger|");
 
@@ -105,7 +123,7 @@ export default function AddPassenger1() {
     if (location.state?.passenger) {
       // Update form fields with the data
       setPageHead("Edit Passenger|");
-      const { name, passport_number, identification_number, date_of_birth, seat_id } = location.state.passenger;
+      const { name, passport_number, identification_number, date_of_birth, seat_id, seat } = location.state.passenger;
       const index = location.state?.index;
 
       // Create a new formData object
@@ -116,11 +134,16 @@ export default function AddPassenger1() {
       identification_number,
       date_of_birth,
       seat_id,
+      seat,
       ...(index !== undefined ? { index: index } : {}), // Only include index if it's defined
     };
 
-      
       setFormData(updatedFormData);
+
+      setSelectedSeatId(location.state.passenger.seat.seat_id);
+      setSelectedSeatNumber(location.state.passenger.seat.seat_number);
+
+      setBackTo(location.state.backTo);
 
       if (index !== undefined) {
         setIndex(index);
@@ -148,13 +171,20 @@ export default function AddPassenger1() {
   }, []);
 
 
+  const showSeatsTable = () => {
+    setDisplaySeatTable(true);
+    tableContainerRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }
+
   //seat selection from the table
   const handleSeatSelection = (index: number) => {
     const selectedSeat = availableSeats[index];
-    setSelectedSeatId(selectedSeat.seat_id);
+    setSelectedSeatId(selectedSeat.id);
+    setSelectedSeatNumber(selectedSeat.seat_number);
+
 
     const selectedSeatObject: seat = {
-      seat_id: selectedSeat?.seat_id,
+      seat_id: selectedSeat?.id,
       seat_number: selectedSeat.seat_number,
       flight_class: selectedSeat.flight_class,
       location: selectedSeat.location,
@@ -177,7 +207,7 @@ export default function AddPassenger1() {
       updatePassenger(passengerIndex, updatedPassengers[passengerIndex]);
     }      
 
-    updateSeat(index, selectedSeat);
+    updateSeat(index, selectedSeatObject);
 
     setDisplaySeatTable(false); // Hide the seat selection table after seat selection
   };
@@ -205,14 +235,8 @@ export default function AddPassenger1() {
 
   //handle Select Seat
   const handleButtonClick = () => {
-    // Add your seat selection logic here
-    setDisplaySeatTable(true); // Show the seat selection table
-
-    //scroll to the table
-    const tableSection = document.getElementById("seatTable");
-    if(tableSection){
-      tableSection.scrollIntoView({behavior: "smooth"});
-    }
+    
+    showSeatsTable();
     //set selected passenger index
     setPassengerIndex(index);
 
@@ -243,7 +267,7 @@ export default function AddPassenger1() {
       addPassenger(passengerToUpdate.index, passengerToUpdate);
     }
   
-    navigate('/bookflight', {state: {formData: formDataFromBookFlight, selectedFlight}});
+    navigate(`/${backTo}`, {state: {formData: formDataFromBookFlight, selectedFlight, isBookingValid}});
 
   };
 
@@ -344,17 +368,28 @@ export default function AddPassenger1() {
                       </Button>
                     )}
                 </div>
-
-                
-              </Form>
-            </Col>
+             </Form>
+            </Col>            
           </Row>
+          {/* Show the success alert when a seat is selected */}
+          {selectedSeatId != 0 && (
+              <Row>
+                  <Col>
+                    <Alert variant="success" className="text-center mt-2">
+                      Seat {selectedSeatNumber} has been selected successfully!
+                    </Alert>
+                  </Col>
+              </Row>
+          )}
+         
+                
+            
         </Container>      
       </Container>
 
       {/* Display seat selection table when Select Seat button is clicked */}
       {displaySeatTable && (
-        <Container className="mt-0">
+        <Container ref={tableContainerRef} className="mt-0">
           {error ? (
             <Alert variant="danger">{error}</Alert>
           ) : availableSeats.length > 0 ? (
@@ -370,7 +405,7 @@ export default function AddPassenger1() {
                 </tr>
               </thead>
               <tbody>
-                {availableSeats.map((availableSeat: seat, index: number) => (
+                {availableSeats.map((availableSeat: seat1, index: number) => (
                   <tr key={index}>
                     <td>{availableSeat.seat_number}</td>
                     <td>{availableSeat.location.name}</td>
@@ -397,12 +432,6 @@ export default function AddPassenger1() {
         </Container>
       )}
 
-      {/* Show the success alert when a seat is selected */}
-      {selectedSeatId && (
-        <Alert variant="success" className="text-center">
-          Seat {selectedSeatId} has been selected successfully!
-        </Alert>
-      )}
     </div>
   );
 }

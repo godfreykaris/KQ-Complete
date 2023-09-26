@@ -49,9 +49,11 @@ const router = [
       element: (
           <SeatProvider>
               <PassengerProvider>
-                <BookingContextProvider>
+                <BookingProvider>
+                  <BookingContextProvider>
                     <BookFlight />
-                </BookingContextProvider>                                  
+                  </BookingContextProvider>
+                </BookingProvider>                                  
               </PassengerProvider>             
          </SeatProvider>
       )        
@@ -82,7 +84,9 @@ const router = [
           <SeatProvider>
               <PassengerProvider>
                 <BookingContextProvider>
+                  <BookingProvider>
                     <AddPassenger1/>
+                  </BookingProvider>
                 </BookingContextProvider>
               </PassengerProvider>
           </SeatProvider>
@@ -133,7 +137,9 @@ const router = [
         <SeatProvider>
               <PassengerProvider>
                 <BookingProvider>
+                  <BookingContextProvider>
                     <ChangeBooking/>
+                  </BookingContextProvider>
                 </BookingProvider>                                  
               </PassengerProvider>             
          </SeatProvider>

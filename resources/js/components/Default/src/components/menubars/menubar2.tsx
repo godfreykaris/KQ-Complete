@@ -5,30 +5,6 @@ import './menubar2.css';
 import { Navbar, Nav, NavDropdown, Container } from 'react-bootstrap';
 
 const menuItems = [
-<<<<<<< HEAD
-  {
-    label: 'Booking',
-    link: '/booking',
-    dropdown: true,
-    items: [
-      { label: 'Book Flight', link: '/bookflight' },
-      { label: 'Change Booking', link: '/changebooking' },
-      { label: 'Delete Booking', link: '/deletebooking' },
-    ],
-  },
-  {
-    label: 'Passengers',
-    link: '/passengers',
-    dropdown: true,
-    items: [
-      { label: 'Add Passenger', link: '/addpassenger' },
-      { label: 'Change Passenger', link: '/changepassenger' },
-      { label: 'Delete Passenger', link: '/deletepassenger' },
-    ],
-  },
-  { label: 'Inquiry', link: '/inquiries' },
-  { label: 'Print Ticket', link: '/printticket' },
-=======
   { label: 'Booking', link: '/booking', dropdown: true, items: [
     { label: 'Book Flight', link: '/bookflight' },
     { label: 'Change Booking', link: '/changebooking' },
@@ -43,7 +19,6 @@ const menuItems = [
   { label: 'Inquiry', link: '/inquiries'},
 
   {label: 'Print Ticket', link:'/printticket'},
->>>>>>> origin/bigg-S
 ];
 
 export default function MenuBar2() {

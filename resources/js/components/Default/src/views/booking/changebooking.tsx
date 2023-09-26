@@ -101,7 +101,6 @@ export default function BookFlight() {
   const [errorMessage, setErrorMessage] = useState("");
   const [emailError, setEmailError] = useState("");
 
-  const [isBookingValid, setIsBookingValid] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
  
   // State to manage the seat modal
@@ -112,11 +111,11 @@ export default function BookFlight() {
   const {state} = location;
 
   // Access the "passengers" array from the context using the usePassengerContext hook
-  const {flightId, setFlightId, passengers, setPassengers, removePassenger, updatePassenger, newFlightId} = usePassengerContext() as PassengerContextType;
+  const {flight_id, setFlightId, passengers, setPassengers, removePassenger, updatePassenger, newFlightId} = usePassengerContext() as PassengerContextType;
   const [selectedPassenger, setSelectedPassenger] = useState<passenger | undefined>(undefined);
 
   //to store values
-  const {formData, setFormData, flightTableData, setFlightTableData, selectedFlight, setSelectedFlight, isPlaneSelected, setIsPlaneSelected} = useBookingContext() as BookingContextType;
+  const {formData, setFormData, flightTableData, setFlightTableData, selectedFlight, setSelectedFlight, isBookingValid, setIsBookingValid} = useBookingContext() as BookingContextType;
 
   //access seats from seat context
   const {updateSeat} = useSeatContext() as SeatContextType;
@@ -143,6 +142,7 @@ export default function BookFlight() {
       const selectedFlightBack = location.state?.selectedFlight;
 
       setSelectedFlight(selectedFlightBack);
+      alert(JSON.stringify(selectedFlight));
       setFormData(formDataBack);
     }
   }, [location.state]);
@@ -154,8 +154,9 @@ export default function BookFlight() {
   };
 
   //to edit passenger when the edit button is clicked
-  const handleEditPassenger = (passenger: passenger, index: number) => {   
-    navigate2('/addpassenger1', {state: {passenger, index}});
+  const handleEditPassenger = (passenger: passenger, index: number) => {  
+    const backTo = "changebooking";
+    navigate2('/addpassenger1', {state: {passenger, index, backTo}});
   };  
 
   // Format date imported from AddPassenger1
@@ -526,7 +527,7 @@ export default function BookFlight() {
       
       //data to be sent
       const sendData = {
-        flightId: flightId,
+        flightId: flight_id,
         email: formData.email,        
         passengers: passengers,
       }
@@ -582,14 +583,12 @@ export default function BookFlight() {
     if(selectedFlight === null){
       setSelectedFlight(flight);
       newFlightId(flight.id);
-      setIsPlaneSelected(true)     
     }else {
       if(passengers.length > 0){
         const confirmUpdate = window.confirm("Changing the flight will clear seats for all passengers. Do you want to continue");
         if(confirmUpdate){
           setSelectedFlight(flight);
           newFlightId(flight.id);
-          setIsPlaneSelected(true)
 
           // Clear seat data for every passenger
           const updatedPassengers = passengers.map((passenger) => ({
@@ -620,10 +619,14 @@ export default function BookFlight() {
       }else{
         setSelectedFlight(flight);
         newFlightId(flight.id);
-        setIsPlaneSelected(true);
       }
       
     }
+
+    if(selectedFlight)
+      {
+        setFormData({...formData, departureDate: formatDateToYYYYMMDD(selectedFlight.departure_time), selectedFrom: {id: selectedFlight.departure_city.id, name: selectedFlight.departure_city.name,  country: selectedFlight.departure_city.country}, selectedTo: {id: selectedFlight.arrival_city.id, name: selectedFlight.arrival_city.name, country: selectedFlight.arrival_city.country} });
+      }
 
    };
 
@@ -948,6 +951,8 @@ export default function BookFlight() {
 
               <hr/>
 
+              {selectedFlight !== null ? <Alert variant='success text-center'>Flight {selectedFlight.flight_number}, {selectedFlight.airline.name} selected</Alert> : <Alert variant='warning text-center'>You haven't selected any flight</Alert>}
+
               {flightTableData && flightTableData.length > 0 ? (
                 <div>
                   <p className="text-primary text-center"><b>These are The Available Flights</b></p>
@@ -972,7 +977,7 @@ export default function BookFlight() {
                           <tbody>
                             {flightTableData.map((item, index) => (
                               <tr
-                                className={flightId == item.id ? "selected-row" : ""}
+                                className={flight_id == item.id ? "selected-row" : ""}
                                 style={{cursor: "pointer"}}
                                 key={index}
                                 onClick={() => handleFlightSelection(item)}
@@ -989,8 +994,8 @@ export default function BookFlight() {
                                   <Button                      
                                     variant="primary"
                                     type="button"
-                                    disabled={flightId != item.id} // Disable if not selected
-                                    active={flightId == item.id}
+                                    disabled={flight_id != item.id} // Disable if not selected
+                                    active={flight_id == item.id}
                                   >
                                     Select
                                   </Button>

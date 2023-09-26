@@ -12,11 +12,7 @@ interface location{
 
 interface seat{
   seat_id: number;
-<<<<<<< HEAD
   seat_number: string;
-=======
-  seat_number: number;
->>>>>>> origin/bigg-S
   flight_class: flight_class | {id: 0, name: ''};
   location: location | {id: 0, name: ''};
   is_available: boolean;
