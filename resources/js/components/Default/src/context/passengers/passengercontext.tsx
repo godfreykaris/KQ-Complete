@@ -12,7 +12,7 @@ interface location{
 
 interface seat{
   seat_id: number;
-  seat_number: number;
+  seat_number: string;
   flight_class: flight_class | {id: 0, name: ''};
   location: location;
   is_available: boolean;
@@ -25,7 +25,7 @@ interface passenger{
   identification_number: number;
   date_of_birth: string;
   seat: seat | {
-    seat_number: 0,
+    seat_number: '',
     flight_class: {id: 0, name: ''},
     location: {id: 0, name: ''},
     is_available: false,
@@ -39,6 +39,8 @@ interface passenger{
 interface PassengerContextType {
   flight_id: number | 0;
   passengers: passenger[];
+  setPassengers: React.Dispatch<React.SetStateAction<passenger[]>>; // Add setPassengers
+  setFlightId: React.Dispatch<React.SetStateAction<number | 0>>; // Add setFlightId
   addPassenger: (index: number, passengerData: passenger) => void;
   updatePassenger: (index: number, passengerData: passenger) => void;
   removePassenger: (index: number) => void;
@@ -80,7 +82,7 @@ export default function PassengerProvider({ children }: passengerProviderProps) 
   };
 
   return (
-    <PassengerContext.Provider value={{ flight_id, passengers, addPassenger, removePassenger, updatePassenger, newFlightId }}>
+    <PassengerContext.Provider value={{ flight_id, passengers, setPassengers, setFlightId, addPassenger, removePassenger, updatePassenger, newFlightId }}>
       {children}
     </PassengerContext.Provider>
   );

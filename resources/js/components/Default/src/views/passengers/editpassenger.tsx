@@ -16,30 +16,30 @@ interface Location{
 }
 
 interface Seat{
-  id: number | 0;
+  seat_id: number | 0;
   seat_number: string;
   flight_class: FlightClass;
   location: Location;
   is_available: boolean;
-  price: 0;
+  price: "";
 }
 
 interface Passenger {
   id: number;
   passenger_id: string;
   name: string;
-  passport_number: string;
-  identification_number: string;
+  passport_number: number;
+  identification_number: number;
   date_of_birth: string;
   seat: Seat;
 }
 
 interface EditPassengerProps {
   showEditModal: boolean; // Specify the type explicitly as boolean
-  handleResubmission: (editedPassenger: Passenger) => void;
+  handleResubmission?: (editedPassenger: Passenger) => void;
   passengerDataObject: Passenger | undefined;
   flightId: string;
-  handleClose: () => void;
+  handleClose?: () => void;
 }
 
 export default function EditPassenger({ showEditModal, handleResubmission, passengerDataObject, handleClose, flightId }: EditPassengerProps) {
@@ -73,7 +73,7 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
         name: '',
       },
       is_available: false,
-      price: 0,
+      price: "",
     },
   });
 
@@ -221,19 +221,28 @@ const getResponseClass = () => {
   //submit form after edit
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    handleResubmission(editedPassenger);
+    if(handleResubmission)
+      handleResubmission(editedPassenger);
   };
 
-  //formating seat price to dollars
-  const formatPriceToDollars = (price: number) => {
-    // Assuming the price is stored as a number, format it as dollars
+  const formatPriceToDollars = (price: string) => {
+    // Parse the string price into a number
+    const numericPrice = parseFloat(price);
+  
+    if (isNaN(numericPrice)) {
+      // Handle the case where the input is not a valid number
+      return "Invalid Price";
+    }
+  
+    // Format the numeric price as dollars
     const formattedPrice = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
-    }).format(price);
-
+    }).format(numericPrice);
+  
     return formattedPrice;
   };
+  
 
 
   return (

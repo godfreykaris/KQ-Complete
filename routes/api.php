@@ -118,7 +118,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/cities/delete/{cityId}', [CitiesController::class, 'delete'])->name('cities.delete');
 });
 
-Route::get('/arrival_cities/{departure_city}', [CitiesController::class, 'getArrivalCities'])->name('cities.get_arrival_cities');
+Route::get('/arrival_cities/{departure_city_id}', [CitiesController::class, 'getArrivalCities'])->name('cities.get_arrival_cities');
 Route::get('/cities', [CitiesController::class, 'index'])->name('cities.all');
 Route::get('/cities/{cityName}/{cityCountry}', [CitiesController::class, 'show'])->name('cities.show');
 
@@ -147,7 +147,7 @@ Route::middleware('auth:api')->group(function () {
 });
 
 Route::get('/seats/{itemName}/{itemId}', [SeatsController::class, 'index'])->name('seats.item_seats');
-Route::get('/seats/{seatNumber}/{planeId}', [SeatsController::class, 'show'])->name('seats.show');
+Route::get('/seats/retrieve/{seatNumber}/{planeId}', [SeatsController::class, 'show'])->name('seats.show');
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/employees/add', [EmployeesController::class, 'store'])->name('employees.add');
@@ -195,9 +195,9 @@ Route::middleware('auth:api')->group(function () {
 Route::get('/openings', [OpeningController::class, 'index'])->name('openings.all');
 Route::get('/openings/{openingId}', [OpeningController::class, 'show'])->name('openings.show');
 
-Route::post('/bookings', [BookingsController::class, 'store'])->name('bookings.store');
+Route::post('/bookings/add', [BookingsController::class, 'store'])->name('bookings.store');
 Route::put('/bookings/{bookingReference}', [BookingsController::class, 'update'])->name('bookings.update');
-Route::delete('/bookings/{bookingReference}', [BookingsController::class, 'destroy'])->name('bookings.destroy');
+Route::delete('/bookings/delete/{bookingReference}/{ticketNumber}', [BookingsController::class, 'destroy'])->name('bookings.destroy');
 
 Route::get('/bookings/get/{bookingReference}/{ticketNumber}', [BookingsController::class, 'getBooking'])->name('booking.get');
 
@@ -214,6 +214,7 @@ Route::get('/booking-creation-success', function () {
 
 Route::post('/booking_inquiry/guest', [GuestBookingInquiryController::class, 'store'])->name('guest_booking_inquiry.store');
 Route::post('/booking_inquiry/registered_user', [AccountBasedBookingInquiriesController::class, 'store'])->name('account_based_booking_inquiry.store');
+Route::get('/booking_inquiry/inquiry_types', [AccountBasedBookingInquiriesController::class, 'getInquiryTypes'])->name('account_based_booking_inquiry.inquiryTypes');
 
 Route::get('/passengers/get/{booking_reference}/{ticket_number}', [PassengersController::class, 'getPassengers'])->name('passengers.get');
 Route::post('/passengers/add/{booking_reference}/{ticket_number}', [PassengersController::class, 'addPassengers'])->name('passengers.add');

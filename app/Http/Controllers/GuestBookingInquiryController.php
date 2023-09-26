@@ -23,22 +23,16 @@ class GuestBookingInquiryController extends Controller
                 ]);
         
                 $guestBookingInquiry = GuestBookingInquiry::create([
-                            // 'name' => $inquiryData['name'],
-                            // 'email' => $inquiryData['email'],
-                            // 'booking_inquiry_type_id' => $inquiryData['inquiry_type_id'],          
-                            // 'subject' => $inquiryData['subject'],
-                            // 'message' => $inquiryData['message'],
-        
-                             /**For testing only */
-                            'name' => fake()->name,
-                            'email' => fake()->safeEmail,
-                            'booking_inquiry_type_id' => BookingInquiryType::pluck('id')->random(),          
-                            'subject' => fake()->sentence,
-                            'message' => fake()->paragraph,
+                            'name' => $inquiryData['name'],
+                            'email' => $inquiryData['email'],
+                            'booking_inquiry_type_id' => $inquiryData['booking_inquiry_type_id'],          
+                            'subject' => $inquiryData['subject'],
+                            'message' => $inquiryData['message'],
+                                
                         ]
                     );
 
-                    return response()->json(['booking_inquiry' => $guestBookingInquiry, 'status' => 1, 'value' => "Guest booking inquiry sent successfully"]);
+                    return response()->json(['status' => 1, 'success' => "Guest booking inquiry sent successfully"]);
             } 
             catch (\Exception $e) 
             {
@@ -48,10 +42,13 @@ class GuestBookingInquiryController extends Controller
                 // Return the error response
 
                 // For debugging
-                // return response()->json(['error' => 'An error occurred. ' . $e->getMessage()], 500);
+                 return response()->json(['error' => 'An error occurred. ' . $e->getMessage(), 'status' => 0]);
 
-                return response()->json(['error' => 'An error occurred.'], 500);
+                //return response()->json(['error' => 'An error occurred.', 'status' => 0]);
             }
 
+            
     }
+
+   
 }

@@ -22,12 +22,12 @@ interface Location{
 }
 
 interface Seat{
-  id: number | 0;
+  seat_id: number | 0;
   seat_number: string;
   flight_class: FlightClass;
   location: Location;
   is_available: boolean;
-  price: 0;
+  price: "";
 }
 
 interface Passenger {
@@ -313,13 +313,14 @@ const getResponseClass = () => {
       <h2 className="text-primary text-center">Edit Passenger Details|</h2>
         <hr/>
         <Col md={6} className="mx-auto">
-        <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
 
         {isLoading ? (
           <LoadingComponent />
         ) :
         (
           <>
+            <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+
             <Form onSubmit={handleSubmit}>
               <Form.Group>
                 <Form.Label>Booking Reference:</Form.Label>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import apiBaseUrl from '../../../config';
+import LoadingComponent from '../../Common/LoadingComponent';
 
 
 const EditPlaneForm: React.FC = () => {
@@ -16,6 +17,9 @@ const EditPlaneForm: React.FC = () => {
   const [responseMessage, setResponseMessage] = useState<string>('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
 
+  const [isLoading, setIsLoading] = useState(true);
+
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,6 +30,7 @@ const EditPlaneForm: React.FC = () => {
 
   const fetchData = async (planeId: string) => {
     try {
+      setIsLoading(true);
 
       const response = await fetch(`${apiBaseUrl}/planes/${planeId}`);
 
@@ -37,12 +42,18 @@ const EditPlaneForm: React.FC = () => {
         setItemId(data.plane.id);
         setPlaneModel(data.plane.model);
         setPlaneCapacity(data.plane.capacity);
-      }     
+      }    
+      
+      setIsLoading(false);
+
       
     } 
     catch (error) 
     {
       console.error('Error fetching data:', error);
+
+      setIsLoading(false);
+
     }
   };
 
@@ -51,6 +62,8 @@ const EditPlaneForm: React.FC = () => {
 
     if ( itemId && planeId && itemName && planeModel && (planeCapacity > 0)) 
     {
+      setIsLoading(true);
+
       try 
       {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
@@ -110,12 +123,17 @@ const EditPlaneForm: React.FC = () => {
            setResponseMessage(`Error: ${response.statusText}`);
          }
 
+         setIsLoading(false);
+
       }
       catch (error) 
       {
         setResponseStatus(0); // Error
         setResponseMessage('Error submitting data: An error occurred');
         console.error('Error submitting data:', error);
+
+        setIsLoading(false);
+
       }
     }
   };
@@ -137,51 +155,58 @@ const EditPlaneForm: React.FC = () => {
 
   return (
     <div className="form-container col-md-4">
-      <h2>Edit Plane</h2>
-      <form onSubmit={handleSaveChanges}>
-        <div className="form-group">
-          <label htmlFor="inputName">Name</label>
-          <input
-            type="text"
-            id="inputName"
-            className="form-control"
-            name="name"
-            value={itemName}
-            onChange={(e) => setItemName(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="inputModel">Model</label>
-          <input
-            type="text"
-            id="inputModel"
-            className="form-control"
-            name="model"
-            value={planeModel}
-            onChange={(e) => setPlaneModel(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="inputCapacity">Capacity</label>
-          <input
-            type="number"
-            id="inputCapacity"
-            className="form-control"
-            name="capacity"
-            value={planeCapacity}
-            onChange={(e) => setPlaneCapacity(Number(e.target.value))}
-            required
-          />
-        </div>
-        <div className="text-center mt-3">
-          <button type="submit" className="btn btn-primary">
-            Save Changes
-          </button>
-        </div>
-      </form>
-      <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+      <h2 className="text-center">Edit Plane</h2>
+      {isLoading ? (
+        /**Show loading */
+        <LoadingComponent />
+      ) : (
+        <>
+          <form onSubmit={handleSaveChanges}>
+            <div className="form-group">
+              <label htmlFor="inputName">Name</label>
+              <input
+                type="text"
+                id="inputName"
+                className="form-control"
+                name="name"
+                value={itemName}
+                onChange={(e) => setItemName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="inputModel">Model</label>
+              <input
+                type="text"
+                id="inputModel"
+                className="form-control"
+                name="model"
+                value={planeModel}
+                onChange={(e) => setPlaneModel(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="inputCapacity">Capacity</label>
+              <input
+                type="number"
+                id="inputCapacity"
+                className="form-control"
+                name="capacity"
+                value={planeCapacity}
+                onChange={(e) => setPlaneCapacity(Number(e.target.value))}
+                required
+              />
+            </div>
+            <div className="text-center mt-3">
+              <button type="submit" className="btn btn-primary">
+                Save Changes
+              </button>
+            </div>
+          </form>
+          <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+          </>
+      )}
     </div>
   );
 };

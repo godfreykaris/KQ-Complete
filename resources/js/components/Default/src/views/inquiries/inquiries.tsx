@@ -4,6 +4,7 @@ import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import apiBaseUrl from "../../../../../config";
+import LoadingComponent from "../../../../Common/LoadingComponent";
 
 interface inquiry{
   id: number;
@@ -30,9 +31,15 @@ export default function SendInquiry() {
   const [successAlert, setSuccessAlert] = useState(false);
   const [erroAlert, setErrorAlert] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
+
+
+  const [responseMessage, setResponseMessage] = useState('');
+  const [responseStatus, setResponseStatus] = useState<number | null>(null);
+
   //fetching all inquiry types as soon as the componenet mounts
   useEffect(() => {
-    fetch(`${apiBaseUrl}/inquiries`)
+    fetch(`${apiBaseUrl}/booking_inquiry/inquiry_types`)
       .then((response) => {
         if (!response.ok) {          
           throw new Error("Error fetching data");
@@ -77,6 +84,22 @@ export default function SendInquiry() {
     setSelectedInquiry(selectedInquiryObject || null);   
   };
 
+  const getResponseClass = () => {
+    if (responseStatus === 1) 
+    {
+      return 'text-success'; // Green color for success
+    } 
+    else if (responseStatus === 0) 
+    {
+      return 'text-danger'; // Red color for error
+    } 
+    else 
+    {
+      return ''; // No specific styles (default)
+    }
+  };
+  
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -110,7 +133,6 @@ export default function SendInquiry() {
           },
           body: JSON.stringify(sendData),
         })        
-        alert(JSON.stringify(sendData));
       }else{
         response = await fetch(`${apiBaseUrl}/booking_inquiry/registered_user`, {
           method: 'POST',
@@ -123,19 +145,43 @@ export default function SendInquiry() {
         })
       }
 
-      if(response.ok){
-        setSuccessAlert(true);        
-      }else{
-        setErrorAlert(true);        
-      }
+      const data = await response.json();
 
-    }catch{
-      setErrorAlert(true);      
-    }
-    
+        if (response.ok) 
+        {
+          if (data.status) 
+          {
+            setResponseStatus(1); // Success
+            setResponseMessage(`Success: ${data.success}.`);
+
+          } 
+          else 
+          {
+            setResponseStatus(0); // Error
+            setResponseMessage(`Error: ${data.error}`);
+          }
+        } 
+        else 
+        {
+          setResponseStatus(0); // Error
+          setResponseMessage(`Error: ${response.statusText}`);
+        }
+
+        setIsLoading(false);
+
+      } 
+      catch (error) 
+      {
+        setIsLoading(false);
+        setResponseStatus(0); // Error
+        setResponseMessage('Error submitting data. Please try again or contact support.');
+        console.error('Error submitting data:', error);
+      }
+        
     setLoading(false);
   };
 
+  
   return (
     <div>
       <MenuBar1 isAuthenticated={false}/>
@@ -147,8 +193,8 @@ export default function SendInquiry() {
       <div className="container-fluid">
         <h2 className="text-primary text-center">Make an Inquiry</h2>
         <Col md={6} className="mx-auto">
-          {successAlert && <Alert variant="success">Inquiry sent successfully!</Alert>}
-          {erroAlert && <Alert variant="danger">An error occurred</Alert>}
+        <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+
         <Form onSubmit={handleSubmit}>
           <Form.Group>
             <Form.Label>Inquiry Type:</Form.Label>
@@ -168,8 +214,8 @@ export default function SendInquiry() {
                 ))}
               </Form.Control>
             ) : (
-              <div className="d-flex align-items-center">
-                <Spinner animation="border" variant="primary" size="sm" />
+              <div className="text-center">
+                <LoadingComponent/>
                 <span className="ml-2">Loading Inquiry types...</span>
               </div>
             )}

@@ -21,7 +21,7 @@ type SeatLocation = {
 
 type Seat = {
   seat_number: string;
-  price: number;
+  price: string;
   is_available: boolean;
   location_id: number;
 };
@@ -31,7 +31,7 @@ const AddSeatForm = () => {
   
   const [formData, setFormData] = useState({
     seat_number: '',
-    price: 0,
+    price: "",
     is_available: false,      
     location_id: 0,
   });
@@ -146,7 +146,7 @@ const AddSeatForm = () => {
       {
         setFormData({
           seat_number: '',
-          price: 0,
+          price: "",
           is_available: false,
           location_id: 0,
         });
@@ -178,7 +178,7 @@ const AddSeatForm = () => {
   const handleAddSeat = () => {
 
     // Validate form data
-    if (seat_number.trim() === '' || price < 1 || location_id === 0)
+    if (seat_number.trim() === '' || price == "" || price =="0" || location_id === 0)
     {
         // If any of the required fields are empty or 0, do not add the seat
         alert('Please fill all fields!');
@@ -222,7 +222,7 @@ const AddSeatForm = () => {
         setFormData(
             {
               seat_number: '',
-              price: 0,
+              price: "",
               is_available: false,
               location_id: 0,
             }
