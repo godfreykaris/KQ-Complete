@@ -29,7 +29,7 @@ export default function Dashboard() {
       </p>
      <Container fluid>
         <Row>
-          <Col md={7} className="mx-auto">
+          <Col md={12} className="mx-auto">
             <Carousel fade interval={3000}>
               <Carousel.Item>
                 <img
@@ -38,7 +38,7 @@ export default function Dashboard() {
                   alt="Dashboard Image 1"
                   
                 />
-                <Carousel.Caption>
+                <Carousel.Caption className="carousel-caption">
                   <h3>Welcome to KQ Airlines</h3>
                   <p>Enjoy a seamless travel experience with us.</p>
                   <Link to="/bookflight">
@@ -52,6 +52,13 @@ export default function Dashboard() {
                   src={seatsImage}
                   alt="Dashboard Image 2"
                 />
+                <Carousel.Caption>
+                  <h3>Relax in Comfort</h3>
+                  <p>Choose your preferred seat and travel in style.</p>
+                  <Link to="/searchflight">
+                    <Button variant="primary">View Seat Options</Button>
+                  </Link>                  
+                </Carousel.Caption>
               </Carousel.Item>
               <Carousel.Item>
                 <img
@@ -59,6 +66,14 @@ export default function Dashboard() {
                   src={planeImage}
                   alt="Dashboard Image 3"
                 />
+
+                <Carousel.Caption className="carousel-caption">
+                  <h3>Welcome to KQ Airlines</h3>
+                  <p>Enjoy a seamless travel experience with us.</p>
+                  <Link to="/bookflight">
+                    <Button variant="primary" >Book a Flight</Button>
+                  </Link>                  
+                </Carousel.Caption>
               </Carousel.Item>
              <Carousel.Item>
                 <img

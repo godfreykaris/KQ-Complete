@@ -10,7 +10,6 @@ import MenuBar2 from '../../components/menubars/menubar2';
 
 import apiBaseUrl from '../../../../../config';
 import { useBookingContext } from '../../context/BookingContext';
-import BookFlight from '../booking/bookflight';
 import LoadingComponent from '../../../../Common/LoadingComponent';
 
 interface FlightClass{
@@ -23,7 +22,7 @@ interface Location{
   name: string;
 }
 
-interface Seat{
+interface seat{
   seat_id: number;
   seat_number: string;
   flight_class: FlightClass;
@@ -34,33 +33,35 @@ interface Seat{
 
 interface Passenger{
   name: string;
-  passport_number: string;
-  identification_number: string;
+  passport_number: number;
+  identification_number: number;
   date_of_birth: string;
-  seat: Readonly<Seat> | {
+  seat: Readonly<seat> | {
     seat_number: '',
     flight_class: {id: 0, name: ''},
     location: {id: 0, name: ''},
     is_available: false,
-    price: string,
-    seat_id: number
+    price: '',
+    seat_id: 0
   };
+  seat_id: number,
   index: number | null;
 }
 
 const intitPassenger: Passenger = {
   name: '',
-  passport_number: '',
-  identification_number: '',
+  passport_number: 0,
+  identification_number: 0,
   date_of_birth: '',
   seat: {
     seat_number: '',
     flight_class: {id: 0, name: ''},
     location: {id: 0, name: ''},
     is_available: false,
-    price: "",
+    price: '',
     seat_id: 0
   },
+  seat_id: 0,
   index: null,
 }
 
@@ -87,11 +88,11 @@ export default function AddPassenger1() {
   const { flightData, updateFlightData } = useBookingContext();
 
   // Passengers Context
-  const {passengers, addPassenger, updatePassenger } = useBookingContext();
+  const { flight_id, passengers, addPassenger, updatePassenger } = usePassengerContext() as PassengerContextType;
   const [passengerIndex, setPassengerIndex] = useState<number | null>(null);
 
   // Seat Selection State
-  const [availableSeats, setAvailableSeats] = useState<Seat[] | []>([]);
+  const [availableSeats, setAvailableSeats] = useState<seat[] | []>([]);
   const [error, setError] = useState("");
   const [selectedSeatId, setSelectedSeatId] = useState<number>(0);
 
@@ -104,10 +105,8 @@ export default function AddPassenger1() {
     if (location.state?.passenger) {
       // Update form fields with the data
       setPageHead("Edit Passenger|");
-      const { name, passport_number, identification_number, date_of_birth } = location.state.passenger;
+      const { name, passport_number, identification_number, date_of_birth, seat_id } = location.state.passenger;
       const index = location.state?.index;
-
-      const bookingDataFlight = location.state.flightData;
 
       // Create a new formData object
     const updatedFormData: Passenger = {
@@ -116,6 +115,7 @@ export default function AddPassenger1() {
       passport_number,
       identification_number,
       date_of_birth,
+      seat_id,
       ...(index !== undefined ? { index: index } : {}), // Only include index if it's defined
     };
 
@@ -132,9 +132,8 @@ export default function AddPassenger1() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${apiBaseUrl}/seats/flight/${flightData.flightId}`);
-        if (!response.ok) 
-        {
+        const response = await fetch(`${apiBaseUrl}/seats/flight/${flight_id}`);
+        if (!response.ok) {
           throw new Error('Network response was not ok.');
         }
         const data = await response.json();
@@ -154,8 +153,8 @@ export default function AddPassenger1() {
     const selectedSeat = availableSeats[index];
     setSelectedSeatId(selectedSeat.seat_id);
 
-    const selectedSeatObject: Seat = {
-      seat_id: selectedSeat.seat_id,
+    const selectedSeatObject: seat = {
+      seat_id: selectedSeat?.seat_id,
       seat_number: selectedSeat.seat_number,
       flight_class: selectedSeat.flight_class,
       location: selectedSeat.location,
@@ -166,6 +165,7 @@ export default function AddPassenger1() {
     setFormData((prevData) => ({
       ...prevData,
       seat: selectedSeatObject,
+      seat_id: selectedSeatObject.seat_id,
     }))
 
     // Update the passenger's seat using the selectedPassengerIndex
@@ -240,7 +240,7 @@ export default function AddPassenger1() {
       updatePassenger(index, passengerToUpdate);
     } else {
       passengerToUpdate.index = passengers.length + 1;
-      addPassenger(passengerToUpdate);
+      addPassenger(passengerToUpdate.index, passengerToUpdate);
     }
   
     navigate('/bookflight', {state: {formData: formDataFromBookFlight, selectedFlight}});
@@ -370,7 +370,7 @@ export default function AddPassenger1() {
                 </tr>
               </thead>
               <tbody>
-                {availableSeats.map((availableSeat: Seat, index: number) => (
+                {availableSeats.map((availableSeat: seat, index: number) => (
                   <tr key={index}>
                     <td>{availableSeat.seat_number}</td>
                     <td>{availableSeat.location.name}</td>
