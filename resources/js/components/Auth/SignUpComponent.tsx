@@ -316,13 +316,17 @@ const SignUpComponent = () => {
 
           <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
 
-          <p className="text-center">
-            <a href="/signin" style={{ textDecoration: "none" }}>
-              Already a Member?
-            </a>
-          </p>
-        </Form>
+        </Form>        
         </Col>
+
+        <p className="text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <a href="/signin" style={{ textDecoration: 'none' }}>Already a Member?</a>
+        </p>
+        <p className="text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <a href="/" style={{ textDecoration: 'none', color: 'white' }}>
+            <button className="btn btn-primary mt-4">Home</button>
+          </a>
+        </p>
       </div>
       )}
 
