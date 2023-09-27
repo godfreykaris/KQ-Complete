@@ -20,6 +20,7 @@ interface seat{
 }
 
 interface passenger{  
+  passenger_id: string;
   name: string;
   passport_number: number;
   identification_number: number;

@@ -14,6 +14,7 @@ import Seat from "../seats/viewseat.js";
 
 import apiBaseUrl from '../../../../../config';
 import LoadingComponent from '../../../../Common/LoadingComponent';
+import { useEditBookingContext } from '../../context/booking/editbookingcontext';
 
 interface flight_class{
   id: number;
@@ -35,6 +36,7 @@ interface seat{
 }
 
 interface passenger{
+  passenger_id: string;
   name: string;
   passport_number: number;
   identification_number: number;
@@ -47,23 +49,6 @@ interface passenger{
     price: "",
     seat_id: 0
   };
-}
-
-// Define an interface that matches the structure of your modified passenger objects
-interface ModifiedPassenger {
-  name: string;
-  passport_number: number;
-  identification_number: number;
-  date_of_birth: string;
-  seat: {
-    seat_number: string;
-    flight_class: { id: number; name: string };
-    location: { id: number; name: string };
-    is_available: boolean;
-    price: string;
-    id: number;
-  };
-  index: number | null;
 }
 
 interface status{
@@ -115,7 +100,8 @@ export default function BookFlight() {
   const [selectedPassenger, setSelectedPassenger] = useState<passenger | undefined>(undefined);
 
   //to store values
-  const {formData, setFormData, flightTableData, setFlightTableData, selectedFlight, setSelectedFlight, isBookingValid, setIsBookingValid} = useBookingContext() as BookingContextType;
+  const {formData, setFormData, flightTableData, setFlightTableData, selectedFlight, setSelectedFlight} = useBookingContext() as BookingContextType;
+  const {bookingReference, setBookingReference, ticketNumber, setTicketNumber,isBookingValid, setIsBookingValid} = useEditBookingContext();
 
   //access seats from seat context
   const {updateSeat} = useSeatContext() as SeatContextType;
@@ -126,26 +112,15 @@ export default function BookFlight() {
   const [isButtonClicked, setIsButtonClicked] = useState(false);
   const navigate = useNavigate();
 
-  const [bookingFormData, setBookingFormData] = useState({
-    bookingReference: "",
-    ticketNumber: "",
-  });
-
   const [responseMessage, setResponseMessage] = useState("");
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
+  const [responseMessage1, setResponseMessage1] = useState("");
+  const [responseStatus1, setResponseStatus1] = useState<number | null>(null);
   const [refError, setRefError] = useState("");
 
-  //check if there is formData in the location state
-  useEffect(() => {
-    if (location.state && location.state.formData) {
-      const formDataBack = location.state?.formData;
-      const selectedFlightBack = location.state?.selectedFlight;
 
-      setSelectedFlight(selectedFlightBack);
-      alert(JSON.stringify(selectedFlight));
-      setFormData(formDataBack);
-    }
-  }, [location.state]);
+
+ 
 
 
   //to remove passenger when delete button is clicked
@@ -156,7 +131,7 @@ export default function BookFlight() {
   //to edit passenger when the edit button is clicked
   const handleEditPassenger = (passenger: passenger, index: number) => {  
     const backTo = "changebooking";
-    navigate2('/addpassenger1', {state: {passenger, index, backTo}});
+    navigate2('/addpassenger1', {state: {passenger, index, backTo, formData}});
   };  
 
   // Format date imported from AddPassenger1
@@ -183,10 +158,14 @@ export default function BookFlight() {
 
     if (sanitizedValue.length <= 10) {
       const newValue = `${prefix}${sanitizedValue.slice(4, 11)}`; // Use the first 7 characters
-      setBookingFormData((prevFormData) => ({
-        ...prevFormData,
-        [name]: newValue,
-      }));
+      if (name === "bookingReference") 
+      {
+        setBookingReference(newValue);
+      } 
+      else if (name === "ticketNumber")
+      {
+        setTicketNumber(newValue);
+      }
       setRefError(""); // Clear any previous errors
     } else {
       setRefError(
@@ -195,10 +174,10 @@ export default function BookFlight() {
     }
   };
 
-  const getResponseClass = () => {
-    if (responseStatus === 1) {
+  const getResponseClass = (status: any) => {
+    if (status === 1) {
       return "text-success"; // Green color for success
-    } else if (responseStatus === 0) {
+    } else if (status === 0) {
       return "text-danger"; // Red color for error
     } else {
       return ""; // No specific styles (default)
@@ -232,7 +211,7 @@ export default function BookFlight() {
           return;
         }
 
-        const response = await fetch(`${apiBaseUrl}/bookings/get/${bookingFormData.bookingReference}/${bookingFormData.ticketNumber}`, {
+        const response = await fetch(`${apiBaseUrl}/bookings/get/${bookingReference}/${ticketNumber}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -249,7 +228,6 @@ export default function BookFlight() {
             setResponseStatus(1); // Success
             setResponseMessage(`Success: ${data.success} You can now add a passenger.`);
 
-            alert(JSON.stringify(data.booking.flight));
             setSelectedFlight(data.booking.flight);
             setFlightId(data.booking.flight_id);
             setIsBookingValid(true);
@@ -258,7 +236,7 @@ export default function BookFlight() {
 
             setFormData({
                 email: bookingData.email,
-                tripType: '',
+                tripType: bookingData.trip_type,
                 departureDate: formatDateToYYYYMMDD(bookingData.flight.departure_time),
                 returnDate: formatDateToYYYYMMDD(bookingData.flight.return_time),
                 selectedFrom: {
@@ -277,6 +255,7 @@ export default function BookFlight() {
 
             for (const passengerData of bookingData.passengers) {
               const modifiedPassenger = {
+                id:passengerData.id,
                 name: passengerData.name,
                 passport_number: passengerData.passport_number,
                 identification_number: passengerData.identification_number,
@@ -447,6 +426,7 @@ export default function BookFlight() {
   
   //locations
   useEffect(() => {
+
     fetch(`${apiBaseUrl}/cities`)
       .then((response) => {
         if (!response.ok) {          
@@ -515,28 +495,38 @@ export default function BookFlight() {
 
     setErrorMessage(""); //clear previous errors
 
-    try{
+    try
+    {
       const passengersWithSeats = passengers.filter(
         (passenger) => Object.keys(passenger.seat).length > 0
       );
 
-      if(passengersWithSeats.length === 0){
+      if(passengersWithSeats.length === 0)
+      {
         setErrorMessage("Please select seats for passengers");
         return;
       }
       
       //data to be sent
-      const sendData = {
-        flightId: flight_id,
-        email: formData.email,        
-        passengers: passengers,
-      }
-  
+      const sendData: any = {
+        flight_id: flight_id,
+        email: formData.email,
+        trip_type: formData.tripType,
+        passengers: passengers.map((passenger) => ({
+          passenger_id: passenger.passenger_id || 'empty',
+          name: passenger.name,
+          passport_number: passenger.passport_number || null,
+          identification_number: passenger.identification_number || null,
+          date_of_birth: passenger.date_of_birth,
+          seat_id: passenger.seat.seat_id,
+        })),
+      };
+      
       setLoading(true);
-  
+      setErrorMessage("");
       //perform POST reuest
-      const response = await fetch(`${apiBaseUrl}/bookings/add`, {
-        method: "POST",
+      const response = await fetch(`${apiBaseUrl}/bookings/${bookingReference}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
@@ -545,24 +535,39 @@ export default function BookFlight() {
         body: JSON.stringify(sendData),
       });
   
-      if(!response.ok){
-        if(response.status === 400){
-          const errorData = await response.json();
-          throw new Error(`Bad Request: ${errorData.message}`);
-        }else if(response.status === 500){
-          throw new Error("Internal server error");
-        }else{
-          throw new Error("Error sending data");
-        }        
+      const data = await response.json();
+
+      if (response.ok) 
+      {
+        if (data.status) 
+        {
+          setResponseStatus1(1); // Success
+          setResponseMessage1(`Success: ${data.success}`);
+          // Redirect to the Stripe payment page
+          window.location.href = data.redirect;
+        } 
+        else 
+        {
+          setResponseStatus1(0); // Error
+          setResponseMessage1(`Error: ${data.error}`);
+        }
+      } 
+      else 
+      {
+        setResponseStatus1(0); // Error
+        setResponseMessage1(`Error: ${response.statusText}`);
       }
-  
-      setLoading(false);
-    }catch (error){
-      setErrorMessage("An error occured while booking the flight");
 
       setLoading(false);
+
+    } 
+    catch (error: any) 
+    {
+      setLoading(false);
+      setResponseStatus1(0); // Error
+      setResponseMessage1('Error updating booking.');
+      console.error('Error updating booking', error);
     }
-       
   };
 
   //the seat modal  
@@ -658,7 +663,7 @@ export default function BookFlight() {
                       id="bookingReference"
                       name="bookingReference"
                       maxLength={12}
-                      value={bookingFormData.bookingReference}
+                      value={bookingReference}
                       onChange={handleBookingDataChange}
                       required
                     />
@@ -674,14 +679,14 @@ export default function BookFlight() {
                       id="ticketNumber"
                       name="ticketNumber"
                       maxLength={12}
-                      value={bookingFormData.ticketNumber}
+                      value={ticketNumber}
                       onChange={handleBookingDataChange}
                       required
                     />
                   </Form.Group>
                   <hr />
                     
-                  <p className={`response-message ${getResponseClass()} text-center`}>
+                  <p className={`response-message ${getResponseClass(responseStatus)} text-center`}>
                     {responseMessage}
                   </p>
                     
@@ -723,8 +728,8 @@ export default function BookFlight() {
                   required
                 >
                   <option value="">Select Trip Type</option>
-                  <option value="OneWay">One Way</option>
-                  <option value="Round">Round Trip</option>
+                  <option value="One way">One Way</option>
+                  <option value="Round trip">Round Trip</option>
                 </Form.Control>
               </Form.Group>
 
@@ -754,7 +759,7 @@ export default function BookFlight() {
 
               <Form.Group>
                 <Form.Label>From:</Form.Label>
-                {locations.length > 0 ? (
+                {locations.length > 0 || formData.selectedFrom.name !== ""? (
                   <Form.Control
                     as="select"
                     id="from"
@@ -762,7 +767,11 @@ export default function BookFlight() {
                     onChange={(e) => handleFromChange(e.target.value)}
                     required
                   >
-                    <option value="">Select Departure Location</option>
+                    <option value={formData.selectedFrom.name !== "" && filteredLocations.length === 0
+                        ? formData.selectedFrom.name
+                        : ""}
+                        >{formData.selectedFrom.name === "" ? "Select Departure Location": formData.selectedFrom.name}
+                    </option>
                     {locations.map((option: location, index: number) => (
                       <option key={index} value={option.name}>
                         {option.name}
@@ -828,7 +837,8 @@ export default function BookFlight() {
                             event.preventDefault(); // Prevent the default link behavior
                           } else {
                             handleAddPassengerClick();
-                            navigate('/addpassenger1', {state: {formData, selectedFlight}});
+                            const backTo = "changebooking"
+                            navigate2('/addpassenger1', {state: {formData, selectedFlight, backTo}});
                           }
                         }}
                         disabled={selectedFlight === null}
@@ -842,8 +852,10 @@ export default function BookFlight() {
               </div>
 
               <hr/>
-
-              <div className='d-flex justify-content-center'>
+              <p className={`response-message ${getResponseClass(responseStatus1)} text-center`}>
+                  {responseMessage1}
+              </p>
+              <div className='d-flex justify-content-center mb-2'>                
                 <Button type="submit" variant="primary" disabled={loading}>
                   {loading ? (
                     <Spinner animation='border' size='sm'/>
@@ -851,13 +863,14 @@ export default function BookFlight() {
                     "Save Changes"
                   )}                    
                 </Button>
+
               </div>
               
               </Form>
             </Col> 
 
                 {/* Display error message if there's an error */}
-              {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
+              {errorMessage && <Alert variant="danger" className="text-center mt-2">{errorMessage}</Alert>}
 
               <hr/>
           

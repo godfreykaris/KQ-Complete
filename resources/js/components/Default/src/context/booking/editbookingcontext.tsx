@@ -20,6 +20,8 @@ interface Location {
     setTicketNumber: React.Dispatch<React.SetStateAction<string>>;
     bookingReference: string;
     setBookingReference: React.Dispatch<React.SetStateAction<string>>;
+    isBookingValid: boolean;
+    setIsBookingValid: React.Dispatch<React.SetStateAction<boolean>>;
   }
 
   const EditBookingContext = createContext<EditBookingContextType | undefined>(undefined);
@@ -36,6 +38,7 @@ interface Location {
 
       const [ticketNumber, setTicketNumber] = useState<string>("");
       const [bookingReference, setBookingReference] = useState<string>("");  
+      const [isBookingValid, setIsBookingValid] = useState<boolean>(false);
 
       const contextValue = {
         editedBooking,
@@ -44,6 +47,8 @@ interface Location {
         setTicketNumber,
         bookingReference,
         setBookingReference,
+        isBookingValid,
+        setIsBookingValid,
       };
 
       return(

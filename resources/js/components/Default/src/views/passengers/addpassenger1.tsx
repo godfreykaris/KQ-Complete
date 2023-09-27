@@ -12,6 +12,7 @@ import apiBaseUrl from '../../../../../config';
 import { useBookingContext } from '../../context/BookingContext';
 import LoadingComponent from '../../../../Common/LoadingComponent';
 import { BookingContextType } from '../../context/booking/bookflightcontext';
+import { useEditBookingContext } from '../../context/booking/editbookingcontext';
 
 interface FlightClass{
   id: number;
@@ -42,6 +43,7 @@ interface seat1{
 }
 
 interface Passenger{
+  passenger_id: string;
   name: string;
   passport_number: number;
   identification_number: number;
@@ -59,6 +61,7 @@ interface Passenger{
 }
 
 const initPassenger: Passenger = {
+  passenger_id: '',
   name: '',
   passport_number: 0,
   identification_number: 0,
@@ -101,7 +104,7 @@ export default function AddPassenger1() {
   const { flight_id, passengers, addPassenger, updatePassenger } = usePassengerContext() as PassengerContextType;
   const [passengerIndex, setPassengerIndex] = useState<number | null>(null);
 
-  const {isBookingValid} = useBookingContext() as BookingContextType;
+  const {bookingReference, setBookingReference, ticketNumber, setTicketNumber,isBookingValid, setIsBookingValid} = useEditBookingContext();
 
 
   const tableContainerRef = useRef<HTMLDivElement | null>(null);
@@ -143,12 +146,14 @@ export default function AddPassenger1() {
       setSelectedSeatId(location.state.passenger.seat.seat_id);
       setSelectedSeatNumber(location.state.passenger.seat.seat_number);
 
-      setBackTo(location.state.backTo);
 
       if (index !== undefined) {
         setIndex(index);
       }   
     }
+
+    setBackTo(location.state.backTo);
+
   }, [location.state?.passenger]);  
   
 
@@ -160,14 +165,22 @@ export default function AddPassenger1() {
           throw new Error('Network response was not ok.');
         }
         const data = await response.json();
-        //alert(JSON.stringify(data));
-        setAvailableSeats(data.seats);
+       // Filter out seats that are already assigned to passengers
+      const filteredSeats = data.seats.filter((seat: seat1) => {
+        return !passengers.some((passenger) => passenger.seat?.seat_id === seat.id);
+      });
+
+      setAvailableSeats(filteredSeats);
+
       } catch (error: any) {
         setError('Error fetching data: ' + error.message);
       }
     };
 
     fetchData();
+
+    
+
   }, []);
 
 
@@ -283,13 +296,15 @@ export default function AddPassenger1() {
       <br/>
       <br/>
       <MenuBar2/>
-      <Container className="d-flex justify-content-center align-items-center mt-7 mb-0" style={{ height: '100vh' }}>
+      <Container className="d-flex justify-content-center align-items-center mt-7 mb-0" >
         <Container fluid>
           <Row>
             <h2 className="text-primary text-center">
               <b>{pageHead}</b>
             </h2>
             <hr />
+
+            { !displaySeatTable && (
             <Col md={6} className="mx-auto">
               <Form onSubmit={handleFormSubmit}>
                 <Form.Group>
@@ -369,7 +384,8 @@ export default function AddPassenger1() {
                     )}
                 </div>
              </Form>
-            </Col>            
+            </Col> 
+            )}           
           </Row>
           {/* Show the success alert when a seat is selected */}
           {selectedSeatId != 0 && (
@@ -389,7 +405,7 @@ export default function AddPassenger1() {
 
       {/* Display seat selection table when Select Seat button is clicked */}
       {displaySeatTable && (
-        <Container ref={tableContainerRef} className="mt-0">
+        <Container ref={tableContainerRef} className="mt-2">
           {error ? (
             <Alert variant="danger">{error}</Alert>
           ) : availableSeats.length > 0 ? (

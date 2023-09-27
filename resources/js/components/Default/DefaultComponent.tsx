@@ -8,7 +8,6 @@ import BookFlight from "./src/views/booking/bookflight";
 import SeatMap from "./src/views/seats/seatmap";
 import AddPassenger from "./src/views/passengers/addpassenger";
 import AddPassenger1 from "./src/views/passengers/addpassenger1";
-import EditPassenger from "./src/views/passengers/editpassenger";
 import Seat from "./src/views/seats/viewseat";
 import DeletePassenger from "./src/views/passengers/deletepassenger";
 import ChangePassenger from "./src/views/passengers/changepassenger";
@@ -82,13 +81,15 @@ const router = [
       path: 'addpassenger1',
       element: (
           <SeatProvider>
+           <EditBookingProvider>
               <PassengerProvider>
-                <BookingContextProvider>
-                  <BookingProvider>
+                <BookingProvider>
+                  <BookingContextProvider>
                     <AddPassenger1/>
-                  </BookingProvider>
-                </BookingContextProvider>
+                  </BookingContextProvider>
+                </BookingProvider>
               </PassengerProvider>
+            </EditBookingProvider>
           </SeatProvider>
       )
   },
@@ -118,16 +119,6 @@ const router = [
       />
   },
   {
-      path: 'editpassenger',
-      element: (
-          <EditBookingProvider>
-            <SeatProvider>
-              <EditPassenger showEditModal={false} handleResubmission={undefined} passengerDataObject={undefined} handleClose={undefined} flightId={''}/>
-            </SeatProvider>
-          </EditBookingProvider>
-      )
-  },
-  {
       path: 'deletepassenger',
       element: <DeletePassenger/>
   },
@@ -135,22 +126,15 @@ const router = [
       path: 'changebooking',
       element: (
         <SeatProvider>
+           <EditBookingProvider>
               <PassengerProvider>
-                <BookingProvider>
-                  <BookingContextProvider>
-                    <ChangeBooking/>
-                  </BookingContextProvider>
-                </BookingProvider>                                  
-              </PassengerProvider>             
+                  <BookingProvider>
+                      <ChangeBooking/>
+                  </BookingProvider>
+              </PassengerProvider>  
+            </EditBookingProvider>
+           
          </SeatProvider>
-      )
-  },
-  {
-      path: 'editbooking',
-      element: (
-        <EditBookingProvider>
-            <EditBooking showEditModal={false} handleResubmission={undefined} bookingDataObject={undefined} handleClose={undefined}/>
-        </EditBookingProvider>
       )
   },
   {

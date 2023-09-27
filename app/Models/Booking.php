@@ -14,6 +14,7 @@ class Booking extends Model
         'email',
         'booking_reference',
         'booking_date',
+        'trip_type',
         
     ];
 

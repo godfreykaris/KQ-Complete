@@ -20,12 +20,15 @@ class BookingFactory extends Factory
      */
     public function definition(): array
     {
-        return [
-            
+        // Randomly select a trip type
+        $tripType = $this->faker->randomElement(['One way', 'Round trip']);
+
+        return [            
             'email' => fake()->safeEmail,
             'booking_reference' => 'KQ-BR-' . fake()->unique()->regexify('[A-Z0-9]{6}'),
             'booking_date' => fake()->dateTime(),
             'flight_id' => Flight::pluck('id')->random(),
+            'trip_type' => $tripType,
         ];
     }
 }

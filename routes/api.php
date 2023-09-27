@@ -207,6 +207,7 @@ Route::get('/stripe-payment', function () {
 
 Route::post('stripe', [PaymentController::class, 'stripePost'])->name('stripe.post');
 Route::get('/afterPayment', [BookingsController::class, 'createBookingAfterPayment'])->name('bookings.createAfterPayment');
+Route::get('/afterPayment', [BookingsController::class, 'updateBookingAfterPayment'])->name('bookings.updateAfterPayment');
 
 Route::get('/booking-creation-success', function () {
     return view('booking.booking_status');
