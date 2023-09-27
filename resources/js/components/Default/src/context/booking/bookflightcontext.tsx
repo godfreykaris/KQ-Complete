@@ -45,6 +45,7 @@ interface BookingContextType {
   setFlightTableData: React.Dispatch<React.SetStateAction<Flight[]>>;
   selectedFlight: Flight | null;
   setSelectedFlight: React.Dispatch<React.SetStateAction<Flight | null>>;
+ 
 }
 
 // Create the context
@@ -79,8 +80,7 @@ export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) =>
   // Define and initialize flightTableData and selectedFlight
   const [flightTableData, setFlightTableData] = useState<Flight[]>([]);
   const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
-
-  // Provide the state variables in the context value
+    // Provide the state variables in the context value
   return (
     <BookingContext.Provider
       value={{
@@ -89,7 +89,7 @@ export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) =>
         flightTableData,
         setFlightTableData,
         selectedFlight,
-        setSelectedFlight
+        setSelectedFlight,        
       }}
     >
       {children}

@@ -53,7 +53,7 @@ const DeleteFormComponent: React.FC = () => {
       }
       else if (seat_number) 
       {
-        url += `/${seat_number}/${plane_id}`;
+        url += `/retrieve/${seat_number}/${plane_id}`;
       }
       else if (flight_id) 
       {
@@ -88,7 +88,7 @@ const DeleteFormComponent: React.FC = () => {
       }
       else if (seat_number) 
       {
-        setItemName(data.seat.name);
+        setItemName(data.seat.seat_number);
         setItemId(data.seat.id);
       }
       else if(flight_id) 
@@ -128,7 +128,8 @@ const DeleteFormComponent: React.FC = () => {
   const handleDelete = async () => {
     try 
     {
-      
+      setIsLoading(true);
+ 
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
       if (!csrfToken) 
@@ -177,12 +178,18 @@ const DeleteFormComponent: React.FC = () => {
         setResponseStatus(0); // Error
         setResponseMessage(`Error: ${response.statusText}`);
       }
+
+      setIsLoading(false);
+
     } 
     catch (error: any) 
     {
       setResponseStatus(0); // Error
       setResponseMessage(`Error deleting data. An error occurred.`);
       console.error('Error deleting data:', error);
+
+      setIsLoading(false);
+
     }
   };
 

@@ -54,9 +54,8 @@
                
         <div class="success-message">
             @if($success)
-                <h2>Booking Successful!</h2>
-                <p>Your booking has been successfully created.</p>
-                <p>The ticket has been sent to you via email.</p>
+                <h2>Booking Operation Successful!</h2>
+                <p>{{ $success }}</p>
                 <p>Thank you for flying with us!</p>
 
             @elseif($error)

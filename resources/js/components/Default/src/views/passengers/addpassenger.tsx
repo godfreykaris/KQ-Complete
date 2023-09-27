@@ -4,11 +4,12 @@ import MenuBar1 from '../../components/menubars/menubar1';
 import { useNavigate } from 'react-router-dom';
 import LoadingComponent from '../../../../Common/LoadingComponent';
 import apiBaseUrl from '../../../../../config';
+import MenuBar2 from '../../components/menubars/menubar2';
 
 interface Passenger {
   name: string;
-  passport_number: string;
-  identification_number: string;
+  passport_number: number;
+  identification_number: number;
   date_of_birth: string;
   seat_id: number;
 }
@@ -25,7 +26,7 @@ interface Location{
 
 interface Seat{
   id: number | 0;
-  seat_number: number;
+  seat_number: '';
   flight_class: FlightClass;
   location: Location;
   is_available: boolean;
@@ -37,15 +38,15 @@ export default function AddPassenger() {
   const [formData, setFormData] = useState<{
     bookingReference: string;
     ticketNumber: string;
-    passport: string;
-    idNumber: string;
+    passport: number;
+    idNumber: number;
     name: string;
     birthDate: Date | null;
   }>({
     bookingReference: '',
     ticketNumber: '',
-    passport: '',
-    idNumber: '',
+    passport: 0,
+    idNumber: 0,
     name: '',
     birthDate: null,
   });
@@ -76,6 +77,7 @@ export default function AddPassenger() {
 
   useEffect(() => {
        fetchSeats(flightId);
+       
   }, [flightId]);
 
   const fetchSeats = async (flightId: string) => {
@@ -213,8 +215,15 @@ export default function AddPassenger() {
       seat_id: selectedSeat ? selectedSeat.id : 0 ,
     };
     
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
 
-    try {
+    setIsLoading(true);
+
+    try 
+    {
 
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
@@ -245,10 +254,7 @@ export default function AddPassenger() {
           {
             setResponseStatus(1); // Success
             setResponseMessage(`Success: ${data.success}.`);
-            window.scrollTo({
-              top: 0,
-              behavior: 'smooth',
-            });
+            
           } 
           else 
           {
@@ -264,8 +270,11 @@ export default function AddPassenger() {
 
         setIsLoading(false);
 
-    } catch (error) {
+    } 
+    catch (error) 
+    {
       throw new Error("An error occurred during submission");
+      setIsLoading(false);
     }
   }
 
@@ -336,8 +345,13 @@ export default function AddPassenger() {
 
   return (
     <div>
-      <MenuBar1 isAuthenticated={false} />
-      <Container className="d-flex justify-content-center align-items-center" style={{ marginTop: '20vh', marginBottom: '20px', height: '100vh', position: 'relative' }}>
+      <MenuBar1 isAuthenticated={false}/>
+      <br/>
+      <br/>
+      <br/>
+      <MenuBar2/>
+      
+      <Container className="d-flex justify-content-center align-items-center">
       <Container fluid>
       <h2 className="text-primary text-center"><b>Add Passenger|</b></h2>
         <hr />
@@ -395,6 +409,8 @@ export default function AddPassenger() {
 
 
           {passengers.length < 10 ? (
+            <>
+             { !displaySeatTable && (
             <Col md={6} className='mx-auto'>
               <Form onSubmit={handleSubmitPassenger}>
                 <Form.Group>
@@ -413,7 +429,7 @@ export default function AddPassenger() {
                 <Form.Group>
                   <Form.Label>Passport Number:</Form.Label>
                   <Form.Control
-                    type="text"
+                    type="number"
                     id="passport"
                     name="passport"
                     value={formData.passport}
@@ -426,7 +442,7 @@ export default function AddPassenger() {
                 <Form.Group>
                   <Form.Label>Id Number:</Form.Label>
                   <Form.Control
-                    type="text"
+                    type="number"
                     id="idNumber"
                     name="idNumber"
                     value={formData.idNumber}
@@ -477,6 +493,8 @@ export default function AddPassenger() {
 
               </Form>
             </Col>
+             )}
+             </>
           ) : (
             <p className='text-danger'>This Booking is Full</p>
           )}
@@ -485,7 +503,7 @@ export default function AddPassenger() {
 
     {/* Show the success alert when a seat is selected */}
     {selectedSeatNumber && (
-      <Alert variant="success" className="text-center" style={{ marginTop: '90px', marginBottom: '10px'}}>
+      <Alert variant="success" className="text-center" >
         Seat {selectedSeatNumber} has been selected successfully!
       </Alert>
     )}
@@ -496,7 +514,7 @@ export default function AddPassenger() {
       /**Show loading */
       <LoadingComponent />
     ): (((seats.length == 0  && selectedSeatNumber == '') || (seats.length > 0  && selectedSeatNumber == '')) && !displaySeatTable) ? (
-      <Alert variant="error" className="text-center" style={{ marginTop: '90px', marginBottom: '10px'}}>
+      <Alert variant="danger" className="text-center">
         Select a seat for the passenger!
       </Alert>
     ): displaySeatTable && (

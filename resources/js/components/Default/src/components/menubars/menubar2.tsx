@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './menubar2.css';
@@ -21,99 +21,58 @@ const menuItems = [
   {label: 'Print Ticket', link:'/printticket'},
 ];
 
-function useDropdownState() {
-  
+export default function MenuBar2() {
+  const [collapsed, setCollapsed] = useState(true);
   const [dropdownState, setDropdownState] = useState<{ [key: string]: boolean }>({});
 
-  const toggleDropdown = (dropdownName: any) => {
+  const toggleNavbar = () => {
+    setCollapsed(!collapsed);
+  };
 
-    //setDropdownState((prevState) => ({
-    setDropdownState((prevState: any) => ({
+  const toggleDropdown = (dropdownName: string) => {
+    setDropdownState((prevState) => ({
       ...prevState,
       [dropdownName]: !prevState[dropdownName],
     }));
   };
 
-  return { dropdownState, toggleDropdown };
-}
-
-export default function MenuBar2() {
-  const [collapsed, setCollapsed] = useState(true);
-  const toggleNavbar = () => {
-    setCollapsed(!collapsed);
-  };
-
-  const { dropdownState, toggleDropdown } = useDropdownState();
-
-  //listen for any clicks out of the dropdown
-  useEffect(() => {
-    const closeDropdownsOnOutsideClick = (event: Event) => {
-      const clickedElement = event.target as HTMLElement;
-      const dropdowns = document.querySelectorAll('dropdown-menu-custom');
-
-      dropdowns.forEach((dropdown) => {
-        if (!dropdown.contains(clickedElement)) 
-        {
-          // Close the dropdown if it's open
-          toggleDropdown(dropdown.getAttribute('data-link'));
-        }
-      });
-    };
-
-    // Attach the click listener to the Navbar component
-    const navbar = document.querySelector('.navbar');
-
-    if(navbar)
-        navbar.addEventListener('click', closeDropdownsOnOutsideClick);
-
-    // Clean up the event listener on component unmount
-    return () => {
-      if(navbar)
-          navbar.removeEventListener('click', closeDropdownsOnOutsideClick);
-    };
-  }, [toggleDropdown]);
-
   return (
     <Navbar id="myNavBar" collapseOnSelect expand="lg" bg="dark" variant="dark" sticky="top">
       <Container>
         <Navbar.Brand>
-            <h3 className='text-glow'>The Pride of Africa|</h3>
+          <h3 className='text-glow'>The Pride of Africa|</h3>
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" onClick={toggleNavbar} />
         <Navbar.Collapse id="responsive-navbar-nav" className={collapsed ? 'collapse' : ''}>
           <Nav className="mr-auto">
-            {menuItems.map((item , index) => (
-              <React.Fragment key={index}>
+            {menuItems.map((item) => (
+              <React.Fragment key={item.link}>
                 {item.dropdown ? (
                   <NavDropdown
                     title={item.label}
-                    id={`navbarDropdown-${index}`}
+                    id={`navbarDropdown-${item.link}`}
+                    show={!!dropdownState[item.link]}
                     onMouseEnter={() => toggleDropdown(item.link)}
                     onMouseLeave={() => toggleDropdown(item.link)}
-                    show={dropdownState[item.link]}
-                    onClick={() => toggleDropdown(item.link)}
-                    data-link={item.link}
                   >
                     <div className='dropdown-menu-custom'>
-                    {item.items.map((subItem, subIndex) => (
-                      <NavDropdown.Item key={subIndex} as={Link} to={subItem.link} >
-                        {subItem.label}
-                      </NavDropdown.Item>
-                    ))}
+                      {item.items.map((subItem) => (
+                        <NavDropdown.Item key={subItem.link} as={Link} to={subItem.link}>
+                          {subItem.label}
+                        </NavDropdown.Item>
+                      ))}
                     </div>
                   </NavDropdown>
                 ) : (
-
-                  <Nav.Link key={index} as={Link} to={item.link}>
+                  <Nav.Link as={Link} to={item.link}>
                     {item.label}
                   </Nav.Link>
-                  
                 )}
               </React.Fragment>
             ))}
           </Nav>
         </Navbar.Collapse>
-      </Container>      
+      </Container>
     </Navbar>
   );
 }

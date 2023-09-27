@@ -8,7 +8,6 @@ import BookFlight from "./src/views/booking/bookflight";
 import SeatMap from "./src/views/seats/seatmap";
 import AddPassenger from "./src/views/passengers/addpassenger";
 import AddPassenger1 from "./src/views/passengers/addpassenger1";
-import EditPassenger from "./src/views/passengers/editpassenger";
 import Seat from "./src/views/seats/viewseat";
 import DeletePassenger from "./src/views/passengers/deletepassenger";
 import ChangePassenger from "./src/views/passengers/changepassenger";
@@ -33,6 +32,8 @@ import { ContextProvider } from "./src/components/miscallenious/contextprovider"
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import SignInComponent from '../Auth/SignInComponent';
 import SignUpComponent from '../Auth/SignUpComponent';
+import { BookingContextProvider} from './src/context/BookingContext';
+
 import { BookingProvider } from './src/context/booking/bookflightcontext';
 import { EditBookingProvider } from './src/context/booking/editbookingcontext';
 
@@ -48,7 +49,9 @@ const router = [
           <SeatProvider>
               <PassengerProvider>
                 <BookingProvider>
+                  <BookingContextProvider>
                     <BookFlight />
+                  </BookingContextProvider>
                 </BookingProvider>                                  
               </PassengerProvider>             
          </SeatProvider>
@@ -78,9 +81,15 @@ const router = [
       path: 'addpassenger1',
       element: (
           <SeatProvider>
+           <EditBookingProvider>
               <PassengerProvider>
-                  <AddPassenger1/>
+                <BookingProvider>
+                  <BookingContextProvider>
+                    <AddPassenger1/>
+                  </BookingContextProvider>
+                </BookingProvider>
               </PassengerProvider>
+            </EditBookingProvider>
           </SeatProvider>
       )
   },
@@ -100,24 +109,14 @@ const router = [
       showSeatModal={false}
       handleCloseSeatModal={() => {}}
       seatObject={{
-        seat_number: 0,
+        seat_number: '',
         flight_class: { id: 0, name: '' },
         location: { id: 0, name: '' },
         is_available: false,
         price: '',
-        _id: 0,
+        seat_id: 0,
       }}
       />
-  },
-  {
-      path: 'editpassenger',
-      element: (
-          <EditBookingProvider>
-            <SeatProvider>
-              <EditPassenger showEditModal={false} handleResubmission={undefined} passengerDataObject={undefined} handleClose={undefined}/>
-            </SeatProvider>
-          </EditBookingProvider>
-      )
   },
   {
       path: 'deletepassenger',
@@ -126,17 +125,16 @@ const router = [
   {
       path: 'changebooking',
       element: (
-        <EditBookingProvider>
-            <ChangeBooking/>
-        </EditBookingProvider>
-      )
-  },
-  {
-      path: 'editbooking',
-      element: (
-        <EditBookingProvider>
-            <EditBooking showEditModal={undefined} handleResubmission={undefined} bookingDataObject={undefined} handleClose={undefined}/>
-        </EditBookingProvider>
+        <SeatProvider>
+           <EditBookingProvider>
+              <PassengerProvider>
+                  <BookingProvider>
+                      <ChangeBooking/>
+                  </BookingProvider>
+              </PassengerProvider>  
+            </EditBookingProvider>
+           
+         </SeatProvider>
       )
   },
   {

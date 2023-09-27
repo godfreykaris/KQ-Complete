@@ -17,7 +17,7 @@ interface Seat{
   flight_class: FlightClass;
   location: Location;
   is_available: boolean;
-  price: 0;
+  price: string | '0';
 }
 
 interface SeatProps{

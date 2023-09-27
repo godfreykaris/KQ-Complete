@@ -7,6 +7,9 @@ import LoadingComponent from '../Common/LoadingComponent';
 import apiBaseUrl from '../../config';
 import { useNavigate } from 'react-router-dom';
 
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
+
 type PasswordField = "password" | "password_confirmation";
 
 
@@ -46,23 +49,20 @@ const SignUpComponent = () => {
     }
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
+const handlePhoneChange = (phone: string) => {
+  
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      phone: '+' + phone,
+    }));
 
-    if (name === "phone") {
-      // Phone number validation
-      const numericValue = value.replace(/\D/g, ""); // Remove non-numeric characters
-      if(/^\d+$/.test(numericValue) || numericValue === ""){
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          [name]: numericValue,
-        }));
-        setPhoneError("");
-      }else{
-        setPhoneError("The input must be numbers");
-      }
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+    const { name, value } = event.target;
       
-    } else if (name === "email") {
+    if (name === "email") {
       // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       setFormData((prevFormData) => ({
@@ -124,6 +124,22 @@ const SignUpComponent = () => {
         return;
       }
 
+        if (formData.phone.length < 8) 
+        {
+          setIsLoading(false);
+          setResponseStatus(0); // Error
+
+          setResponseMessage('Phone number must be at least 8 digits');
+          return;
+        } 
+        else if (formData.phone.length > 15) 
+        {
+          setIsLoading(false);
+          setResponseStatus(0); // Error
+          setResponseMessage('Phone number cannot exceed 15 digits');
+
+          return;
+        } 
       const response = await fetch(`${apiBaseUrl}/users/register`, {
         method: 'POST',
         headers: {
@@ -218,32 +234,13 @@ const SignUpComponent = () => {
 
           <Form.Group>
             <Form.Label>Phone:</Form.Label>
-            <div className="input-group">
-              <div className="input-group-prepend">
-                <Form.Control
-                  as="select"
-                  id="countryCode"
-                  name="countryCode"
-                  value={formData.countryCode}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="+254">KE (+254)</option>
-                  <option value="+255">TZ (+255)</option>
-                  <option value="+1">USA (+1)</option>
-                </Form.Control>
-              </div>
-              <Form.Control
-                type="tel"
-                id="phone"
-                name="phone"
-                maxLength={9}
+             <PhoneInput
+                country={'ke'}
                 value={formData.phone}
-                onChange={handleChange}
-                required
+                onChange={handlePhoneChange}
+                inputClass="form-control w-100"
               />
-            </div>
-            {phoneError && <p className="text-danger">{phoneError}</p>}
+            
           </Form.Group>
 
           <Form.Group>

@@ -14,6 +14,7 @@ class Booking extends Model
         'email',
         'booking_reference',
         'booking_date',
+        'trip_type',
         
     ];
 
@@ -26,5 +27,11 @@ class Booking extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function flight()
+    {
+        return $this->belongsTo(Flight::class, 'flight_id');
+    }
+
     
 }

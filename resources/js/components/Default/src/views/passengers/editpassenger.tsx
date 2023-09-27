@@ -16,30 +16,30 @@ interface Location{
 }
 
 interface Seat{
-  id: number | 0;
+  seat_id: number | 0;
   seat_number: string;
   flight_class: FlightClass;
   location: Location;
   is_available: boolean;
-  price: 0;
+  price: string;
 }
 
 interface Passenger {
   id: number;
   passenger_id: string;
   name: string;
-  passport_number: string;
-  identification_number: string;
+  passport_number: number;
+  identification_number: number;
   date_of_birth: string;
   seat: Seat;
 }
 
 interface EditPassengerProps {
   showEditModal: boolean; // Specify the type explicitly as boolean
-  handleResubmission: (editedPassenger: Passenger) => void;
+  handleResubmission?: (editedPassenger: Passenger) => void;
   passengerDataObject: Passenger | undefined;
   flightId: string;
-  handleClose: () => void;
+  handleClose?: () => void;
 }
 
 export default function EditPassenger({ showEditModal, handleResubmission, passengerDataObject, handleClose, flightId }: EditPassengerProps) {
@@ -58,11 +58,11 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
     id: 0, // You may need to provide default values for other properties
     passenger_id: '',
     name: '',
-    passport_number: '',
-    identification_number: '',
+    passport_number: 0,
+    identification_number: 0,
     date_of_birth: '',
     seat: {
-      id: 0,
+      seat_id: 0,
       seat_number: '',
       flight_class: {
         id: 0,
@@ -73,7 +73,7 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
         name: '',
       },
       is_available: false,
-      price: 0,
+      price: '',
     },
   });
 
@@ -97,7 +97,7 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
     const selectedSeat = seats[index];
 
     const selectedSeatObject: Seat = {
-      id: selectedSeat.id,
+      seat_id: selectedSeat.seat_id,
       seat_number: selectedSeat.seat_number,
       flight_class: selectedSeat.flight_class,
       location: selectedSeat.location,
@@ -129,7 +129,7 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
           flight_class: selectedSeat.flight_class || "",
           location: selectedSeat.location || "",
           is_available: selectedSeat.is_available || false,
-          price: selectedSeat.price || 0,
+          price: selectedSeat.price || '',
         },
       }));
     }
@@ -141,12 +141,12 @@ export default function EditPassenger({ showEditModal, handleResubmission, passe
       setEditedPassenger({
         ...restData,
         seat: {
-          id: seat.id || 0,
+          seat_id: seat.seat_id || 0,
           seat_number: seat.seat_number || "",
           flight_class: seat.flight_class || "",          
           location: seat.location || "",
           is_available: seat.is_available || false,
-          price: seat.price || 0,
+          price: seat.price || '',
         },
       });
     }
@@ -221,21 +221,11 @@ const getResponseClass = () => {
   //submit form after edit
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    handleResubmission(editedPassenger);
+    if(handleResubmission)
+      handleResubmission(editedPassenger);
   };
 
-  //formating seat price to dollars
-  const formatPriceToDollars = (price: number) => {
-    // Assuming the price is stored as a number, format it as dollars
-    const formattedPrice = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price);
-
-    return formattedPrice;
-  };
-
-
+  
   return (
     <Modal show={showEditModal} onHide={handleClose}>
       <Modal.Header closeButton>
@@ -365,11 +355,11 @@ const getResponseClass = () => {
               <div className="form-group">
                 <label htmlFor="seatPrice">Seat Price: </label>
                 <input
-                  type="text"
+                  type="number"
                   id="seatPrice"
                   className="form-control"
                   name="seat.price"
-                  value={formatPriceToDollars(editedPassenger.seat.price)}
+                  value={editedPassenger.seat.price}
                   onChange={handleChange}
                   readOnly
                   required

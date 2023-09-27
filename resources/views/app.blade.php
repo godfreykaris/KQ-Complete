@@ -8,11 +8,15 @@
         
         <title>KQ</title>
 
+        {{-- <link rel="stylesheet" href="{{ asset('build/assets/index-2f04c6bf.css') }}"> --}}
+        
         @viteReactRefresh
         @vite('resources/js/index.tsx')
+
     </head>
     <body>
         <div id="app"></div>
-        
+
+        {{-- <script src="{{ asset('build/assets/index-6c3ec53c.js') }}"></script> --}}
     </body>
 </html>

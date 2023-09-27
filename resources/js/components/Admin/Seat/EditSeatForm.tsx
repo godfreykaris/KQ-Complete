@@ -93,6 +93,8 @@ const EditSeatForm: React.FC = () => {
 
     try 
     {
+      setIsLoading(true);
+
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
       if (!csrfToken) 
@@ -152,10 +154,15 @@ const EditSeatForm: React.FC = () => {
         setResponseStatus(0); // Error
         setResponseMessage(`Error: ${response.statusText}`);
       }
+
+      setIsLoading(false);
+
     } catch (error) {
       setResponseStatus(0); // Error
       setResponseMessage('Error submitting data: An error occurred');
       console.error('Error submitting data:', error);
+      setIsLoading(false);
+
     }
   };
 

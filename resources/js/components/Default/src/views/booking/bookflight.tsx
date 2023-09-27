@@ -26,7 +26,7 @@ interface location{
 
 interface seat{
   seat_id: number;
-  seat_number: number;
+  seat_number: string;
   flight_class: flight_class | {id: 0, name: ''}; 
   location: location | {id: 0, name: ''};
   is_available: boolean;
@@ -39,7 +39,7 @@ interface passenger{
   identification_number: number;
   date_of_birth: string;
   seat: seat | {
-    seat_number: 0,
+    seat_number: string,
     flight_class: {id: 0, name: ''},
     location: {id: 0, name: ''},
     is_available: false,
@@ -127,7 +127,8 @@ export default function BookFlight() {
 
   //to edit passenger when the edit button is clicked
   const handleEditPassenger = (passenger: passenger, index: number) => {   
-    navigate2('/addpassenger1', {state: {passenger, index, formData, selectedFlight}});
+    const backTo = "bookflight";
+    navigate2('/addpassenger1', {state: {passenger, index, formData, selectedFlight, backTo}});
   };  
 
   // Format date imported from AddPassenger1
@@ -390,12 +391,22 @@ export default function BookFlight() {
      setShowSeatModal(false);
    };
 
+function formatDateToYYYYMMDD(dateTimeString: string) {
+    const originalDate = new Date(dateTimeString);
+    const year = originalDate.getFullYear();
+    const month = String(originalDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(originalDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
    //function to handle flight selection
    const handleFlightSelection = (flight: flight) => {
     if(selectedFlight === null || selectedFlight.id === flight.id){
       setSelectedFlight(flight);
       newFlightId(flight.id);  
-    }else {
+    }
+    else 
+    {
       if(passengers.length > 0){
         const confirmUpdate = window.confirm("Changing the flight will clear seats for all passengers. Do you want to continue");
         if(confirmUpdate){
@@ -406,7 +417,7 @@ export default function BookFlight() {
           const updatedPassengers = passengers.map((passenger) => ({
             ...passenger,
             seat: {
-              seat_number: 0,
+              seat_number: '',
               flight_class: { id: 0, name: '' },
               location: { id: 0, name: '' },
               is_available: false,
@@ -419,7 +430,7 @@ export default function BookFlight() {
           updatedPassengers.forEach((updatedPassenger, index: number) => {
             updatePassenger(index, updatedPassenger);
             updateSeat(index, {
-              seat_number: 0,
+              seat_number: '',
               flight_class: { id: 0, name: '' },
               location: { id: 0, name: '' },
               is_available: false,
@@ -433,6 +444,11 @@ export default function BookFlight() {
         newFlightId(flight.id);
       }
       
+    }
+
+    if(selectedFlight)
+    {
+      setFormData({...formData, departureDate: formatDateToYYYYMMDD(selectedFlight.departure_time), selectedFrom: {id: selectedFlight.departure_city.id, name: selectedFlight.departure_city.name,  country: selectedFlight.departure_city.country}, selectedTo: {id: selectedFlight.arrival_city.id, name: selectedFlight.arrival_city.name, country: selectedFlight.arrival_city.country} });
     }
 
    };
@@ -692,7 +708,7 @@ export default function BookFlight() {
                 showSeatModal={showSeatModal}
                 handleCloseSeatModal={handleCloseSeatModal}
                 seatObject={selectedPassenger ? selectedPassenger.seat : {
-                                                                          seat_number: 0,
+                                                                          seat_number: '',
                                                                           flight_class: { id: 0, name: '' },
                                                                           location: { id: 0, name: '' },
                                                                           is_available: false,
@@ -728,31 +744,32 @@ export default function BookFlight() {
                           </thead>
                           <tbody>
                             {flightTableData.map((item, index) => (
-                              <tr
-                                className={selectedFlight === item ? "selected-row" : ""}
-                                style={{cursor: "pointer"}}
-                                key={index}
-                                onClick={() => handleFlightSelection(item)}
-                              >
-                                <td>{item.flight_status.name}</td>
-                                <td>{item.flight_number}</td>
-                                <td>{item.departure_city.name}</td>
-                                <td>{item.arrival_city.name}</td>
-                                <td>{item.airline.name}</td>
-                                <td>{item.duration}</td>
-                                <td>{item.departure_time}</td>
-                                <td>{item.return_time}</td>
-                                <td>
-                                  <Button                      
-                                    variant="primary"
-                                    type="button"
-                                    disabled={selectedFlight !== item} // Disable if not selected
-                                  >
-                                    Select
-                                  </Button>
-                                </td>
-                              </tr>
-                            ))}
+                                <tr
+                                  className={flight_id == item.id ? "selected-row" : ""}
+                                  style={{cursor: "pointer"}}
+                                  key={index}
+                                  onClick={() => handleFlightSelection(item)}
+                                >
+                                  <td>{item.flight_status.name}</td>
+                                  <td>{item.flight_number}</td>
+                                  <td>{item.departure_city.name}</td>
+                                  <td>{item.arrival_city.name}</td>
+                                  <td>{item.airline.name}</td>
+                                  <td>{item.duration}</td>
+                                  <td>{item.departure_time}</td>
+                                  <td>{item.return_time}</td>
+                                  <td>
+                                    <Button                      
+                                      variant="primary"
+                                      type="button"
+                                      disabled={flight_id != item.id} // Disable if not selected
+                                      active={flight_id == item.id}
+                                    >
+                                      Select
+                                    </Button>
+                                  </td>
+                                </tr>
+                              ))}
                           </tbody>
                         </Table>
                       </div>

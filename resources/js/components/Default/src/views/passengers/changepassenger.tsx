@@ -1,6 +1,5 @@
 import React, { FormEvent, useEffect, useState } from "react";
 import { Container, Form, Button, Table, Modal, Spinner } from "react-bootstrap";
-import EditPassenger from "./editpassenger.js";
 import PassengerSeat from "../seats/viewseat.js";
 import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
@@ -9,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import apiBaseUrl from "../../../../../config.js";
 import LoadingComponent from "../../../../Common/LoadingComponent.js";
 import { useEditBookingContext } from "../../context/booking/editbookingcontext.js";
+import EditPassenger from "./editpassenger";
 
 
 interface FlightClass{
@@ -22,20 +22,20 @@ interface Location{
 }
 
 interface Seat{
-  id: number | 0;
+  seat_id: number | 0;
   seat_number: string;
   flight_class: FlightClass;
   location: Location;
   is_available: boolean;
-  price: 0;
+  price: string;
 }
 
 interface Passenger {
   id: number;
   passenger_id: string;
   name: string;
-  passport_number: string;
-  identification_number: string;
+  passport_number: number;
+  identification_number: number;
   date_of_birth: string;
   seat: Seat;
 }
@@ -313,13 +313,14 @@ const getResponseClass = () => {
       <h2 className="text-primary text-center">Edit Passenger Details|</h2>
         <hr/>
         <Col md={6} className="mx-auto">
-        <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
 
         {isLoading ? (
           <LoadingComponent />
         ) :
         (
           <>
+            <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+
             <Form onSubmit={handleSubmit}>
               <Form.Group>
                 <Form.Label>Booking Reference:</Form.Label>
@@ -413,16 +414,16 @@ const getResponseClass = () => {
         </div>
       </Container>
 
-      {/* EditPassenger Modal */}
+       {/* EditPassenger Modal */}
       
-        <EditPassenger
+       <EditPassenger
           showEditModal={showEditModal} // Pass the correct prop
           handleResubmission={handleResubmission}
           passengerDataObject={passengerData}
           flightId={flightId} // Pass the flightId as a prop
           handleClose={handleCloseEditModal}
         />
-
+      
       {/* Seat Modal */}
       <Modal show={showSeatModal} onHide={handleCloseSeatModal}>
         {passengerSeat ? (
