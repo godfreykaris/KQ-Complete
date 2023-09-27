@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Laravel 10 - Stripe Payment Gateway Integration Tutorial Example - Tutsmake.com</title>
+    <title>KQ | Stripe Payment</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <style type="text/css">
-        
         .container {
             display: flex;
             align-items: center;
@@ -19,7 +20,6 @@
         .panel-title {
             font-weight: bold;
             margin-top: 5px;
-
         }
         /* Style the success and error messages */
         .alert {
@@ -38,7 +38,6 @@
         .panel-body {
             margin-bottom: 20px;
         }
-
         img {
             max-width: 200px;
             height: auto; /* Maintain aspect ratio */
@@ -47,7 +46,6 @@
     </style>
 </head>
 <body>
-  
 <div class="container">
     <div class="row">
         <div class="col-lg-12">
@@ -71,27 +69,23 @@
                             <p>{{ Session::get('success') ?: Session::get('error') }}</p>
                         </div>
                     @endif
-
-                    <form 
-                        role="form" 
-                        action="{{ route('stripe.post') }}" 
-                        method="post" 
+                    <form
+                        role="form"
+                        action="{{ route('stripe.post') }}"
+                        method="post"
                         class="require-validation"
                         data-cc-on-file="false"
                         data-stripe-publishable-key="{{ env('STRIPE_KEY') }}"
                         id="payment-form">
                         @csrf
-
                         <div class='form-group required'>
                             <label class='control-label'>Name on Card</label>
                             <input class='form-control' id='nameOnCard' size='4' type='text' placeholder="John">
                         </div>
-
                         <div class='form-group card required'>
                             <label class='control-label'>Card Number</label>
                             <input autocomplete='off' class='form-control card-number' id='cardNumber' size='20' type='text' placeholder="4242424242424242">
                         </div>
-
                         <div class='form-group'>
                             <div class='row'>
                                 <div class='col-sm-12 col-md-4'>
@@ -108,41 +102,52 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class='row'>
                             <div class='col-md-12 error form-group hide'>
                                 <div class='alert alert-danger'>Please correct the errors and try again.</div>
                             </div>
                         </div>
-
+                        <!-- Add a loading spinner -->
+                        <div id="loading-spinner" class="text-center hide mt-3 mb-3">
+                            <span><b><h4>Loading. Please wait...</h4></b></span>
+                        </div>
+                        <!-- Add an error message element -->
+                        <div id="error-message" class="alert alert-danger hide"></div>
                         <div class="row">
                             <div class="col-sm-12 btn-block">
-                                <button class="btn btn-primary btn-lg" type="submit">Pay Now (${{ Session::get('ticketPrice') }})</button>
+                                <!-- Modify the button to hide it and show the loading spinner when clicked -->
+                                <button id="pay-now-button" class="btn btn-primary btn-lg" type="submit">Pay Now (${{ Session::get('ticketPrice') }})</button>
                             </div>
                         </div>
                     </form>
                 </div>
-            </div>        
+            </div>
         </div>
     </div>
 </div>
-  
-</body>
-  
 <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  
+
 <script type="text/javascript">
 $(function() {
     var $form = $(".require-validation");
-   
+    var $loadingSpinner = $("#loading-spinner");
+    var $errorMessage = $("#error-message");
+    var $payNowButton = $("#pay-now-button");
+
+    // Hide the loading spinner and error message initially
+    $loadingSpinner.addClass("hide");
+    $errorMessage.addClass("hide");
+
     $('form.require-validation').on('submit', function(e) {
+        e.preventDefault();
+
+        // Show the loading spinner and hide the "Pay Now" button
+        $loadingSpinner.removeClass("hide");
+        $payNowButton.addClass("hide");
+
         var $form = $(".require-validation"),
             inputSelector = ['input[type=email]', 'input[type=password]', 'input[type=text]', 'input[type=file]', 'textarea'].join(', '),
-            $inputs = $form.find('.required').find(inputSelector),
-            $errorMessage = $form.find('div.error'),
-            valid = true;
+            $inputs = $form.find('.required').find(inputSelector);
 
         $errorMessage.addClass('hide');
         $('.has-error').removeClass('has-error');
@@ -152,12 +157,10 @@ $(function() {
             if ($input.val() === '') {
                 $input.parent().addClass('has-error');
                 $errorMessage.removeClass('hide');
-                valid = false;
             }
         });
 
-        if (!$form.data('cc-on-file') && valid) {
-            e.preventDefault();
+        if (!$form.data('cc-on-file')) {
             Stripe.setPublishableKey($form.data('stripe-publishable-key'));
             Stripe.createToken({
                 number: $('.card-number').val(),
@@ -170,10 +173,9 @@ $(function() {
 
     function stripeResponseHandler(status, response) {
         if (response.error) {
-            $('.error')
-                .removeClass('hide')
-                .find('.alert')
-                .text(response.error.message);
+            // Hide the loading spinner and show the error message
+            $loadingSpinner.addClass("hide");
+            $errorMessage.removeClass("hide").text(response.error.message);
         } else {
             var token = response['id'];
             $form.find('input[type=text]').empty();
@@ -194,4 +196,5 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 /* ------------------------------------------- */
 </script>
+</body>
 </html>

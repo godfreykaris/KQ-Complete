@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('flight_id')->constrained('flights');
             $table->string('email');
             $table->string('booking_reference');
+            $table->string('trip_type');
             $table->dateTime('booking_date');
             $table->timestamps();
         });

@@ -40,6 +40,32 @@ interface PassengerData {
   passengers: Passenger[];
 }
 
+// Define the interfaces for your data
+interface Status {
+  name: string;
+}
+
+interface Airline {
+  name: string;
+}
+
+interface Locations {
+  name: string;
+  country: string;
+  id: number;
+}
+interface Flight {
+  id: number;
+  flight_status: Status;
+  flight_number: number;
+  departure_city: Locations;
+  arrival_city: Locations;
+  airline: Airline;
+  duration: string;
+  departure_time: string;
+  return_time: string;
+}
+
 interface FlightData {
   flightId: number;
   email: string;
