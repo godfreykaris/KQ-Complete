@@ -45,6 +45,14 @@ export default function SearchFlight() {
 
   const navigate = useNavigate();
 
+  function formatDateToYYYYMMDD(dateTimeString: string) {
+    const originalDate = new Date(dateTimeString);
+    const year = originalDate.getFullYear();
+    const month = String(originalDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(originalDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   // Departure locations and destinations
   useEffect(() => {
     if (formData.departureDate !== "" && formData.selectedFrom.name !== "") {
@@ -191,7 +199,12 @@ export default function SearchFlight() {
       if(confirmUpdate){
         setSelectedFlight(flight);
       }
-    }  
+    }
+    
+    if(selectedFlight)
+    {
+      setFormData({...formData, departureDate: formatDateToYYYYMMDD(selectedFlight.departure_time), selectedFrom: {id: selectedFlight.departure_city.id, name: selectedFlight.departure_city.name,  country: selectedFlight.departure_city.country}, selectedTo: {id: selectedFlight.arrival_city.id, name: selectedFlight.arrival_city.name, country: selectedFlight.arrival_city.country} });
+    }
    };
 
    //----------- Handle submit --------------//

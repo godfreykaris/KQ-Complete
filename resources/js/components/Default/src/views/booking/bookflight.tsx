@@ -138,7 +138,15 @@ export default function BookFlight() {
     const month = String(dateObj.getMonth() + 1).padStart(2, "0");
     const day = String(dateObj.getDate()).padStart(2, "0");
     return `${year}/${month}/${day}`;
-  };  
+  };
+  
+  function formatDateToYYYYMMDD(dateTimeString: string) {
+    const originalDate = new Date(dateTimeString);
+    const year = originalDate.getFullYear();
+    const month = String(originalDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(originalDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
 
   // Handle change
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -434,6 +442,11 @@ export default function BookFlight() {
         newFlightId(flight.id);
       }
       
+    }
+
+    if(selectedFlight)
+    {
+      setFormData({...formData, departureDate: formatDateToYYYYMMDD(selectedFlight.departure_time), selectedFrom: {id: selectedFlight.departure_city.id, name: selectedFlight.departure_city.name,  country: selectedFlight.departure_city.country}, selectedTo: {id: selectedFlight.arrival_city.id, name: selectedFlight.arrival_city.name, country: selectedFlight.arrival_city.country} });
     }
 
    };
