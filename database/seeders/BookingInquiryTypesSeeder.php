@@ -17,7 +17,7 @@ class BookingInquiryTypesSeeder extends Seeder
             ['name' => 'Add Booking'],
             ['name' => 'Change Booking'],
             ['name' => 'Delete Booking'],
-            // ['name' => 'Flight Inquiry'],
+            ['name' => 'Apply Job'],
             // ['name' => 'Refund Inquiry'],
             // ['name' => 'Seat Inquiry'],
             // ['name' => 'Schedule Inquiry'],

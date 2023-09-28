@@ -38,7 +38,7 @@ export default function Dashboard() {
 
               <div className="custom-caption">
               <h3>Relax in Comfort</h3>
-                  <p>Choose your preferred seat and travel in style.</p>
+                  <p>Choose your preferred seat in you flight of choice while booking and travel in style.</p>
                   <Link to="/searchflight">
                     <Button variant="primary">View Seat Options</Button>
                   </Link>
