@@ -91,6 +91,8 @@ export default function BookFlight() {
   // State to manage the seat modal
   const [showSeatModal, setShowSeatModal] = useState(false);
 
+  const [isFetchingFlights, setIsFetchingFlights] = useState(false);
+
   //data from the search flight component
   const location = useLocation();
   const {state} = location;
@@ -351,6 +353,14 @@ export default function BookFlight() {
     <Tooltip id='tooltip'>{message}</Tooltip>
   )
 
+    // Departure locations and destinations
+    useEffect(() => {
+      if(selectedFlight)
+      {
+        setFormData({...formData, departureDate: formatDateToYYYYMMDD(selectedFlight.departure_time), returnDate: formatDateToYYYYMMDD(selectedFlight.return_time), selectedFrom: {id: selectedFlight.departure_city.id, name: selectedFlight.departure_city.name,  country: selectedFlight.departure_city.country}, selectedTo: {id: selectedFlight.arrival_city.id, name: selectedFlight.arrival_city.name, country: selectedFlight.arrival_city.country} });
+      }
+    }, [selectedFlight]);
+
   // Departure locations and destinations
   useEffect(() => {
     if (formData.departureDate !== "" && formData.selectedFrom.name !== "") {
@@ -368,6 +378,7 @@ export default function BookFlight() {
 
   //flight filters
   const fetchFlightsByCity = () => {
+    setIsFetchingFlights(true);
     fetch(`${apiBaseUrl}/flights/byDepartureCityId/${formData.selectedFrom.id}`)
       .then((response) => response.json())
       .then((data: { flights: flight[] }) => {
@@ -377,10 +388,15 @@ export default function BookFlight() {
       .catch((error: any) => {
         setErrorMessage("An error occurred");
         console.log("Error fetching data: ", error);
-      });
+      })
+      .finally(() => {
+        setIsFetchingFlights(false)
+      })
+      ;
   };
 
   const fetchFlightsByDepartureDate = () => {
+    setIsFetchingFlights(true);
     fetch(`${apiBaseUrl}/flights/byDepartureDate/${formData.departureDate}`)    
       .then((response) => response.json())
       .then((data: { flights: flight[] }) => {
@@ -390,10 +406,15 @@ export default function BookFlight() {
       .catch((error: any) => {
         setErrorMessage("An error occurred");
         console.log("Error fetching data: ", error);
-      });
+      })
+      .finally(() => {
+        setIsFetchingFlights(false)
+      })
+      ;
   };
 
   const fetchFlightsByDepartureDateAndCity = () => {
+    setIsFetchingFlights(true);
     fetch(`${apiBaseUrl}/flights/byDepartureDateCity/${formData.departureDate}/${formData.selectedFrom.id}`)
       .then((response) => response.json())
       .then((data: { flights: flight[] }) => {
@@ -403,10 +424,15 @@ export default function BookFlight() {
       .catch((error: any) => {
         setErrorMessage("An error occurred");
         console.log("Error fetching data: ", error);
-      });
+      })
+      .finally(() => {
+        setIsFetchingFlights(false)
+      })
+      ;
   };
 
   const fectchAllFlights = () => {
+    setIsFetchingFlights(true);
     fetch(`${apiBaseUrl}/flights`)
       .then((response) => {
         if (!response.ok) {          
@@ -419,6 +445,9 @@ export default function BookFlight() {
       })
       .catch((_error) => {        
         throw new Error("Error fetching data: ");
+      })
+      .finally(() => {
+        setIsFetchingFlights(false)
       });
   } 
 
@@ -543,8 +572,13 @@ export default function BookFlight() {
         {
           setResponseStatus1(1); // Success
           setResponseMessage1(`Success: ${data.success}`);
-          // Redirect to the Stripe payment page
-          window.location.href = data.redirect;
+
+          if(data.redirect)
+          {
+              // Redirect to the Stripe payment page
+              window.location.href = data.redirect;
+          }
+         
         } 
         else 
         {
@@ -630,7 +664,7 @@ export default function BookFlight() {
 
     if(selectedFlight)
       {
-        setFormData({...formData, departureDate: formatDateToYYYYMMDD(selectedFlight.departure_time), selectedFrom: {id: selectedFlight.departure_city.id, name: selectedFlight.departure_city.name,  country: selectedFlight.departure_city.country}, selectedTo: {id: selectedFlight.arrival_city.id, name: selectedFlight.arrival_city.name, country: selectedFlight.arrival_city.country} });
+        setFormData({...formData, departureDate: formatDateToYYYYMMDD(selectedFlight.departure_time), returnDate: formatDateToYYYYMMDD(selectedFlight.return_time), selectedFrom: {id: selectedFlight.departure_city.id, name: selectedFlight.departure_city.name,  country: selectedFlight.departure_city.country}, selectedTo: {id: selectedFlight.arrival_city.id, name: selectedFlight.arrival_city.name, country: selectedFlight.arrival_city.country} });
       }
 
    };
@@ -744,7 +778,7 @@ export default function BookFlight() {
                 />
               </Form.Group>
 
-              {formData.tripType === "Round" && (
+              {formData.tripType === "Round trip" && (
                 <Form.Group>
                   <Form.Label>Return Date:</Form.Label>
                   <Form.Control
@@ -1022,7 +1056,13 @@ export default function BookFlight() {
                   </Row>
                 </div>
                 ) : (
-                  <Alert variant='warning'>No Flights Available</Alert>
+                  <>
+                  {isFetchingFlights ? (
+                    <LoadingComponent/>
+                  ): (
+                      <Alert variant='warning'>No Flights Available</Alert>
+                  )}
+                </>
                 )}
                 </>
              )}
