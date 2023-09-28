@@ -690,9 +690,9 @@ class BookingsController extends Controller
             $seats = $request->session()->get('seats');
 
            // Ensure that $seats is an array and not empty before proceeding
-           if (!is_array($seats) || !empty($seats)) 
+           if (!is_array($seats) || empty($seats)) 
            {             
-              return view('booking.error')->with('error', 'No seats found.')->with('success', '');;
+              return view('booking.status')->with('error', 'No seats found.')->with('success', '');;
            }
 
             // Create a new booking
@@ -824,7 +824,7 @@ class BookingsController extends Controller
             //return response()->json(['error' => 'An error occurred. ' . $e->getMessage(),  'status' => 0]);
 
             // Return the error response
-            return view('booking.booking_status')->with('error' ,'An error occurred.')->with('success', '');;
+            return view('booking.booking_status')->with('error' ,'An error occurred.' . $e->getMessage())->with('success', '');;
         }    
        
     }

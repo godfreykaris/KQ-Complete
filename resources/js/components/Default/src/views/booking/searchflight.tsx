@@ -107,6 +107,14 @@ useEffect(() => {
   }
 }, [selectedFlight]);
 
+  function formatDateToYYYYMMDD(dateTimeString: string) {
+    const originalDate = new Date(dateTimeString);
+    const year = originalDate.getFullYear();
+    const month = String(originalDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(originalDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   // Departure locations and destinations
   useEffect(() => {
     if (formData.departureDate !== "" && formData.selectedFrom.name !== "") {
@@ -262,16 +270,6 @@ useEffect(() => {
     }));
 
   };
-
-
-
-  function formatDateToYYYYMMDD(dateTimeString: string) {
-    const originalDate = new Date(dateTimeString);
-    const year = originalDate.getFullYear();
-    const month = String(originalDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const day = String(originalDate.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
   
 
   //----------- Handle submit --------------//
