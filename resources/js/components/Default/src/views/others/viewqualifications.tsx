@@ -1,7 +1,17 @@
 import React from "react";
 import { Modal, Button } from "react-bootstrap";
 
-export default function Qualifications({showQualificationsModal, handleCloseModal, Qualifications}) {
+interface qualification{
+  name: string
+}
+
+interface qualificationProp{
+  showQualificationsModal: boolean;
+  handleCloseModal: () => void;
+  Qualifications: qualification[];
+}
+
+const Qualifications: React.FC<qualificationProp> = ({showQualificationsModal, handleCloseModal, Qualifications}) => {
 
 
   return (
@@ -11,14 +21,14 @@ export default function Qualifications({showQualificationsModal, handleCloseModa
       </Modal.Header>
       <Modal.Body>
         {/* Add your seat information here */}
-        {Qualifications > 0 ? (
-            Qualifications.map((item, index) => (
+        {Qualifications.length > 0 ? (
+            Qualifications.map((item: qualification, index: number) => (
                 <div key={index}>
-                    <p>{item}</p>
+                    <p>{item.name}</p>
                 </div>                
             ))
         ) : (
-            <p className="text-danger"><b>No Qualifications information provided. Contact support for further help </b></p>
+            <p className="text-center"><b>No Qualifications information provided. Contact support for further help </b></p>
         )}
       </Modal.Body>
       <Modal.Footer>
@@ -29,3 +39,5 @@ export default function Qualifications({showQualificationsModal, handleCloseModa
     </Modal>
   )
 }
+
+export default Qualifications;

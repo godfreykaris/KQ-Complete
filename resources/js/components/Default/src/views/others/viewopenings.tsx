@@ -5,37 +5,56 @@ import MenuBar2 from "../../components/menubars/menubar2"
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
+import apiBaseUrl from "../../../../../config";
+
 import Skills from "./viewskills";
 import Qualifications from "./viewqualifications.js";
 
+interface skill{
+  name: string
+}
+
+interface qualification{
+  name: string;
+}
+
+
+interface opening{
+  title: string;
+  description: string;
+  skills: skill[];
+  qualifications: qualification[];
+}
+
 
 export default function ViewOpenings() {
+
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const [showSkillsModal, setShowSkillsModal] = useState(false);
   const [showQualificationsModal, setShowQualificationsModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItem, setSelectedItem] = useState<opening | {title: '', description: '', skills: [], qualifications: []}>({title: '', description: '', skills: [], qualifications: []});
 
-  const handleViewSkills = (item) => {
+  const handleViewSkills = (item: opening) => {
     setSelectedItem(item);
     setShowSkillsModal(true);
   };
 
-  const handleViewQualifications = (item) => {
+  const handleViewQualifications = (item: opening) => {
     setSelectedItem(item);
     setShowQualificationsModal(true);
   }
 
   const handleShowInterest = () => {
-    navigate("/applyjob");
+    navigate("/inquiries");
   };
 
   //fetch data as soon as the component renders and store it in the tableData array
   useEffect(() => {
-    const API_URL = "/src/components/testdata/planes.json";
+    const API_URL = `${apiBaseUrl}/openings`;
     const fetchData = () => {
       fetch(API_URL)
         .then((response) => {
@@ -82,9 +101,9 @@ export default function ViewOpenings() {
             <h3 className="text-center">These are the available openings</h3>
             <div className="table-responsive table-container">
               {loading ? (
-                <div className="d-flex align-items-center">
+                <div className="d-flex justify-content-center mt-4">
                   <Spinner animation="border" variant="primary" size="sm" />
-                  <span className="ml-2">Loading...</span>
+                  <span className="text-center">Loading...</span>
                 </div>
               ) : tableData.length === 0 ? (
                 <Alert variant="warning">There are no Openings at the moment</Alert>
@@ -100,7 +119,7 @@ export default function ViewOpenings() {
                     </tr>
                   </thead>
                   <tbody>
-                    {tableData.map((item, index) => (
+                    {tableData.map((item: opening, index: number) => (
                       <tr key={index}>
                         <td>{item.title}</td>
                         <td>{item.description}</td>

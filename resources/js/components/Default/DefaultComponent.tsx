@@ -5,13 +5,11 @@ import { Route, Routes } from 'react-router-dom';
 import Dashboard from '././src/views/others/dashboard';
 import NotFound from "./src/views/others/notfound";
 import BookFlight from "./src/views/booking/bookflight";
-import SeatMap from "./src/views/seats/seatmap";
 import AddPassenger from "./src/views/passengers/addpassenger";
 import AddPassenger1 from "./src/views/passengers/addpassenger1";
 import Seat from "./src/views/seats/viewseat";
 import DeletePassenger from "./src/views/passengers/deletepassenger";
 import ChangePassenger from "./src/views/passengers/changepassenger";
-import EditBooking from "./src/views/booking/editbooking";
 import Deletebooking from "./src/views/booking/deletebooking";
 import ChangeBooking from "./src/views/booking/changebooking";
 import SendInquiry from "./src/views/inquiries/inquiries";
@@ -20,16 +18,12 @@ import SeatProvider from "./src/context/seats/sendseatdata";
 import Footer from "./src/components/homeelements/footer";
 import Cards from "./src/components/homeelements/cards";
 import SearchFlight from "./src/views/booking/searchflight";
-import FlightProvider from "./src/context/flights/flightcontext";
 import About from "./src/views/others/about";
 import ContactUs from "./src/views/others/contact";
 import ViewOpenings from "./src/views/others/viewopenings";
-import DashboardLayout from "./src/components/layouts/dashboardlayout";
 import Skills from "./src/views/others/viewskills";
 import PrintTicket from "./src/views/booking/printticket";
-import { ContextProvider } from "./src/components/miscallenious/contextprovider";
 
-import { Navigate, createBrowserRouter } from "react-router-dom";
 import SignInComponent from '../Auth/SignInComponent';
 import SignUpComponent from '../Auth/SignUpComponent';
 import { BookingContextProvider} from './src/context/BookingContext';
@@ -59,14 +53,6 @@ const router = [
          </SeatProvider>
       )        
     },
-    {
-      path: 'seatmap',
-      element: (
-          <SeatProvider>
-              <SeatMap planeId={undefined} onSeatSelected={undefined}/>
-          </SeatProvider>
-      )
-  },
   {
       path: '/signin',
       element: <SignInComponent/>
@@ -189,7 +175,7 @@ const router = [
   },
   {
       path: 'viewskills',
-      element: <Skills showSkillsModal={undefined} handleCloseModal={undefined} skillsArray={undefined}/>
+      element: <Skills showSkillsModal={false} handleCloseModal={() => {}} skillsArray={[]}/>
   },
   {
       path: 'printticket',

@@ -295,7 +295,7 @@ useEffect(() => {
         return response.json(); // This will automatically parse the JSON response
       })
       .then((data) => {
-        setFlightTableData(data.flights); 
+        setFlightTableData(data.flights);
       })
       .catch((_error) => {        
         throw new Error("Error fetching data: ");
