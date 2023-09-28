@@ -768,48 +768,48 @@ class BookingsController extends Controller
                 "passengers" => $addedPassengers,
             ];
         
-            // // Load the blade template view that is used to organize and style the ticket data
-            // $pdf = FacadePdf::loadView('ticket.pdf_template', $ticketData);
+            // Load the blade template view that is used to organize and style the ticket data
+            $pdf = FacadePdf::loadView('ticket.pdf_template', $ticketData);
                         
-            // // Send an email with the PDF attachment
-            // Mail::send([], [], function (Message $message) use ($pdf, $ticketData) {
-            //     $message->to($ticketData['bookingEmail'])
-            //         ->subject('Your Ticket Information')
-            //         ->html(
-            //             "<html>
-            //                 <head>
-            //                     <style>
-            //                         /* Center-align the content */
-            //                         body {
-            //                             text-align: center;
-            //                         }
-            //                         .container {
-            //                             display: inline-block;
-            //                             text-align: center;
-            //                         }
-            //                     </style>
-            //                 </head>
-            //                 <body>
-            //                     <div class='container'>
-            //                         <h2>Your Ticket Information</h2>
-            //                         <p>Hello,</p>
-            //                         <p>Thank you for booking your ticket with us. Attached is your ticket information.</p>
-            //                         <p><strong>Ticket Number:</strong> {$ticketData['ticketNumber']}</p>
-            //                         <p><strong>Ticket Price:</strong> {$ticketData['ticketPrice']} USD</p>
-            //                         <p><strong>Booking Reference:</strong> {$ticketData['bookingReference']}</p>
-            //                         <p><strong>Flight:</strong> {$ticketData['flight']}</p>
-            //                         <p><strong>Destination:</strong> {$ticketData['destination']}</p>
-            //                         <p><strong>Flight Type:</strong> {$ticketData['flightType']}</p>
-            //                         <p>Thank you for choosing our services!</p>
+            // Send an email with the PDF attachment
+            Mail::send([], [], function (Message $message) use ($pdf, $ticketData) {
+                $message->to($ticketData['bookingEmail'])
+                    ->subject('Your Ticket Information')
+                    ->html(
+                        "<html>
+                            <head>
+                                <style>
+                                    /* Center-align the content */
+                                    body {
+                                        text-align: center;
+                                    }
+                                    .container {
+                                        display: inline-block;
+                                        text-align: center;
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <div class='container'>
+                                    <h2>Your Ticket Information</h2>
+                                    <p>Hello,</p>
+                                    <p>Thank you for booking your ticket with us. Attached is your ticket information.</p>
+                                    <p><strong>Ticket Number:</strong> {$ticketData['ticketNumber']}</p>
+                                    <p><strong>Ticket Price:</strong> {$ticketData['ticketPrice']} USD</p>
+                                    <p><strong>Booking Reference:</strong> {$ticketData['bookingReference']}</p>
+                                    <p><strong>Flight:</strong> {$ticketData['flight']}</p>
+                                    <p><strong>Destination:</strong> {$ticketData['destination']}</p>
+                                    <p><strong>Flight Type:</strong> {$ticketData['flightType']}</p>
+                                    <p>Thank you for choosing our services!</p>
                                     
-            //                     </div>
-            //                 </body>
-            //             </html>"
-            //         )
-            //         ->attachData($pdf->output(), 'ticket.pdf', [
-            //             'mime' => 'application/pdf',
-            //         ]);
-            // });
+                                </div>
+                            </body>
+                        </html>"
+                    )
+                    ->attachData($pdf->output(), 'ticket.pdf', [
+                        'mime' => 'application/pdf',
+                    ]);
+            });
 
 
             return view('booking.booking_status')->with('success', 'Booking created successfully. Ticket data sent to your email.')->with('error', '');

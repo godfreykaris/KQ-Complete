@@ -9,6 +9,7 @@ import apiBaseUrl from "../../../../../config";
 
 import Skills from "./viewskills";
 import Qualifications from "./viewqualifications.js";
+import LoadingComponent from "../../../../Common/LoadingComponent";
 
 interface skill{
   name: string
@@ -101,10 +102,7 @@ export default function ViewOpenings() {
             <h3 className="text-center">These are the available openings</h3>
             <div className="table-responsive table-container">
               {loading ? (
-                <div className="d-flex justify-content-center mt-4">
-                  <Spinner animation="border" variant="primary" size="sm" />
-                  <span className="text-center">Loading...</span>
-                </div>
+                <LoadingComponent/>
               ) : tableData.length === 0 ? (
                 <Alert variant="warning">There are no Openings at the moment</Alert>
               ) : (
