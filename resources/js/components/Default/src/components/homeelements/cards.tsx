@@ -11,7 +11,7 @@ import beijingImage from "../../../public/beijing.jpg";
 import dubaiImage from "../../../public/dubai.jpg";
 import rioImage from "../../../public/rio.jpg";
 import searchGif from "../../../public/search.gif";
-import pamplonaImage from "../../../public/pamplona.avif";
+import pamplonaImage from "../../../public/pamplona.jpg";
 import welcomeGif from "../../../public/welcome.gif";
 
 interface Partner {

@@ -25,44 +25,53 @@
   }
 }
 
-.image-container {
+
+
+/* Dashboard container */
+.dashboard-container {
+  background-color: #f7f7f7; /* Use a light background color for readability */
+  padding: 20px; /* Add some padding for spacing */
+  border-radius: 10px; /* Apply rounded corners for a modern look */
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for depth */
+  transition: transform 0.3s, box-shadow 0.3s; /* Add transition effects */;
+}
+
+/* Dashboard background image */
+.dashboard-background {
+  background-size: cover; /* Cover the entire container with the background image */
+  background-repeat: no-repeat; /* Prevent image repetition */
+  background-position: center center; /* Center the background image */
+  margin-left: 10px;
+  margin-right: 10px;
   border-radius: 8px;
-  overflow: hidden; /* Hide any content that might overflow outside the round container */
-  width: 100%; 
-  height: 100%;
+  height: 100vh; /* Make the container fill the viewport height */
 }
 
-/* Improve readability of text on images */
-.carousel-caption {
-  background-color: rgba(0, 0, 0, 0.6); /* Add a semi-transparent background */
-  color: white; /* Set text color to white */
+.dashboard-container:hover {
+  transform: scale(1.05); /* Scale up the card on hover */
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3); /* Increase shadow on hover */
 }
 
-
-/* Style the buttons in the carousel */
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
-  color: white; /* Icon color */
-  border-radius: 50%; /* Make the buttons round */
-  padding: 8px; /* Add padding to the buttons */
+/* Custom caption style */
+.custom-caption {
+  background-color: rgba(255, 255, 255, 0.8); /* Use a semi-transparent background for captions */
+  padding: 20px; /* Add padding to the captions */
+  border-radius: 5px; /* Apply rounded corners to the captions */
+  text-align: center; /* Center-align text within captions */
+  max-width: 400px; /* Limit the width of captions for readability */
+  margin: 0 auto; /* Center the captions horizontally */
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1); /* Add a subtle shadow to captions */
+  transition: transform 0.3s, box-shadow 0.3s; /* Add transition effects */
+  margin-top: 100px;
 }
 
-/* Adjust the size of the carousel indicators */
-.carousel-indicators li {
-  width: 10px;
-  height: 10px;
-  margin: 0 5px;
-  background-color: rgba(0, 0, 0, 0.6);
-  border-radius: 50%;
+/* Customize caption text styles */
+.custom-caption h3 {
+  font-size: 24px; /* Use a readable font size for headings */
+  margin-bottom: 10px; /* Add spacing between heading and paragraph */
 }
 
-/* Style the active indicator */
-.carousel-indicators .active {
-  background-color: rgb(237, 232, 232);
-}
-
-/* Improve the spacing between carousel and other sections */
-.carousel-section {
-  margin-bottom: 40px; /* Add space at the top of the carousel */
+.custom-caption p {
+  font-size: 16px; /* Use a standard font size for paragraphs */
+  line-height: 1.5; /* Improve text readability with proper line height */
 }

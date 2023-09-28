@@ -212,9 +212,13 @@ const SignInComponent = () => {
 
             <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
 
-            <div className="text-center mt-3">
-              <Link to="/signup">Don't have an account? Sign Up</Link>
+            <div className="text-center mt-3" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <Link to="/signup" style={{ textDecoration: 'none' }}>Don't have an account? Sign Up</Link>
+              <Button variant="primary mt-4">
+                <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>Home</Link>
+              </Button>
             </div>
+
           </Col>
         </Container>
       )}

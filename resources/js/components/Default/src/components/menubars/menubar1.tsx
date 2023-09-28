@@ -3,21 +3,23 @@ import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 
+import useLogout from '../../../../Auth/useLogout';
+
 const menuItems = [
   { label: 'Home', link: '/' },
   { label: 'Contact', link: '/contact' },
   { label: 'About', link: '/about' },
 ];
 
-  export default function MenuBar1({ isAuthenticated }: { isAuthenticated: boolean }) {
+
+export default function MenuBar1({ isAuthenticated }: { isAuthenticated: boolean }) {
+  const handleLogout = useLogout();
+  const accessToken = sessionStorage.getItem('access_token');
   const AuthenticatedMenuBar = () => (
       <div>
         {/* Add any additional menu items for authenticated users */}
         <Nav className="ml-auto">
-        <Nav.Link as={Link} to="/profile">
-          Profile
-        </Nav.Link>
-        <Nav.Link as={Link} to="/logout">
+        <Nav.Link onClick={handleLogout}>
           Logout
         </Nav.Link>
       </Nav>
@@ -54,7 +56,7 @@ const menuItems = [
          ))}
         </Nav>
           {/* Conditionally render the appropriate menu bar */}
-          {isAuthenticated ? <AuthenticatedMenuBar /> : <GuestMenuBar />}
+          {accessToken ? <AuthenticatedMenuBar /> : <GuestMenuBar />}
         </Navbar.Collapse>
       </Container>
     </Navbar>

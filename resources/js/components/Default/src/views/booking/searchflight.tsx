@@ -259,10 +259,9 @@ export default function SearchFlight() {
                 )}
               </Form.Group>
 
-              <Form.Group>
-                <Form.Label>To:</Form.Label>
-                {filteredLocations.length > 0 ? (
-                  <Form.Control
+              <Form.Group>                
+                {(filteredLocations.length > 0) && (
+                  <><Form.Label>To:</Form.Label><Form.Control
                     as="select"
                     value={formData.selectedTo.name}
                     onChange={(e) => handleToChange(e.target.value)}
@@ -274,12 +273,7 @@ export default function SearchFlight() {
                         {option.name}
                       </option>
                     ))}
-                  </Form.Control>
-                ) : (
-                  <div className="d-flex align-items-center">
-                    <Spinner animation="border" variant="primary" size="sm" />
-                    <span className="ml-2">Loading Destinations...</span>
-                  </div>
+                  </Form.Control></>
                 )}
               </Form.Group>
 
