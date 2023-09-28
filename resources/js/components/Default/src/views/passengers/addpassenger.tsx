@@ -254,6 +254,12 @@ export default function AddPassenger() {
           {
             setResponseStatus(1); // Success
             setResponseMessage(`Success: ${data.success}.`);
+
+             if(data.redirect)
+             {
+                 // Redirect to the Stripe payment page
+                 window.location.href = data.redirect;
+             }
             
           } 
           else 

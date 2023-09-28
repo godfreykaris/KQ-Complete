@@ -105,7 +105,9 @@ class PassengersController extends Controller
             }
 
             // The ticket price to update
-            $ticketPrice = $ticket->ticket_price;
+            $previousTicketPrice = $ticket->ticket_price;
+
+            $currentTicketPrice = $previousTicketPrice;
 
             // Create and save the new passengers
             $addedPassengers = [];
@@ -138,40 +140,65 @@ class PassengersController extends Controller
                 }
                 else
                 {
-                    // Add the passenger
-                    $passenger = new Passenger($passengerData);
-                    $passenger->passenger_id = $passenger->generatePassengerId();
-
-                    $existingPassenger = Passenger::where('seat_id', $passenger->seat_id)
-                                                    ->where('passport_number', $passenger->passport_number)
-                                                    ->where('identification_number', $passenger->identification_number)
-                                                    ->first();
-
-                    if($existingPassenger)
-                    {
-                        return response()->json(['error' => 'Passenger Exists', 'status' => 0]);
-                    }
-
-                    $booking->passengers()->save($passenger);
-                    $addedPassengers[] = $passenger->toArray(); // Convert passenger object to an array and store it
-
-                    // Update the seat's availability
-                    $seat->update([
-                'is_available' => false,
-            ]);  
-                    
+                     
                     // Update the ticket price
-                    $ticketPrice += $seat->price;
+                    $currentTicketPrice += $seat->price;
                 }                
                 
             }
 
-            // Update the ticket
-            $ticket->update([
-                'ticket_price' => $ticketPrice,            
-            ]);
 
-            return response()->json(['success' => 'Passenger Added successfully.', 'status' => 1]);
+         if($currentTicketPrice > $previousTicketPrice)
+         {
+            $request->session()->put('ticket', $ticket);
+            $request->session()->put('booking', $booking);
+            $request->session()->put('passengersData',$passengersData);
+
+            // Store the ticket price in the session
+            $request->session()->put('ticketPrice', $currentTicketPrice - $previousTicketPrice);
+            $request->session()->put('currentTicketPrice', $currentTicketPrice);
+
+            $request->session()->put('updating', false);
+            $request->session()->put('booking_process', false);
+ 
+            // Redirect to a specific route after booking creation
+            return response()->json(['redirect' => route('stripe.payment'), 'success' => 'Redirecting to Stripe. Please wait...', 'status' => 1]);  
+         }            
+            
+                
+            // Create and save the new passengers
+          $addedPassengers = [];
+          foreach ($passengersData['passengers'] as $passengerData) 
+          {
+                // Add the passenger
+                $passenger = new Passenger($passengerData);
+                $passenger->passenger_id = $passenger->generatePassengerId();
+
+                $existingPassenger = Passenger::where('seat_id', $passenger->seat_id)
+                                                ->where('passport_number', $passenger->passport_number)
+                                                ->where('identification_number', $passenger->identification_number)
+                                                ->first();
+
+                if($existingPassenger)
+                {
+                    return response()->json(['error' => 'Passenger Exists', 'status' => 0]);
+                }
+            
+                $booking->passengers()->save($passenger);
+                $addedPassengers[] = $passenger->toArray(); // Convert passenger object to an array and store it
+            
+                // Update the seat's availability
+                $seat->update([
+                    'is_available' => false,
+                ]);  
+          }
+
+          // Update the ticket
+          $ticket->update([
+              'ticket_price' => $currentTicketPrice,            
+          ]);
+
+          return response()->json(['success' => 'Passenger Added successfully.', 'status' => 1]);
         }
         catch (\Exception $e) 
         {
@@ -298,6 +325,56 @@ class PassengersController extends Controller
             return response()->json(['error' => 'The ticket associated with this booking is invalid. Booking reference: ' . $bookingReference, 'status' => 0]);
         }
 
+        $previousTicketPrice = $ticket->ticket_price;
+        $currentTicketPrice = $previousTicketPrice;
+
+        // Iterate over the passengers provided in the request
+        foreach ($passengersData['passengers'] as $passengerData) 
+        {
+            // Find the passenger by a unique identifier (e.g., passport number or identification number)
+            $existingPassenger = Passenger::where('passenger_id', $passengerData['passenger_id'])->first();
+
+            $existingPassengerSeat = Seat::where('id', $existingPassenger->seat_id)->first();
+
+            // Update passenger's seat availability
+            $seat = Seat::where('id', $passengerData['seat_id'])->first();
+
+            // Make sure the seat is valid
+            if(!$seat && ($seat->is_available || $seat->id === $existingPassenger->seat_id))
+            {
+                return response()->json(['error' => 'The passenger\'s seat is unavailable.', 'status' => 0]);
+            }
+
+            if (!$existingPassenger) 
+            {
+               return response()->json(['error' => 'The passenger with seat number' .  $seat->seat_number .' was not found.', 'status' => 0]);
+            }
+            
+
+            if($existingPassengerSeat->price < $seat->price)
+            {
+                $currentTicketPrice += $seat->price - $existingPassengerSeat->price;
+            }
+        }
+
+
+        if($currentTicketPrice > $previousTicketPrice)
+        {
+            $request->session()->put('ticket', $ticket);
+            $request->session()->put('passengersData',$passengersData);
+
+            // Store the ticket price in the session
+            $request->session()->put('ticketPrice', $currentTicketPrice - $previousTicketPrice);
+            $request->session()->put('currentTicketPrice', $currentTicketPrice);
+
+ 
+            $request->session()->put('updating', true);
+            $request->session()->put('booking_process', false);
+ 
+            // Redirect to a specific route after booking creation
+            return response()->json(['redirect' => route('stripe.payment'), 'success' => 'Redirecting to Stripe. Please wait...', 'status' => 1]);  
+        }
+        
 
         // Iterate over the passengers provided in the request
         foreach ($passengersData['passengers'] as $passengerData) 
@@ -307,25 +384,20 @@ class PassengersController extends Controller
 
             // Update passenger's seat availability
             $seat = Seat::where('id', $passengerData['seat_id'])->first();
-            // Make sure the seat is valid
-            if(!$seat && ($seat->is_available || $seat->id === $existingPassenger->seat_id))
-            {
-                return response()->json(['error' => 'The passenger\'s seat is unavailable.', 'status' => 0]);
-            }
 
-            if ($existingPassenger) 
-            {
-                // Update the existing passenger's details
-                $existingPassenger->update($passengerData);
-            } 
-            else 
-            {
-                // Passenger doesn't exist, create a new one
-                $passenger = new Passenger($passengerData);
-                $passenger->passenger_id = $passenger->generatePassengerId();
-                $booking->passengers()->save($passenger);
-            }
-        }
+            // Update the seat availability
+            $seat->update([
+               'is_available' => false,
+            ]);
+
+            // Update the existing passenger's details
+            $existingPassenger->update($passengerData);
+        } 
+        
+
+        $ticket->update([
+            'ticket_price' => $currentTicketPrice,            
+        ]);
 
         return response()->json(['success' => 'Passengers updated successfully.', 'status' => 1]);
     } 
@@ -339,5 +411,121 @@ class PassengersController extends Controller
     }
 }
 
+public function updatePassengersAfterPayment(Request $request)
+{
+    try
+    {
+        // Retrieve the booking data from the session
+        $passengersData = $request->session()->get('passengersData');
+
+        $ticket = $request->session()->get('ticket');
+
+        $currentTicketPrice = $request->session()->get('currentTicketPrice');
+
+      
+        // Iterate over the passengers provided in the request
+        foreach ($passengersData['passengers'] as $passengerData) 
+        {
+            // Find the passenger by a unique identifier (e.g., passport number or identification number)
+            $existingPassenger = Passenger::where('passenger_id', $passengerData['passenger_id'])->first();
+        
+            // Update passenger's seat availability
+            $seat = Seat::where('id', $passengerData['seat_id'])->first();
+        
+            // Update the seat availability
+            $seat->update([
+               'is_available' => false,
+            ]);
+        
+            // Update the existing passenger's details
+            $existingPassenger->update($passengerData);
+        } 
+           
+        $ticket->update([
+            'ticket_price' => $currentTicketPrice,            
+        ]);
+
+        return view('booking.booking_status')->with('success', 'Passengers Updated successfully.')->with('error', '');;
+
+
+    }
+    catch (\Exception $e) 
+    {
+        // Log the error
+        Log::error($e->getMessage());
+
+        // For debugging
+        //return response()->json(['error' => 'An error occurred. ' . $e->getMessage(),  'status' => 0]);
+
+        // Return the error response
+        return view('booking.booking_status')->with('error' ,'An error occurred.')->with('success', '');;
+    } 
+
+}
+
+
+public function addPassengersAfterPayment(Request $request)
+{
+    try
+    {
+        // Retrieve the booking data from the session
+        $passengersData = $request->session()->get('passengersData');
+  
+        $ticket = $request->session()->get('ticket');
+  
+        $currentTicketPrice = $request->session()->get('currentTicketPrice');
+
+        $booking =  $request->session()->get('booking');
+
+
+          // Create and save the new passengers
+        $addedPassengers = [];
+        foreach ($passengersData['passengers'] as $passengerData) 
+        {
+              // Add the passenger
+              $passenger = new Passenger($passengerData);
+              $passenger->passenger_id = $passenger->generatePassengerId();
+
+              $existingPassenger = Passenger::where('seat_id', $passenger->seat_id)
+                                              ->where('passport_number', $passenger->passport_number)
+                                              ->where('identification_number', $passenger->identification_number)
+                                              ->first();
+
+              if($existingPassenger)
+              {
+                  return response()->json(['error' => 'Passenger Exists', 'status' => 0]);
+              }
+          
+              $booking->passengers()->save($passenger);
+              $addedPassengers[] = $passenger->toArray(); // Convert passenger object to an array and store it
+              
+              $seat = Seat::where('id',  $passenger->seat_id)->first();
+              // Update the seat's availability
+              $seat->update([
+                  'is_available' => false,
+              ]);  
+        }
+
+        // Update the ticket
+        $ticket->update([
+            'ticket_price' => $currentTicketPrice,            
+        ]);
+
+        return view('booking.booking_status')->with('success', 'Passengers added successfully.')->with('error', '');
+
+    }
+    catch (\Exception $e) 
+    {
+        // Log the error
+        Log::error($e->getMessage());
+
+        // For debugging
+        //return response()->json(['error' => 'An error occurred. ' . $e->getMessage(),  'status' => 0]);
+
+        // Return the error response
+        return view('booking.booking_status')->with('error' ,'An error occurred.' . $e->getMessage())->with('success', '');;
+    }    
+   
+}
 
 }

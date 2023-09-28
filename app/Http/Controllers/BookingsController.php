@@ -401,11 +401,18 @@ class BookingsController extends Controller
                     $ticketPrice += $seat->price;
                 }
 
+                if($bookingData['trip_type'] == 'Round trip')
+                    $ticketPrice *= 2;
+
                 // Store the ticket price in the session
                 $request->session()->put('ticketPrice', $ticketPrice);
+
+                $request->session()->put('updating', false);
+                $request->session()->put('booking_process', true);
+
                 
                 // Redirect to a specific route after booking creation
-                return response()->json(['redirect' => route('stripe.payment')]);   
+                return response()->json(['redirect' => route('stripe.payment'), 'success' => 'Redirecting to Stripe. Please wait...', 'status' => 1]);   
                                 
 
         } 
@@ -415,10 +422,10 @@ class BookingsController extends Controller
             Log::error($e->getMessage());
         
             // For debugging
-            return response()->json(['error' => 'An error occurred. ' . $e->getMessage(), 'status' => 0]);
+            //return response()->json(['error' => 'An error occurred. ' . $e->getMessage(), 'status' => 0]);
 
             // Return the error response
-           // return response()->json(['error' => 'An error occurred. ',  'status' => 0]);
+            return response()->json(['error' => 'An error occurred. ',  'status' => 0]);
         }
     }
 
@@ -435,7 +442,7 @@ class BookingsController extends Controller
 
             if (!$booking) 
             {
-                return response()->json(['error' => 'Booking not found.'], 404);
+                return response()->json(['error' => 'Booking not found.', 'status' => 0]);
             }
 
             // Validate the request data
@@ -491,10 +498,6 @@ class BookingsController extends Controller
    
                     $seats[] = $seat;
 
-                    // Update the seat's availability
-                    $seat->update([
-                        'is_available' => false,
-                    ]); 
                 }
                 else
                 {
@@ -513,6 +516,9 @@ class BookingsController extends Controller
                  $currentTicketPrice  += $seat->price;
              }
 
+             if($bookingData['trip_type'] == 'Round trip')
+                $currentTicketPrice *= 2;
+
              if($currentTicketPrice > $previousTicketPrice)
              {
                  // Store the booking data in the session
@@ -523,9 +529,11 @@ class BookingsController extends Controller
                  $request->session()->put('seats', $seats);
 
                 // Store the ticket price in the session
-                $request->session()->put('ticketPrice', $currentTicketPrice);
+                $request->session()->put('ticketPrice', $currentTicketPrice - $previousTicketPrice);
 
                 $request->session()->put('updating', true);
+                $request->session()->put('booking_process', true);
+
                 
                 // Redirect to a specific route after booking creation
                 return response()->json(['redirect' => route('stripe.payment'), 'success' => 'Redirecting to Stripe. Please wait...', 'status' => 1]); 
@@ -626,13 +634,20 @@ class BookingsController extends Controller
 
             $seats = $request->session()->get('seats');
 
+           // Ensure that $seats is an array and not empty before proceeding
+           if (!is_array($seats) || !empty($seats)) 
+           {             
+              return view('booking.error')->with('error', 'No seats found.')->with('success', '');;
+           }
+
+
             // Retrieve the booking
             $booking = Booking::where('booking_reference', $bookingReference)->first();
 
              //Make sure it is a valid booking
              if (!$booking) 
              {
-                return view('booking.error')->with('error', 'Booking update failed.');
+                return view('booking.error')->with('error', 'Booking update failed.')->with('success', '');;
             }
             // Call the function to update passengers and booking
             $result = $this->updatePassengersAndBooking($booking, $bookingData);
@@ -640,11 +655,11 @@ class BookingsController extends Controller
             // Check if the update was successful (you should define your own success criteria)
             if ($result->getStatusCode() === 200) {
                 // Return a view with a success message
-                return view('booking.booking_status')->with('success', 'Booking updated successfully.');
+                return view('booking.booking_status')->with('success', 'Booking updated successfully.')->with('error', '');;
             } else {
                 // Handle the case where the update was not successful
                 // You can return an error view or redirect to an error page
-                return view('booking.error')->with('error', 'Booking update failed.');
+                return view('booking.error')->with('error', 'Booking update failed.')->with('success', '');;
             }
 
 
@@ -658,7 +673,7 @@ class BookingsController extends Controller
             //return response()->json(['error' => 'An error occurred. ' . $e->getMessage(),  'status' => 0]);
     
             // Return the error response
-            return view('booking.booking_status')->with('error' ,'An error occurred.');
+            return view('booking.booking_status')->with('error' ,'An error occurred.')->with('success', '');;
         } 
 
     }
@@ -671,14 +686,19 @@ class BookingsController extends Controller
         {
             // Retrieve the booking data from the session
             $bookingData = $request->session()->get('bookingData');
-
+       
             $seats = $request->session()->get('seats');
-            
+
+           // Ensure that $seats is an array and not empty before proceeding
+           if (!is_array($seats) || !empty($seats)) 
+           {             
+              return view('booking.error')->with('error', 'No seats found.')->with('success', '');;
+           }
 
             // Create a new booking
             $booking = Booking::create([
                 'flight_id' => $bookingData['flight_id'],
-                'email' => $bookingData['passenger_email'],
+                'email' => $bookingData['email'],
                 'trip_type' => $bookingData['trip_type'],
                 'booking_date' => Carbon::now(), // Use the current date and time as the booking date
                 'booking_reference' => $this->generateBookingReference(),
@@ -716,7 +736,7 @@ class BookingsController extends Controller
             // Get the flight status id
             $flightStatusId = $this->getFlightStatus($booking->flight_id);
             if($flightStatusId == null)
-                return view('booking.booking_status')->with('error' ,'An error occurred when setting the flight status');
+                return view('booking.booking_status')->with('error' ,'An error occurred when setting the flight status')->with('success', '');;
             
             // Get the ticket price
             $ticketPrice = $this->calculateTicketPrice($booking->id);
@@ -792,7 +812,7 @@ class BookingsController extends Controller
             // });
 
 
-            return view('booking.booking_status')->with('success', 'Booking created successfully. Ticket data sent to your email.');
+            return view('booking.booking_status')->with('success', 'Booking created successfully. Ticket data sent to your email.')->with('error', '');
 
         }
         catch (\Exception $e) 
@@ -804,7 +824,7 @@ class BookingsController extends Controller
             //return response()->json(['error' => 'An error occurred. ' . $e->getMessage(),  'status' => 0]);
 
             // Return the error response
-            return view('booking.booking_status')->with('error' ,'An error occurred.');
+            return view('booking.booking_status')->with('error' ,'An error occurred.')->with('success', '');;
         }    
        
     }

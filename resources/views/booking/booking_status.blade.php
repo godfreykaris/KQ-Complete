@@ -53,19 +53,20 @@
     <div class="container mt-30">
                
         <div class="success-message">
-            @if($success)
+            @if($success != '')
                 <h2>Booking Operation Successful!</h2>
                 <p>{{ $success }}</p>
                 <p>Thank you for flying with us!</p>
 
-            @elseif($error)
-                <h2>Booking Failed</h2>
+            @elseif($error != '')
+                <h2>Booking Operation Failed</h2>
                 <p>Sorry, we couldn't process your booking at this time.</p>
                 <div class="alert alert-danger text-center">
                     {{ $error }}
+                    <p>Please contact support.</p>
                 </div>
             @else
-                <h2>Booking Failed</h2>
+                <h2>Booking Operation Failed</h2>
                 <p>Sorry, we couldn't process your booking at this time.</p>
             @endif
         </div>
