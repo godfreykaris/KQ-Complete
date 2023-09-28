@@ -41,13 +41,15 @@ const router = [
       path: "bookflight",
       element: (
           <SeatProvider>
+           <EditBookingProvider>
               <PassengerProvider>
                 <BookingProvider>
                   <BookingContextProvider>
                     <BookFlight />
                   </BookingContextProvider>
                 </BookingProvider>                                  
-              </PassengerProvider>             
+              </PassengerProvider>  
+              </EditBookingProvider>           
          </SeatProvider>
       )        
     },
@@ -82,11 +84,15 @@ const router = [
   {
       path: 'changepassenger',
       element: (
-          <EditBookingProvider>
-            <SeatProvider>
+        <SeatProvider>
+        <EditBookingProvider>
+          <PassengerProvider>
+            <BookingProvider>
               <ChangePassenger/>
-            </SeatProvider>
+              </BookingProvider>
+            </PassengerProvider>
           </EditBookingProvider>
+        </SeatProvider>
       )
   },
   {
@@ -104,6 +110,7 @@ const router = [
       }}
       />
   },
+ 
   {
       path: 'deletepassenger',
       element: <DeletePassenger/>
@@ -142,9 +149,16 @@ const router = [
   {
       path: 'searchflight',
       element: (
+      <EditBookingProvider>
+        <PassengerProvider>  
           <BookingProvider>
-              <SearchFlight/>
+            <BookingContextProvider>
+              <SearchFlight />
+            </BookingContextProvider>
           </BookingProvider>
+        </PassengerProvider>  
+      </EditBookingProvider>
+
       )
   },
   {

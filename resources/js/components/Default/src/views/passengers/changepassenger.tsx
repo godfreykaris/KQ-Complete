@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import apiBaseUrl from "../../../../../config.js";
 import LoadingComponent from "../../../../Common/LoadingComponent.js";
 import { useEditBookingContext } from "../../context/booking/editbookingcontext.js";
-import EditPassenger from "./editpassenger";
+import { PassengerContextType, usePassengerContext } from "../../context/passengers/passengercontext";
 
 
 interface FlightClass{
@@ -31,29 +31,21 @@ interface Seat{
 }
 
 interface Passenger {
-  id: number;
   passenger_id: string;
   name: string;
   passport_number: number;
   identification_number: number;
   date_of_birth: string;
   seat: Seat;
+  seat_id: number;
+  index: number | null;
+
 }
 
-export default function ChangePassenger() {
-  const [formData, setFormData] = useState({
-    bookingReference: "",
-    ticketNumber: ""
-  });
+export default function ChangePassenger() { 
 
-  const {bookingReference, setBookingReference, ticketNumber, setTicketNumber} = useEditBookingContext();
-
-  useEffect(() => {
-    setBookingReference(formData.bookingReference);
-    setTicketNumber(formData.ticketNumber);
-  }, [bookingReference, formData.bookingReference, ticketNumber, formData.ticketNumber]);
-
-  const [passengers, setPassengers] = useState<Passenger[]>([]);
+  const {flight_id, setFlightId, passengers, setPassengers, removePassenger, updatePassenger, newFlightId} = usePassengerContext() as PassengerContextType;
+  const {bookingReference, setBookingReference, ticketNumber, setTicketNumber,isBookingValid, setIsBookingValid} = useEditBookingContext();
 
   const [isLoading, setIsLoading] = useState(false);
   const [refError, setRefError] = useState("");
@@ -62,7 +54,17 @@ export default function ChangePassenger() {
 
   const [responseMessage, setResponseMessage] = useState('');
   const [responseStatus, setResponseStatus] = useState<number | null>(null);
+  const [responseMessage1, setResponseMessage1] = useState("");
+  const [responseStatus1, setResponseStatus1] = useState<number | null>(null);
 
+  const navigate2 = useNavigate();
+
+
+  //to edit passenger when the edit button is clicked
+  const handleEditPassenger = (passenger: Passenger, index: number) => {  
+    const backTo = "changepassenger";
+    navigate2('/addpassenger1', {state: {passenger, index, backTo}});
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -82,10 +84,14 @@ export default function ChangePassenger() {
     if (sanitizedValue.length <= 10) 
     {
         const newValue = `${prefix}${sanitizedValue.slice(4, 11)}`; // Use the first 7 characters
-        setFormData((prevFormData) => ({
-            ...prevFormData,
-            [name]: newValue,
-        }));
+        if (name === "bookingReference") 
+        {
+          setBookingReference(newValue);
+        } 
+        else if (name === "ticketNumber")
+        {
+          setTicketNumber(newValue);
+        }
         setRefError(""); // Clear any previous errors
     } 
     else 
@@ -94,18 +100,13 @@ export default function ChangePassenger() {
     }
 };
 
-const getResponseClass = () => {
-  if (responseStatus === 1) 
-  {
-    return 'text-success'; // Green color for success
-  } 
-  else if (responseStatus === 0) 
-  {
-    return 'text-danger'; // Red color for error
-  } 
-  else 
-  {
-    return ''; // No specific styles (default)
+const getResponseClass = (status: any) => {
+  if (status === 1) {
+    return "text-success"; // Green color for success
+  } else if (status === 0) {
+    return "text-danger"; // Red color for error
+  } else {
+    return ""; // No specific styles (default)
   }
 };
 
@@ -131,7 +132,7 @@ const getResponseClass = () => {
           return;
         }
 
-        const response = await fetch(`${apiBaseUrl}/passengers/get/${formData.bookingReference}/${formData.ticketNumber}`, {
+        const response = await fetch(`${apiBaseUrl}/passengers/get/${bookingReference}/${ticketNumber}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -148,8 +149,43 @@ const getResponseClass = () => {
             setResponseStatus(1); // Success
             setResponseMessage(`Success: ${data.success} You can now edit passengers.`);
 
-            setPassengers(data.passengers);
             setFlightId(data.flightId);
+            setIsBookingValid(true);
+                      
+            const passengersData = data.passengers;
+
+
+            const modifiedPassengers: any[] = [];
+
+            for (const passengerData of passengersData) {
+              const modifiedPassenger = {
+                id:passengerData.id,
+                passenger_id: passengerData.passenger_id,
+                name: passengerData.name,
+                passport_number: passengerData.passport_number,
+                identification_number: passengerData.identification_number,
+                date_of_birth: passengerData.date_of_birth,
+                seat: {
+                  seat_number: passengerData.seat.seat_number,
+                  flight_class: {
+                    id: passengerData.seat.flight_class.id,
+                    name: passengerData.seat.flight_class.name,
+                  },
+                  location: {
+                    id: passengerData.seat.location.id,
+                    name: passengerData.seat.location.name,
+                  },
+                  is_available: passengerData.seat.is_available,
+                  price: passengerData.seat.price,
+                  seat_id: passengerData.seat.id,
+                },
+                index: null,
+              };
+
+              modifiedPassengers.push(modifiedPassenger);
+            }
+
+            setPassengers(modifiedPassengers);
 
           } 
           else 
@@ -184,7 +220,6 @@ const getResponseClass = () => {
   const [showSeatModal, setShowSeatModal] = useState(false);
   const [passengerSeat, setPassengerSeat] = useState<Seat>();
   const [passengerData, setPassengerData] = useState<Passenger>();
-  const [flightId, setFlightId] = useState('');
 
 
   const handleSeat = (passengerSeatData: Seat) => {
@@ -198,49 +233,7 @@ const getResponseClass = () => {
     setShowSeatModal(false);
   };
 
-  //the edit passenger button
-  const [showEditModal, setShowEditModal] = useState(false);
-
-  const handleCloseEditModal = () => {
-    setShowEditModal(false);
-  };
-
-  const handleEdit = (passengerData: Passenger) => {
-    setPassengerData(passengerData);
-    setIsButtonClicked(true);
-    setShowEditModal(true);
-  };
-
-  const handleResubmission = (editedPassenger : Passenger) => {
-    // Find the index of the edited passenger in the passengers array
-    const editedPassengerIndex = passengers.findIndex(
-      (passenger) => passenger.id === editedPassenger.id
-    );
-
-    if (editedPassengerIndex !== -1) {
-      // Update the seat data for the edited passenger only
-      const updatedPassengers = [...passengers]; // Create a copy of the passengers array
-      updatedPassengers[editedPassengerIndex] = {
-        ...editedPassenger, // Copy the existing passenger data
-        seat: {
-          ...updatedPassengers[editedPassengerIndex].seat, // Copy the existing seat data
-          seat_number: editedPassenger.seat.seat_number,
-          flight_class: editedPassenger.seat.flight_class,
-          location: editedPassenger.seat.location,
-          is_available: editedPassenger.seat.is_available,
-          price: editedPassenger.seat.price,
-        },
-      };
-
-      setPassengers(updatedPassengers);
-
-    }
-    
-
-    // Close the modal
-    setShowEditModal(false);
-  };
-
+ 
   const handleSubmitPassengers = async (event: FormEvent) => {
     event.preventDefault();
 
@@ -258,46 +251,63 @@ const getResponseClass = () => {
           navigate('/');
           return;
         }
-      const response = await fetch(`${apiBaseUrl}/passengers/change/${formData.bookingReference}/${formData.ticketNumber}`, {
+
+
+      const response = await fetch(`${apiBaseUrl}/passengers/change/${bookingReference}/${ticketNumber}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': csrfToken,
 
         },
-        body: JSON.stringify({ passengers: passengers }),
+        body: JSON.stringify({ passengers: passengers.map((passenger) => ({
+          passenger_id: passenger.passenger_id || 'empty',
+          name: passenger.name,
+          passport_number: passenger.passport_number || null,
+          identification_number: passenger.identification_number || null,
+          date_of_birth: passenger.date_of_birth,
+          seat_id: passenger.seat.seat_id,
+        })) }),
       });
 
       
       const data = await response.json();
 
-        if (response.ok) 
+      if (response.ok) 
+      {
+        if (data.status) 
         {
-          if (data.status) 
+          setResponseStatus1(1); // Success
+          setResponseMessage1(`Success: ${data.success}`);
+
+          if(data.redirect)
           {
-            setResponseStatus(1); // Success
-            setResponseMessage(`Success: ${data.success}`);
-            window.scrollTo({
-              top: 0,
-              behavior: 'smooth',
-            });
-          } 
-          else 
-          {
-            setResponseStatus(0); // Error
-            setResponseMessage(`Error: ${data.error}`);
+              // Redirect to the Stripe payment page
+              window.location.href = data.redirect;
           }
+         
         } 
         else 
         {
-          setResponseStatus(0); // Error
-          setResponseMessage(`Error: ${response.statusText}`);
+          setResponseStatus1(0); // Error
+          setResponseMessage1(`Error: ${data.error}`);
         }
+      } 
+      else 
+      {
+        setResponseStatus1(0); // Error
+        setResponseMessage1(`Error: ${response.statusText}`);
+      }
 
-        setIsLoading(false);
+      setIsLoading(false);
 
-    } catch (error) {
-      throw new Error("An error occurred during submission");
+    } 
+    catch (error: any) 
+    {
+      setIsLoading(false);
+      setResponseStatus1(0); // Error
+      setResponseMessage1('Error updating passengers.');
+      console.error('Error updating passengers', error);
     }
   }
 
@@ -312,6 +322,8 @@ const getResponseClass = () => {
       <Container fluid>
       <h2 className="text-primary text-center">Edit Passenger Details|</h2>
         <hr/>
+        {!isBookingValid ? (
+          <>
         <Col md={6} className="mx-auto">
 
         {isLoading ? (
@@ -319,7 +331,7 @@ const getResponseClass = () => {
         ) :
         (
           <>
-            <p className={`response-message ${getResponseClass()} text-center`}>{responseMessage}</p>
+            <p className={`response-message ${getResponseClass(responseStatus)} text-center`}>{responseMessage}</p>
 
             <Form onSubmit={handleSubmit}>
               <Form.Group>
@@ -329,7 +341,7 @@ const getResponseClass = () => {
                   id="bookingReference"
                   name="bookingReference"
                   maxLength={12}
-                  value={formData.bookingReference}
+                  value={bookingReference}
                   onChange={handleChange}
                   required
                 />
@@ -345,7 +357,7 @@ const getResponseClass = () => {
                   id="ticketNumber"
                   name="ticketNumber"
                   maxLength={12}
-                  value={formData.ticketNumber}
+                  value={ticketNumber}
                   onChange={handleChange}
                   required
                 />
@@ -356,13 +368,6 @@ const getResponseClass = () => {
                   Retrieve Passengers
                 </Button>
               </div>
-
-              <div className="text-center mt-5">
-                <Button type="button" variant="primary" onClick={ handleSubmitPassengers}>
-                  Save Changes
-                </Button>
-              </div>
-
             </Form>
           </>
         )            
@@ -371,8 +376,22 @@ const getResponseClass = () => {
         </Col>
 
         <br/>
-              
+        </>
+          ) : (   
+        <>
+        <p className={`response-message ${getResponseClass(responseStatus1)} text-center`}>
+             {responseMessage1}
+         </p>
+         <div className='d-flex justify-content-center mb-2'>                
+           <Button type="button" variant="primary" onClick={ handleSubmitPassengers}>
+             {isLoading ? (
+               <Spinner animation='border' size='sm'/>
+             ) : (
+               "Save Changes"
+             )}                    
+           </Button>
 
+         </div>
         {/* display passenger data */}
         <div style={{overflow: "auto"}}>
         {passengers.length > 0 && (
@@ -402,7 +421,7 @@ const getResponseClass = () => {
                     </Button>
                   </td>
                   <td>
-                    <Button onClick={() => handleEdit(passenger)} variant="primary" type="button">
+                    <Button onClick={() => handleEditPassenger(passenger, index)} variant="primary" type="button">
                       Edit
                     </Button>
                   </td>
@@ -412,17 +431,10 @@ const getResponseClass = () => {
           </Table>
         )}
         </div>
+        </>
+        )}
       </Container>
 
-       {/* EditPassenger Modal */}
-      
-       <EditPassenger
-          showEditModal={showEditModal} // Pass the correct prop
-          handleResubmission={handleResubmission}
-          passengerDataObject={passengerData}
-          flightId={flightId} // Pass the flightId as a prop
-          handleClose={handleCloseEditModal}
-        />
       
       {/* Seat Modal */}
       <Modal show={showSeatModal} onHide={handleCloseSeatModal}>

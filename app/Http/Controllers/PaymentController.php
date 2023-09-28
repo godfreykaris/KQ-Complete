@@ -33,12 +33,25 @@ class PaymentController extends Controller
                 "description" => "Test payment from tutsmake.com." 
             ]);
 
-            $updatingBooking = $request->session()->get('updating');
+            $updating = $request->session()->get('updating');
+            $booking = $request->session()->get('booking_process');
 
-            if($updatingBooking)
-                return redirect()->route('bookings.updateAfterPayment')->with('success', 'Payment successful!');
+            if($booking)
+            {
+                if($updating)
+                    return redirect()->route('bookings.updateAfterPayment')->with('success', 'Payment successful!');
+                else
+                    return redirect()->route('bookings.createAfterPayment')->with('success', 'Payment successful!');
+            }
             else
-                return redirect()->route('bookings.createAfterPayment')->with('success', 'Payment successful!');
+            {
+                if($updating)
+                    return redirect()->route('passengers.updateAfterPayment')->with('success', 'Payment successful!');
+                else
+                    return redirect()->route('passengers.createAfterPayment')->with('success', 'Payment successful!');
+            }
+
+            
         }
         catch (\Stripe\Exception\CardException $e) 
         {

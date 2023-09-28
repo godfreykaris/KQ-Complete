@@ -126,12 +126,13 @@ export default function AddPassenger1() {
     if (location.state?.passenger) {
       // Update form fields with the data
       setPageHead("Edit Passenger|");
-      const { name, passport_number, identification_number, date_of_birth, seat_id, seat } = location.state.passenger;
+      const { passenger_id, name, passport_number, identification_number, date_of_birth, seat_id, seat } = location.state.passenger;
       const index = location.state?.index;
 
       // Create a new formData object
     const updatedFormData: Passenger = {
       ...formData,
+      passenger_id,
       name,
       passport_number,
       identification_number,
@@ -159,14 +160,15 @@ export default function AddPassenger1() {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
+      try 
+      {
         const response = await fetch(`${apiBaseUrl}/seats/flight/${flight_id}`);
         if (!response.ok) {
           throw new Error('Network response was not ok.');
         }
         const data = await response.json();
        // Filter out seats that are already assigned to passengers
-      const filteredSeats = data.seats.filter((seat: seat1) => {
+      const filteredSeats:seat1[] = data.seats.filter((seat: seat1) => {
         return !passengers.some((passenger) => passenger.seat?.seat_id === seat.id);
       });
 
@@ -323,7 +325,7 @@ export default function AddPassenger1() {
                 <Form.Group>
                   <Form.Label>Passport Number:</Form.Label>
                   <Form.Control
-                    type="text"
+                    type="number"
                     name="passport_number"
                     value={formData.passport_number}
                     onChange={handleChange}
@@ -336,7 +338,7 @@ export default function AddPassenger1() {
                 <Form.Group>
                   <Form.Label>ID Number:</Form.Label>
                   <Form.Control
-                    type="text"
+                    type="number"
                     name="identification_number"
                     value={formData.identification_number}
                     onChange={handleChange}
