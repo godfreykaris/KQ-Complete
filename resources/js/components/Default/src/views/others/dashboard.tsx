@@ -1,104 +1,56 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Container, Row, Col, Carousel, Button } from "react-bootstrap";
+import { Container, Row, Col, Button } from "react-bootstrap";
 import MenuBar1 from "../../components/menubars/menubar1";
 import MenuBar2 from "../../components/menubars/menubar2";
 import Footer from "../../components/homeelements/footer";
 import Cards from "../../components/homeelements/cards";
 import "./dashboard-image.css";
-
 import "bootstrap/dist/css/bootstrap.min.css";
-import "react-bootstrap-carousel/dist/react-bootstrap-carousel.css";
-
 import hostessImage from "../../../public/hostess.jpg";
-import seatsImage from "../../../public/seats.webp";
-import planeImage from "../../../public/787-8.png";
-import kqImage from "../../../public/KQ-1.png";
+
 
 export default function Dashboard() {
   return (
-    <div className="dashboard-fade-in" style={{ backgroundColor: "-moz-initial" }}>
+    <div className="dashboard-fade-in">
       <MenuBar1 isAuthenticated={false} />
       <hr />
-      <hr />
-      <hr />
-      <MenuBar2 />
-      <hr />
-     <p className="text-center">
-        <b className="text-glow">Enjoy The Greatest Experience With KQ!</b>
-      </p>
-     <Container fluid>
-        <Row>
-          <Col md={12} className="mx-auto">
-            <Carousel fade interval={3000}>
-              <Carousel.Item>
-                <img
-                  className="d-block w-100 image-container carousel-image"
-                  src={hostessImage}
-                  alt="Dashboard Image 1"
-                  
-                />
-                <Carousel.Caption className="carousel-caption">
-                  <h3>Welcome to KQ Airlines</h3>
-                  <p>Enjoy a seamless travel experience with us.</p>
-                  <Link to="/bookflight">
-                    <Button variant="primary" >Book a Flight</Button>
-                  </Link>                  
-                </Carousel.Caption>
-              </Carousel.Item>
-              <Carousel.Item>
-                <img
-                  className="d-block w-100 image-container carousel-image"
-                  src={seatsImage}
-                  alt="Dashboard Image 2"
-                />
-                <Carousel.Caption>
-                  <h3>Relax in Comfort</h3>
+      <br/>
+      <br/>
+      <MenuBar2/>
+      <div
+        className="dashboard-background"
+        style={{
+          backgroundImage: `url(${hostessImage})`,
+          marginTop: '8px',
+        }}
+      >
+        <Container>
+          <Row>
+            <Col md={12} className="mx-auto">
+              <div className="custom-caption">
+                <h3>Welcome to KQ Airlines</h3>
+                <p>Enjoy a seamless travel experience with us.</p>
+                <Link to="/bookflight">
+                  <Button variant="primary">Book a Flight</Button>
+                </Link>
+              </div>
+
+              <div className="custom-caption">
+              <h3>Relax in Comfort</h3>
                   <p>Choose your preferred seat and travel in style.</p>
                   <Link to="/searchflight">
                     <Button variant="primary">View Seat Options</Button>
-                  </Link>                  
-                </Carousel.Caption>
-              </Carousel.Item>
-              <Carousel.Item>
-                <img
-                  className="d-block w-100 image-container carousel-image"
-                  src={planeImage}
-                  alt="Dashboard Image 3"
-                />
-
-                <Carousel.Caption className="carousel-caption">
-                  <h3>Welcome to KQ Airlines</h3>
-                  <p>Enjoy a seamless travel experience with us.</p>
-                  <Link to="/bookflight">
-                    <Button variant="primary" >Book a Flight</Button>
-                  </Link>                  
-                </Carousel.Caption>
-              </Carousel.Item>
-             <Carousel.Item>
-                <img
-                  className="d-block w-100 image-container carousel-image"
-                  src={kqImage}
-                  alt="Dashboard Image 3"
-                />
-                <Carousel.Caption>
-                  <h3>Relax in Comfort</h3>
-                  <p>Choose your preferred seat and travel in style.</p>
-                  <Link to="/searchflight">
-                    <Button variant="primary">View Seat Options</Button>
-                  </Link>                  
-                </Carousel.Caption>
-              </Carousel.Item>
-
-              {/* Add more Carousel.Items with different images as needed */}
-            </Carousel>
-          </Col>
-        </Row>
-      </Container>
-     <hr />
-     <Cards />
-     <hr />
-     <Footer />
+                  </Link>
+              </div>
+            </Col>
+          </Row>
+        </Container>
+      </div>
+      <hr />
+      <Cards />
+      <hr />
+      <Footer />
     </div>
   );
 }

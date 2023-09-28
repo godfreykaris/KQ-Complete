@@ -14,14 +14,14 @@ const useLogout = () => {
       {
         console.error('CSRF token not found.');
 
-        navigate('/signin');
+        navigate('/');
         return;
       }
 
       const accessToken = sessionStorage.getItem('access_token');
       if (!accessToken) {
-        // Redirect to the sign-in page if the accessToken is not set
-        navigate('/signin');
+        // Redirect to the home page if the accessToken is not set
+        navigate('/');
         return;
       }
 
@@ -38,15 +38,15 @@ const useLogout = () => {
       {
         // Logout successful
         sessionStorage.removeItem('access_token');
-        // Redirect to the sign-in page after logout
-        navigate('/signin');
+        // Redirect to the home page after logout
+        navigate('/');
       } 
       else 
       {
         // Logout successful
         sessionStorage.removeItem('access_token');
-        // Redirect to the sign-in page after logout
-        navigate('/signin');
+        // Redirect to the home page after logout
+        navigate('/');
       }
     } 
     catch (error) 
